@@ -87,7 +87,7 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             <SectionHeader title='Montante "A" - Mão-de-obra' total={montanteA} />
                             <LineItem name="1) Salário Base / Piso" value={d.salarioBase} />
                             {d.gratificacoes && d.gratificacoes > 0 && <LineItem name="Gratificações / Função" value={d.gratificacoes} />}
-                            {d.adicionais.copa && d.adicionais.copa > 0 && <LineItem name="Adicional de Copa (Não Gratificação)" value={d.adicionais.copa} />}
+
                             <LineItem name="Adicional Insalubridade" value={d.adicionais.insalubridade} />
                             <LineItem name="Adicional Periculosidade" value={d.adicionais.periculosidade} />
                             <LineItem name="Adicional Noturno (c/ Hora Reduzida)" value={d.adicionais.noturno} />
@@ -112,6 +112,7 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             <LineItem name="3) Cesta Básica / Assiduidade" value={d.beneficios.cestaBasica} />
                             <LineItem name="4) Uniformes / EPIs (Mensal)" value={d.beneficios.uniforme} />
                             {d.beneficios.vaSobreFerias > 0 && <LineItem name="5) Provisão VA nas Férias (1/12)" value={d.beneficios.vaSobreFerias} />}
+                            {d.beneficios.adicionalCopa > 0 && <LineItem name="Adicional de Copa (Fixo/Mês)" value={d.beneficios.adicionalCopa} />}
 
                             {/* Descontos (Values are negative) */}
                             {d.beneficios.descontoVA < 0 && <tr className="border-b border-gray-100 text-sm hover:bg-gray-50 text-red-600">

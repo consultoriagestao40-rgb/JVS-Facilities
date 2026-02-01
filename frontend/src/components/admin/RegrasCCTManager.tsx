@@ -100,6 +100,7 @@ export default function RegrasCCTManager() {
             cestaBasica: cesta,
             uniforme: uniforme,
             vaSobreFerias: vaFerias,
+            adicionalCopa: copa,
             descontoVT: -descontoVT,
             descontoVA: -descontoVA,
             total: totalBen
@@ -157,7 +158,7 @@ export default function RegrasCCTManager() {
                     noturno: 0,
                     intrajornada: 0,
                     dsr: 0,
-                    copa: copa,
+                    // copa moved to benefits
                     total: 0
                 },
                 beneficios: detailBen,
@@ -600,7 +601,7 @@ export default function RegrasCCTManager() {
                                         <input
                                             type="number"
                                             step="0.01"
-                                            value={(currentRegra.configuracoesBeneficios?.descontoVA ?? 0.20) * 100}
+                                            value={Number((currentRegra.configuracoesBeneficios?.descontoVA ?? 0.20) * 100).toFixed(2)}
                                             onChange={e => handleChange('configuracoesBeneficios', 'descontoVA', String(Number(e.target.value) / 100))}
                                             className="w-16 p-1 border rounded text-xs"
                                         />
@@ -621,7 +622,7 @@ export default function RegrasCCTManager() {
                                         <input
                                             type="number"
                                             step="0.01"
-                                            value={(currentRegra.configuracoesBeneficios?.descontoVT ?? 0.06) * 100}
+                                            value={Number((currentRegra.configuracoesBeneficios?.descontoVT ?? 0.06) * 100).toFixed(2)}
                                             onChange={e => handleChange('configuracoesBeneficios', 'descontoVT', String(Number(e.target.value) / 100))}
                                             className="w-16 p-1 border rounded text-xs"
                                         />
@@ -668,7 +669,7 @@ export default function RegrasCCTManager() {
                                         <input
                                             type="number"
                                             step="0.01"
-                                            value={Number(val) * 100} // Display as %
+                                            value={Number((Number(val) * 100).toFixed(4))} // Display as % rounded
                                             onChange={e => handleChange('provisoes', key, String(Number(e.target.value) / 100))}
                                             className="w-full p-2 border rounded"
                                         />
@@ -686,7 +687,7 @@ export default function RegrasCCTManager() {
                                     <input
                                         type="number"
                                         step="0.01"
-                                        value={Number(val) * 100} // Display as %
+                                        value={Number((Number(val) * 100).toFixed(4))} // Display as % rounded
                                         onChange={e => handleChange('aliquotas', key, String(Number(e.target.value) / 100))}
                                         className="w-full p-2 border rounded"
                                     />
