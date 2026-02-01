@@ -35,8 +35,14 @@ const emptyRegra: RegraCCTType = {
         iss: 0.05,
         margemLucro: 0.15
     },
+    custosOperacionais: {
+        examesMedicos: 15.00,
+        uniformeEpis: 30.00
+    },
     adicionais: {
         insalubridade: false,
+        grauInsalubridade: 0.20,
+        baseInsalubridade: 'SALARIO_MINIMO',
         periculosidade: false
     },
     provisoes: {
@@ -247,7 +253,17 @@ export default function RegrasCCTManager() {
         const provRate = Object.values(regra.provisoes || {}).reduce((acc, val) => acc + Number(val), 0);
         const totalProv = (piso + gratificacoes) * provRate;
 
-        return piso + gratificacoes + totalBen + totalEnc + totalProv;
+        // Custos Operacionais
+        const ops = (regra.custosOperacionais?.examesMedicos || 0) + (regra.custosOperacionais?.uniformeEpis || 0);
+
+        // Insalubridade (Estimativa Simples)
+        let insalubridade = 0;
+        if (regra.adicionais.insalubridade) {
+            const base = regra.adicionais.baseInsalubridade === 'SALARIO_MINIMO' ? 1412 : piso;
+            insalubridade = base * (regra.adicionais.grauInsalubridade || 0.20);
+        }
+
+        return piso + gratificacoes + insalubridade + totalBen + totalEnc + totalProv + ops;
     };
 
     const calculateEstimativePrice = (regra: RegraCCTType) => {
@@ -386,12 +402,81 @@ export default function RegrasCCTManager() {
                             <div>
                                 <label className="block text-sm font-medium mb-1">Gratificações (R$)</label>
                                 <input
-                                    type="number"
-                                    value={currentRegra.gratificacoes || ''}
-                                    onChange={e => handleChange(null, 'gratificacoes', e.target.value)}
                                     className="w-full p-2 border rounded"
                                     placeholder="0.00"
                                 />
+                            </div>
+
+                            <hr className="border-gray-200" />
+                            <h4 className="font-bold text-sm text-gray-500 uppercase">Custos Operacionais (Mensal)</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Exames Médicos</label>
+                                    <input
+                                        type="number"
+                                        value={currentRegra.custosOperacionais?.examesMedicos || 0}
+                                        onChange={e => handleChange('custosOperacionais', 'examesMedicos', e.target.value)}
+                                        className="w-full p-2 border rounded"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Uniformes/EPIs</label>
+                                    <input
+                                        type="number"
+                                        value={currentRegra.custosOperacionais?.uniformeEpis || 0}
+                                        onChange={e => handleChange('custosOperacionais', 'uniformeEpis', e.target.value)}
+                                        className="w-full p-2 border rounded"
+                                    />
+                                </div>
+                            </div>
+
+                            <hr className="border-gray-200" />
+                            <h4 className="font-bold text-sm text-gray-500 uppercase">Adicionais</h4>
+                            <div className="space-y-2 bg-yellow-50 p-2 rounded">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={currentRegra.adicionais.insalubridade}
+                                        onChange={e => handleChange('adicionais', 'insalubridade', e.target.checked)}
+                                        id="chkInsalubridade"
+                                    />
+                                    <label htmlFor="chkInsalubridade" className="font-medium">Insalubridade</label>
+                                </div>
+
+                                {currentRegra.adicionais.insalubridade && (
+                                    <div className="ml-6 space-y-2">
+                                        <div className="flex gap-2">
+                                            <div className="w-1/2">
+                                                <label className="text-xs block text-gray-600">Grau (%):</label>
+                                                <select
+                                                    value={currentRegra.adicionais.grauInsalubridade}
+                                                    onChange={e => handleChange('adicionais', 'grauInsalubridade', Number(e.target.value))}
+                                                    className="w-full p-1 border rounded text-sm"
+                                                >
+                                                    <option value={0.10}>10% (Mínimo)</option>
+                                                    <option value={0.20}>20% (Médio)</option>
+                                                    <option value={0.40}>40% (Máximo)</option>
+                                                </select>
+                                            </div>
+                                            <div className="w-1/2">
+                                                <label className="text-xs block text-gray-600">Base:</label>
+                                                <select
+                                                    value={currentRegra.adicionais.baseInsalubridade}
+                                                    onChange={e => {
+                                                        setCurrentRegra(prev => ({
+                                                            ...prev,
+                                                            adicionais: { ...prev.adicionais, baseInsalubridade: e.target.value as any }
+                                                        }))
+                                                    }}
+                                                    className="w-full p-1 border rounded text-sm"
+                                                >
+                                                    <option value="SALARIO_MINIMO">Salário Mínimo</option>
+                                                    <option value="SALARIO_BASE">Piso Salarial</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

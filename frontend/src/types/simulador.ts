@@ -39,7 +39,11 @@ export interface RegraCCT {
         tipoValeRefeicao?: 'DIARIO' | 'MENSAL';
         valeTransporte: number;
         cestaBasica: number;
-        uniforme: number;
+        uniforme: number; // Will serve as monthly uniform cost
+    };
+    custosOperacionais: {
+        examesMedicos: number; // Mensal
+        uniformeEpis: number; // Mensal - if separate from benefits? Or replace. Let's keep distinct.
     };
     aliquotas: {
         inss: number;
@@ -52,6 +56,8 @@ export interface RegraCCT {
     };
     adicionais: {
         insalubridade: boolean;
+        grauInsalubridade: number; // e.g. 0.20, 0.40
+        baseInsalubridade: 'SALARIO_MINIMO' | 'SALARIO_BASE';
         periculosidade: boolean;
     };
     provisoes: {
