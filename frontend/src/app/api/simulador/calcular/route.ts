@@ -165,8 +165,12 @@ function getValores(params?: ParametrosCustos) {
             limpeza: 1590.00,
             seguranca: 2100.00,
             recepcao: 1750.00,
+            recepcao: 1750.00,
             jardinagem: 1800.00
-        }
+        },
+        // Defaults for new structure (merged in getValoresFinais usually, but needed for type inference)
+        CUSTOS_OPS: { examesMedicos: 0, uniformeEpis: 0 },
+        ADICIONAIS_CONFIG: { insalubridade: false, grauInsalubridade: 0.20, baseInsalubridade: 'SALARIO_MINIMO' as const }
     };
 }
 
@@ -423,10 +427,11 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 
     // 6. Insumos & Operacionais
     const custoExames = valores.CUSTOS_OPS?.examesMedicos || 0;
-    const insumos = (config.materiais || 0) + custoExames;
+    const insumos = (config.materiais || 0); // Don't merge anymore
 
     // Subtotal (Custo Operacional Direto)
-    const custoOperacional = remuneracaoTotal + beneficios.total + encargos + totalProvisoes + insumos;
+    // Now include custoExames explicitly
+    const custoOperacional = remuneracaoTotal + beneficios.total + encargos + totalProvisoes + insumos + custoExames;
 
     // 7. Lucro
     const lucro = custoOperacional * valores.ALIQUOTAS.MARGEM_LUCRO;
@@ -458,6 +463,10 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
             decimoTerceiro: provisoesObj.decimoTerceiro,
             rescisao: provisoesObj.rescisao,
             total: totalProvisoes
+        },
+        custosOperacionais: {
+            examesMedicos: custoExames,
+            total: custoExames
         },
         insumos,
         tributos,

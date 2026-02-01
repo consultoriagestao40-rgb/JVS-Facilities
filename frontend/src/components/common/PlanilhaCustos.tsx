@@ -87,11 +87,11 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             <SectionHeader title='Montante "A" - Mão-de-obra' total={montanteA} />
                             <LineItem name="1) Salário Base / Piso" value={d.salarioBase} />
                             {d.gratificacoes && d.gratificacoes > 0 && <LineItem name="Gratificações / Função" value={d.gratificacoes} />}
-                            {d.adicionais.insalubridade > 0 && <LineItem name="Adicional Insalubridade" value={d.adicionais.insalubridade} />}
-                            {d.adicionais.periculosidade > 0 && <LineItem name="Adicional Periculosidade" value={d.adicionais.periculosidade} />}
-                            {d.adicionais.noturno > 0 && <LineItem name="Adicional Noturno (c/ Hora Reduzida)" value={d.adicionais.noturno} />}
-                            {d.adicionais.intrajornada > 0 && <LineItem name="Hora Extra Intrajornada (Indenizada)" value={d.adicionais.intrajornada} />}
-                            {d.adicionais.dsr > 0 && <LineItem name="Reflexo DSR (Sobre Variáveis)" value={d.adicionais.dsr} />}
+                            <LineItem name="Adicional Insalubridade" value={d.adicionais.insalubridade} />
+                            <LineItem name="Adicional Periculosidade" value={d.adicionais.periculosidade} />
+                            <LineItem name="Adicional Noturno (c/ Hora Reduzida)" value={d.adicionais.noturno} />
+                            <LineItem name="Hora Extra Intrajornada (Indenizada)" value={d.adicionais.intrajornada} />
+                            <LineItem name="Reflexo DSR (Sobre Variáveis)" value={d.adicionais.dsr} />
 
                             <tr className="bg-gray-50 font-semibold text-xs text-gray-600"><td colSpan={4} className="px-4 py-1">Encargos & Provisões</td></tr>
                             <LineItem name="2) Encargos Sociais (INSS, FGTS, RAT...)" value={d.encargos} />
@@ -100,8 +100,9 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             <LineItem name="5) Provisão Rescisão" value={d.provisoes.rescisao} />
 
                             {/* MONTANTE B */}
-                            <SectionHeader title='Montante "B" - Insumos' total={montanteB} />
+                            <SectionHeader title='Montante "B" - Insumos & Operacionais' total={montanteB + (d.custosOperacionais?.total || 0)} />
                             <LineItem name="1) Materiais e Equipamentos" value={d.insumos} />
+                            <LineItem name="2) Exames Médicos (PCMSO/ASO)" value={d.custosOperacionais?.examesMedicos || 0} />
 
                             {/* MONTANTE C */}
                             <SectionHeader title='Montante "C" - Benefícios' total={montanteC} />
@@ -124,7 +125,7 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             {/* SUBTOTAL */}
                             <tr className="bg-gray-200 font-bold text-gray-800">
                                 <td colSpan={3} className="px-4 py-2 text-right uppercase text-xs">Total Parcial (A + B + C)</td>
-                                <td className="px-4 py-2 text-right">{formatCurrency(montanteA + montanteB + montanteC)}</td>
+                                <td className="px-4 py-2 text-right">{formatCurrency(montanteA + montanteB + (d.custosOperacionais?.total || 0) + montanteC)}</td>
                             </tr>
 
                             {/* MONTANTE D */}
