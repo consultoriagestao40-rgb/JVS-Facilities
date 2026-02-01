@@ -6,8 +6,8 @@ const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const poppins = Poppins({ weight: ['400', '600', '700'], subsets: ["latin"], variable: '--font-poppins' });
 
 export const metadata: Metadata = {
-    title: "JVSServ - Facilities",
-    description: "Website de alta conversão para Grupo JVSServ",
+    title: "JVS Facilities",
+    description: "Website de alta conversão para JVS Facilities",
 };
 
 import Footer from "@/components/common/Footer";

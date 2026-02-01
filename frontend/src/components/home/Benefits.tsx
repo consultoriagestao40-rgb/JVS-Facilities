@@ -32,7 +32,7 @@ export default function Benefits() {
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-16">
                     <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
-                        Por que escolher a JVSServ?
+                        Por que escolher a JVS Facilities?
                     </h2>
                     <p className="text-lg text-gray-600">
                         Entendemos os desafios da gestão de facilities. Nossa plataforma foi desenhada para resolver seus principais problemas.

@@ -11,7 +11,7 @@ export default function Footer() {
 
                     {/* Brand & Resume */}
                     <div className="col-span-1 md:col-span-1">
-                        <h3 className="text-2xl font-bold text-white mb-4">JVSServ</h3>
+                        <h3 className="text-2xl font-bold text-white mb-4">JVS Facilities</h3>
                         <p className="text-sm text-gray-400 leading-relaxed mb-6">
                             Soluções inteligentes em terceirização de serviços e facilities.
                             Qualidade, transparência e eficiência para sua empresa.
@@ -29,7 +29,7 @@ export default function Footer() {
                         <ul className="space-y-2 text-sm">
                             <li><Link href="/" className="hover:text-primary transition-colors">Início</Link></li>
                             <li><Link href="/#servicos" className="hover:text-primary transition-colors">Nossos Serviços</Link></li>
-                            <li><Link href="/#beneficios" className="hover:text-primary transition-colors">Por que JVSServ</Link></li>
+                            <li><Link href="/#beneficios" className="hover:text-primary transition-colors">Por que JVS Facilities</Link></li>
                             <li><Link href="/simulador" className="hover:text-primary transition-colors">Simulador Online</Link></li>
                         </ul>
                     </div>
@@ -51,22 +51,22 @@ export default function Footer() {
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-start gap-3">
                                 <MapPin className="w-5 h-5 text-primary shrink-0" />
-                                <span>Av. Paulista, 1000 - Bela Vista<br />São Paulo - SP</span>
+                                <span>Av. Maringá, 1273 - Emiliano Perneta<br />Pinhais - PR</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone className="w-5 h-5 text-primary shrink-0" />
-                                <span>(11) 99999-9999</span>
+                                <span>(41) 3505-0020</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Mail className="w-5 h-5 text-primary shrink-0" />
-                                <span className="break-all">contato@jvsserv.com.br</span>
+                                <span className="break-all">comercial@grupojvsserv.com.br</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="border-t border-slate-800 pt-8 mt-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-                    <p>&copy; {new Date().getFullYear()} Grupo JVSServ. Todos os direitos reservados.</p>
+                    <p>&copy; {new Date().getFullYear()} JVS Facilities. Todos os direitos reservados.</p>
                     <div className="flex gap-6 mt-4 md:mt-0">
                         <Link href="#" className="hover:text-white transition-colors">Política de Privacidade</Link>
                         <Link href="#" className="hover:text-white transition-colors">Termos de Uso</Link>

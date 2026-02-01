@@ -46,7 +46,7 @@ export default function SocialProof() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                     >
-                        <h3 className="text-xl font-bold mb-6 text-center text-gray-300">Empresas que confiam na JVSServ</h3>
+                        <h3 className="text-xl font-bold mb-6 text-center text-gray-300">Empresas que confiam na JVS Facilities</h3>
                         {/* Placeholder Grid for Logos */}
                         <div className="grid grid-cols-3 gap-6 opacity-60">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
