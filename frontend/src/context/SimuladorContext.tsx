@@ -10,6 +10,7 @@ type SimuladorContextType = {
     updateUserData: (data: UserData) => void;
     toggleServico: (id: ServicoTipo) => void;
     updateConfiguracao: (config: ConfiguracaoServico) => void;
+    removeConfiguracao: (id: string) => void; // New
     updateParametros: (params: ParametrosCustos) => void;
     updateRegrasCCT: (regras: RegraCCT[]) => void;
 };
@@ -71,17 +72,17 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
 
     const updateConfiguracao = (config: ConfiguracaoServico) => {
         setState(prev => {
-            // Check if config for this service already exists
-            const existingIndex = prev.configuracoes.findIndex(c => c.servicoId === config.servicoId);
+            // Update by Unique ID, or Append if new
+            const existingIndex = prev.configuracoes.findIndex(c => c.id === config.id);
 
             let newConfigs;
             if (existingIndex !== -1) {
-                // UPDATE existing config
+                // UPDATE existing
                 newConfigs = prev.configuracoes.map((c, i) =>
                     i === existingIndex ? config : c
                 );
             } else {
-                // ADD new config
+                // ADD new
                 newConfigs = [...prev.configuracoes, config];
             }
 
@@ -90,6 +91,13 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
                 configuracoes: newConfigs
             };
         });
+    };
+
+    const removeConfiguracao = (id: string) => {
+        setState(prev => ({
+            ...prev,
+            configuracoes: prev.configuracoes.filter(c => c.id !== id)
+        }));
     };
 
     const updateParametros = (params: ParametrosCustos) => {
@@ -114,6 +122,7 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
             updateUserData,
             toggleServico,
             updateConfiguracao,
+            removeConfiguracao, // New
             updateParametros,
             updateRegrasCCT
         }}>

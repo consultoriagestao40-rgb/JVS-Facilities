@@ -15,7 +15,10 @@ export type ServicoSelecionado = {
 };
 
 export type ConfiguracaoServico = {
+    id: string; // Unique ID (UUID)
     servicoId: ServicoTipo;
+    estado: string; // Moved from 'any'
+    cidade: string;
     diasSemana: string[]; // ['seg', 'ter', ...]
     horarioEntrada: string; // '08:00'
     horarioSaida: string; // '17:00'
