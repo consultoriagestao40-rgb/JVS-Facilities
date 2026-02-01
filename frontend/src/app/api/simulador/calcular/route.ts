@@ -122,7 +122,7 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     const salarioBase = getPisoSalarial(config.funcao, valores);
 
     // 2. Adicionais
-    const adicionaisObj = calcularAdicionais(salarioBase, valores, config.adicionais);
+    const adicionaisObj = calcularAdicionais(salarioBase, valores, config);
     const remuneracaoTotal = salarioBase + adicionaisObj.total;
 
     // 3. Beneficios
@@ -159,6 +159,9 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
         adicionais: { // Updated structure
             insalubridade: adicionaisObj.insalubridade,
             periculosidade: adicionaisObj.periculosidade,
+            noturno: adicionaisObj.noturno,
+            intrajornada: adicionaisObj.intrajornada,
+            dsr: adicionaisObj.dsr,
             total: adicionaisObj.total
         },
         beneficios,

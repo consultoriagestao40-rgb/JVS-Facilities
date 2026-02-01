@@ -20,6 +20,7 @@ export type ConfiguracaoServico = {
     horarioEntrada: string; // '08:00'
     horarioSaida: string; // '17:00'
     quantidade: number;
+    intrajornada?: boolean; // New: Suppress break?
 };
 
 
@@ -96,6 +97,9 @@ export interface BreakdownCustos {
     adicionais: {
         insalubridade: number;
         periculosidade: number;
+        noturno: number; // New
+        intrajornada: number; // New
+        dsr: number; // New
         total: number;
     };
     beneficios: number;

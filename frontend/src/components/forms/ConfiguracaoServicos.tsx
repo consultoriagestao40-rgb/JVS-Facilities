@@ -150,6 +150,19 @@ export default function ConfiguracaoServicos() {
                                         />
                                     </div>
                                 </div>
+
+                                <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100 mt-4">
+                                    <input
+                                        type="checkbox"
+                                        id={`intrajornada-${serviceId}`}
+                                        checked={!!config.intrajornada}
+                                        onChange={(e) => handleUpdate(serviceId, 'intrajornada', e.target.checked)}
+                                        className="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300"
+                                    />
+                                    <label htmlFor={`intrajornada-${serviceId}`} className="text-sm text-gray-700 cursor-pointer select-none">
+                                        <strong>Indenizar Intrajornada</strong> (Pagar 1h Extra/dia por supressão de intervalo)
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     )
