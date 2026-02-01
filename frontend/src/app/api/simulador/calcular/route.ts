@@ -122,6 +122,7 @@ function getValores(params?: ParametrosCustos) {
             VALE_TRANSPORTE_DIA: params?.beneficios.valeTransporte ?? 12.00,
             CESTA_BASICA: params?.beneficios.cestaBasica ?? 150.00,
             UNIFORME_MENSAL: params?.beneficios.uniforme ?? 25.00,
+            GRATIFICACOES: 0 // Default
         },
         PISOS: params?.pisosSalariais ?? {
             limpeza: 1590.00,

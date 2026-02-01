@@ -56,9 +56,9 @@ export default function RegrasCCTManager() {
 
     const handleSimulateExtract = () => {
         // Construct a mock ItemResultado based on current rule values
-        // Note: This is an estimation for preview purposes
         const diasMes = 22; // Avg
         const piso = currentRegra.salarioPiso;
+        const gratificacoes = currentRegra.gratificacoes || 0;
 
         // Beneficios
         const ben = currentRegra.beneficios;
@@ -77,6 +77,7 @@ export default function RegrasCCTManager() {
         const uniforme = Number(ben.uniforme);
 
         // Descontos
+        // VT 6% do Piso (não inclui gratificações legalmente, mas depende da CCT. Padrão é salário base)
         const descontoVT = Math.min(piso * configBen.descontoVT, custoVT);
         const descontoVA = custoVR * configBen.descontoVA;
 
@@ -96,66 +97,38 @@ export default function RegrasCCTManager() {
             total: totalBen
         };
 
-        const piso = currentRegra.salarioPiso;
-        const gratificacoes = currentRegra.gratificacoes || 0;
-
-        // ...
-
         // Encargos (INSS + FGTS + RAT)
         const encRate = currentRegra.aliquotas.inss + currentRegra.aliquotas.fgts + currentRegra.aliquotas.rat;
-        // Encargos sobre Piso + Gratificacoes
+        // Encargos incidem sobre TOTAL REMUNERAÇÃO (Piso + Gratificacoes)
         const totalEnc = (piso + gratificacoes) * encRate;
 
         // Provisoes
         const prov = currentRegra.provisoes || { ferias: 0.1111, decimoTerceiro: 0.0833, rescisao: 0.05 };
+        // Provisões também sobre Total Remuneração
         const totalProv = (piso + gratificacoes) * (Number(prov.ferias) + Number(prov.decimoTerceiro) + Number(prov.rescisao));
-        // ... (inside detailProv too)
-
-        const totalOperacional = piso + gratificacoes + totalBen + totalEnc + totalProv;
-
-        // ...
-
-        const mockItem: ItemResultado = {
-            // ...
-            detalhamento: {
-                salarioBase: piso,
-                gratificacoes: gratificacoes,
-                // ...
-            }
-        };
-
-        // ... In Render:
-
-        // Footer Sum:
-        currentRegra.salarioPiso +
-            (currentRegra.gratificacoes || 0) +
-            (Object.values(currentRegra.beneficios)
-                .filter((v): v is number => typeof v === 'number')
-                .reduce((acc, val) => acc + val, 0)) +
-            ((currentRegra.salarioPiso + (currentRegra.gratificacoes || 0)) * (currentRegra.aliquotas.inss + currentRegra.aliquotas.fgts + currentRegra.aliquotas.rat)) +
-            ((currentRegra.salarioPiso + (currentRegra.gratificacoes || 0)) * Object.values(currentRegra.provisoes || {}).reduce((acc, val) => acc + Number(val), 0))
 
         const detailProv = {
-            ferias: piso * Number(prov.ferias),
-            decimoTerceiro: piso * Number(prov.decimoTerceiro),
-            rescisao: piso * Number(prov.rescisao),
+            ferias: (piso + gratificacoes) * Number(prov.ferias),
+            decimoTerceiro: (piso + gratificacoes) * Number(prov.decimoTerceiro),
+            rescisao: (piso + gratificacoes) * Number(prov.rescisao),
             total: totalProv
         };
 
-        const totalOperacional = piso + totalBen + totalEnc + totalProv;
+        const totalOperacional = piso + gratificacoes + totalBen + totalEnc + totalProv;
 
         // Lucro
         const lucro = totalOperacional * currentRegra.aliquotas.margemLucro;
 
-        // Impostos (Gross Up Approximation for Preview)
-        // Rate = (PIS + COFINS + ISS)
+        // Impostos (Gross Up Approximation)
         const taxRate = currentRegra.aliquotas.pis + currentRegra.aliquotas.cofins + currentRegra.aliquotas.iss;
-        const divisor = 1 - (taxRate + currentRegra.aliquotas.margemLucro);
-        // Note: This is a simplified preview. Real calc is complex.
-        // Let's use clean sum for display
-        const impostos = totalOperacional * taxRate; // Estimate
 
-        const totalMensal = totalOperacional + lucro + impostos;
+        // Simple approx for preview: T = Revenue * TaxRate. Revenue = Cost + Profit + Taxes.
+        // Revenue = (Cost + Profit) / (1 - TaxRate)
+        const baseCalculo = totalOperacional + lucro;
+        const receitaBruta = baseCalculo / (1 - taxRate);
+        const impostos = receitaBruta * taxRate;
+
+        const totalMensal = receitaBruta;
 
         const mockItem: ItemResultado = {
             config: {
@@ -169,6 +142,7 @@ export default function RegrasCCTManager() {
             custoTotal: totalMensal,
             detalhamento: {
                 salarioBase: piso,
+                gratificacoes: gratificacoes,
                 adicionais: {
                     insalubridade: 0,
                     periculosidade: 0,
