@@ -175,12 +175,22 @@ export default function RegrasCCTManager() {
         setPreviewItem(mockItem);
     };
 
-    // Sync from context on mount
+    // Sync from API on mount to get latest Mock Data
     useEffect(() => {
-        if (state.regrasCCT) {
-            setRegras(state.regrasCCT);
+        async function loadRegras() {
+            try {
+                const res = await fetch('/api/simulador/regras', { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    setRegras(data);
+                    // Also update context if needed, but local state is priority for Admin
+                }
+            } catch (error) {
+                console.error("Failed to load rules", error);
+            }
         }
-    }, [state.regrasCCT]);
+        loadRegras();
+    }, []);
 
     const handleSave = () => {
         const newRegras = [...regras];
