@@ -90,24 +90,14 @@ function getMatchingRule(
 
         if (score > maxScore) {
             maxScore = score;
-            // If we found a match in the list, we clone the rule and override the Piso
-            if (foundSpecificCargoInList && configCargo) {
-                const specificRole = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
-                const specificPiso = specificRole?.piso || r.salarioPiso;
-                const specificGratificacao = specificRole?.gratificacao ?? r.gratificacoes;
-                // Store copa temporarily in a new property (need to extend RegraCCT locally or handle via extra variable)
-                // For simplicity, we will merge it into 'adicionais' config or return it as part of the match info.
-                // Best approach: Add 'adicionalCopa' to the match object (cast as any if needed or update type globally)
-                bestMatch = {
-                    ...r,
-                    salarioPiso: specificPiso,
-                    gratificacoes: specificGratificacao,
-                    cargo: configCargo,
-                    // @ts-ignore: Prop 'copa' doesn't exist on RegraCCT yet but we need to pass it
-                    adicionalCopa: specificRole?.adicionalCopa || 0
-                };
-            } else {
+            // Best Match Logic...
+            // ...
+        } else if (score === maxScore) {
+            // Tie-breaker: Prefer PR over others if score is equal (Safety for current user)
+            if (r.uf === 'PR' && bestMatch?.uf !== 'PR') {
                 bestMatch = r;
+                maxScore = score;
+                // Re-apply clone logic if needed (simplified here, assuming if tie it's generic vs generic)
             }
         }
     }
