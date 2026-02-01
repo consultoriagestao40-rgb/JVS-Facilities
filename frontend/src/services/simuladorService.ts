@@ -1,6 +1,7 @@
 import { SimuladorState, ResultadoSimulacao } from '../types/simulador';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+// Use relative path by default to work with Next.js Rewrites/API Routes automatically
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 // Backend expects valid payload
 interface BackendConfigPayload {
