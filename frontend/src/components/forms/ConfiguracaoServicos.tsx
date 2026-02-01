@@ -276,47 +276,7 @@ export default function ConfiguracaoServicos() {
                                     </label>
                                 </div>
 
-                                {/* Cargo Específico Selector */}
-                                {/* Only show if there are rules available for this Service Type */}
-                                {(() => {
-                                    // 1. Filter Rules for this Service Type + Current User State (City/State)
-                                    // Note: We need to access state.userData to filter by location if we want to be precise,
-                                    // but for now let's just show all distinct cargos for this Service Function.
-
-                                    const relevantRules = state.regrasCCT?.filter(r =>
-                                        r.funcao === serviceId &&
-                                        r.cargo && // Must have a cargo defined
-                                        // Optional: Filter by State if UserData has it
-                                        (!state.userData.empresa || true)
-                                    ) || [];
-
-                                    // Deduplicate Cargos
-                                    const uniqueCargos = Array.from(new Set(relevantRules.map(r => r.cargo)));
-
-                                    if (uniqueCargos.length > 0) {
-                                        return (
-                                            <div className="space-y-3 pt-4 border-t border-gray-100">
-                                                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                                                    <Users size={18} /> Função Específica / Cargo
-                                                </label>
-                                                <select
-                                                    value={config.cargo || ''}
-                                                    onChange={(e) => handleUpdate(serviceId, 'cargo', e.target.value)}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none bg-white"
-                                                >
-                                                    <option value="">Padrão (Genérico)</option>
-                                                    {uniqueCargos.map((cargo, idx) => (
-                                                        <option key={idx} value={cargo as string}>{cargo}</option>
-                                                    ))}
-                                                </select>
-                                                <p className="text-xs text-gray-500">
-                                                    Selecione a função exata para aplicar a regra salarial correta.
-                                                </p>
-                                            </div>
-                                        );
-                                    }
-                                    return null;
-                                })()}
+                                { /* Legacy Cargo Selector Removed */}
                             </div>
                         </div>
                     )

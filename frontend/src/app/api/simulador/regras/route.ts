@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { RegraCCT } from '@/types/simulador';
 
+export const dynamic = 'force-dynamic';
+
 const MOCK_DEFAULTS = {
     aliquotas: { inss: 0.20, fgts: 0.08, rat: 0.02, pis: 0.0165, cofins: 0.076, iss: 0.05, margemLucro: 0.15 },
     custosOperacionais: { examesMedicos: 15, uniformeEpis: 30 },
