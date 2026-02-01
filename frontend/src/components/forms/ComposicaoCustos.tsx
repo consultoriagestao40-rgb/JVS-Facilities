@@ -39,11 +39,7 @@ export default function ComposicaoCustos() {
             const updatedConfig = {
                 ...config,
                 materiais: materiaisValue,
-                // Store copa as a boolean flag or as a number
-                // Since backend expects adicionalCopa as number, we need to get it from rules
-                // For now, just mark it as a flag - backend will calculate based on rules
-                adicionalCopa: undefined, // Copa value comes from CCT rules, not user input
-                // Store adicionais flags (will be used by backend to enable calculations)
+                // adicionalCopa preserved from ...config
                 insalubridade: data.insalubridade,
                 periculosidade: data.periculosidade,
                 copa: data.copa // Boolean flag to enable copa calculation
