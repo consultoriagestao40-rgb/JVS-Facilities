@@ -3,7 +3,9 @@
 import { useSimulador } from '@/context/SimuladorContext';
 import { RegraCCT, RegraCCT as RegraCCTType } from '@/types/simulador';
 import { useState, useEffect } from 'react';
-import { Plus, Trash, Edit, Save, X, Search } from 'lucide-react';
+import { Plus, Trash, Edit, Save, X, Search, FileText } from 'lucide-react';
+import PlanilhaCustos from '@/components/common/PlanilhaCustos';
+import { ItemResultado, BreakdownCustos } from '@/types/simulador';
 
 const emptyRegra: RegraCCTType = {
     id: '',
@@ -44,6 +46,86 @@ export default function RegrasCCTManager() {
     const [isEditing, setIsEditing] = useState(false);
     const [currentRegra, setCurrentRegra] = useState<RegraCCTType>(emptyRegra);
     const [searchTerm, setSearchTerm] = useState('');
+    const [previewItem, setPreviewItem] = useState<ItemResultado | null>(null);
+
+    const handleSimulateExtract = () => {
+        // Construct a mock ItemResultado based on current rule values
+        // Note: This is an estimation for preview purposes
+        const diasMes = 22; // Avg
+        const piso = currentRegra.salarioPiso;
+
+        // Beneficios
+        const ben = currentRegra.beneficios;
+        const totalBen = Number(ben.valeRefeicao) * diasMes + Number(ben.valeTransporte) * diasMes + Number(ben.cestaBasica) + Number(ben.uniforme);
+        const detailBen = {
+            valeRefeicao: Number(ben.valeRefeicao) * diasMes,
+            valeTransporte: Number(ben.valeTransporte) * diasMes,
+            cestaBasica: Number(ben.cestaBasica),
+            uniforme: Number(ben.uniforme),
+            total: totalBen
+        };
+
+        // Encargos (INSS + FGTS + RAT)
+        const encRate = currentRegra.aliquotas.inss + currentRegra.aliquotas.fgts + currentRegra.aliquotas.rat;
+        const totalEnc = piso * encRate;
+
+        // Provisoes
+        const prov = currentRegra.provisoes || { ferias: 0.1111, decimoTerceiro: 0.0833, rescisao: 0.05 };
+        const totalProv = piso * (Number(prov.ferias) + Number(prov.decimoTerceiro) + Number(prov.rescisao));
+        const detailProv = {
+            ferias: piso * Number(prov.ferias),
+            decimoTerceiro: piso * Number(prov.decimoTerceiro),
+            rescisao: piso * Number(prov.rescisao),
+            total: totalProv
+        };
+
+        const totalOperacional = piso + totalBen + totalEnc + totalProv;
+
+        // Lucro
+        const lucro = totalOperacional * currentRegra.aliquotas.margemLucro;
+
+        // Impostos (Gross Up Approximation for Preview)
+        // Rate = (PIS + COFINS + ISS)
+        const taxRate = currentRegra.aliquotas.pis + currentRegra.aliquotas.cofins + currentRegra.aliquotas.iss;
+        const divisor = 1 - (taxRate + currentRegra.aliquotas.margemLucro);
+        // Note: This is a simplified preview. Real calc is complex.
+        // Let's use clean sum for display
+        const impostos = totalOperacional * taxRate; // Estimate
+
+        const totalMensal = totalOperacional + lucro + impostos;
+
+        const mockItem: ItemResultado = {
+            config: {
+                funcao: currentRegra.funcao,
+                quantidade: 1,
+                horarioEntrada: '08:00',
+                horarioSaida: '17:00',
+                dias: ['Preview']
+            },
+            custoUnitario: totalMensal,
+            custoTotal: totalMensal,
+            detalhamento: {
+                salarioBase: piso,
+                adicionais: {
+                    insalubridade: 0,
+                    periculosidade: 0,
+                    noturno: 0,
+                    intrajornada: 0,
+                    dsr: 0,
+                    total: 0
+                },
+                beneficios: detailBen,
+                encargos: totalEnc,
+                provisoes: detailProv,
+                insumos: 0,
+                tributos: impostos,
+                lucro: lucro,
+                totalMensal: totalMensal
+            }
+        };
+
+        setPreviewItem(mockItem);
+    };
 
     // Sync from context on mount
     useEffect(() => {
@@ -311,14 +393,27 @@ export default function RegrasCCTManager() {
                             </span>
                         </div>
                         <div>
-                            <span className="block font-bold uppercase text-xs opacity-70">Total Alíquotas</span>
+                            <span className="block font-bold uppercase text-xs opacity-70">Custo Base Estimado (Colaborador)</span>
                             <span className="text-lg font-bold">
-                                {(Object.values(currentRegra.aliquotas).reduce((acc, val) => acc + Number(val), 0) * 100).toFixed(2)}%
+                                {/* Piso + Beneficios + Encargos (29.68%) + Provisões */}
+                                R$ {(
+                                    currentRegra.salarioPiso +
+                                    Object.values(currentRegra.beneficios).reduce((acc, val) => acc + Number(val), 0) +
+                                    (currentRegra.salarioPiso * (currentRegra.aliquotas.inss + currentRegra.aliquotas.fgts + currentRegra.aliquotas.rat)) +
+                                    (currentRegra.salarioPiso * Object.values(currentRegra.provisoes || {}).reduce((acc, val) => acc + Number(val), 0))
+                                ).toFixed(2)}
                             </span>
                         </div>
                     </div>
 
                     <div className="mt-8 flex justify-end gap-4 border-t pt-6">
+                        <button
+                            onClick={handleSimulateExtract}
+                            className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-bold flex items-center gap-2"
+                        >
+                            <FileText className="w-5 h-5" />
+                            Simular Extrato
+                        </button>
                         <button onClick={() => setIsEditing(false)} className="px-6 py-2 text-gray-600 hover:text-gray-900 font-medium">Cancelar</button>
                         <button onClick={handleSave} className="px-8 py-2 bg-primary text-white rounded-lg hover:bg-green-600 font-bold flex items-center gap-2">
                             <Save className="w-5 h-5" />
@@ -327,6 +422,7 @@ export default function RegrasCCTManager() {
                     </div>
                 </div>
             )}
+            {previewItem && <PlanilhaCustos item={previewItem} onClose={() => setPreviewItem(null)} />}
         </div>
     );
 }
