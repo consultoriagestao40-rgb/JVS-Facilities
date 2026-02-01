@@ -12,6 +12,7 @@ interface BackendConfigPayload {
     horarioSaida: string;
     quantidade: number;
     materiais?: number;
+    adicionalCopa?: number;
     adicionais?: {
         insalubridade?: boolean;
         periculosidade?: boolean;
@@ -439,10 +440,15 @@ function calcularProvisoes(remuneracao: number, valores: any): DetailedBreakdown
 }
 
 function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
+    const Materials = config.materiais || 0;
+
     // 1. Base e Gratificações
     const salarioBase = getPisoSalarial(config.funcao, valores);
     const gratificacoes = valores.VALORES_BASE.GRATIFICACOES || 0;
-    const adicionalCopa = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
+    // Merge Manual + Rule Copa
+    const adicionalCopaRule = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
+    const adicionalCopaManual = config.adicionalCopa || 0;
+    const adicionalCopa = adicionalCopaRule + adicionalCopaManual; // Additive
 
     // 2. Adicionais
     const adicionaisObj = calcularAdicionais(salarioBase, valores, config); // Adicionais calculados sobre Salário Base geralmente
@@ -476,15 +482,18 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     // Preço de Venda = (Custo + Lucro) / (1 - TaxaImpostos)
     const precoSemImpostos = custoOperacional + lucro;
     const totalImpostosRate = valores.ALIQUOTAS.PIS + valores.ALIQUOTAS.COFINS + valores.ALIQUOTAS.ISS_PADRAO;
-    const precoFinal = precoSemImpostos / (1 - totalImpostosRate);
-    const tributos = precoFinal - precoSemImpostos;
+    const precoFinalUnitario = precoSemImpostos / (1 - totalImpostosRate);
+    const tributos = precoFinalUnitario - precoSemImpostos;
 
-    const custoTotal = precoFinal * config.quantidade;
+    // Total Mensal (Multiplicado pela quantidade)
+    const custoTotal = precoFinalUnitario * config.quantidade;
 
-    const detalhamento: BreakdownCustos = {
+    // Detalhamento (Unitário para exibição coerente)
+    const detalhamento = {
         salarioBase,
-        gratificacoes, // New Field
-        adicionais: { // Updated structure
+        gratificacoes,
+        aliquotas: valores.ALIQUOTAS,
+        adicionais: {
             insalubridade: adicionaisObj.insalubridade,
             periculosidade: adicionaisObj.periculosidade,
             noturno: adicionaisObj.noturno,
@@ -494,8 +503,8 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
             total: adicionaisObj.total + adicionalCopa
         },
         beneficios,
-        encargos, // Now only Social Charges
-        provisoes: { // New Field
+        encargos,
+        provisoes: {
             ferias: provisoesObj.ferias,
             decimoTerceiro: provisoesObj.decimoTerceiro,
             rescisao: provisoesObj.rescisao,
@@ -508,13 +517,13 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
         insumos,
         tributos,
         lucro,
-        totalMensal: precoFinal
+        totalMensal: precoFinalUnitario // Keep Unitary here for breakdown table default view
     };
 
     return {
         config, // Return original config as reference
-        custoUnitario: precoFinal,
-        custoTotal,
+        custoUnitario: precoFinalUnitario,
+        custoTotal, // Final Total for Summary (Unit * Qty)
         detalhamento
     };
 }

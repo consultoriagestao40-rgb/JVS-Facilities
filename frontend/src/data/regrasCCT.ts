@@ -18,7 +18,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
         funcao: 'LIMPEZA',
         dataVigencia: '2025-01-01',
         salarioPiso: 1900.00, // Servente 44h reference
-        beneficios: { valeRefeicao: 25, valeTransporte: 12, cestaBasica: 150, uniforme: 25 },
+        beneficios: { valeRefeicao: 25, valeTransporte: 12, cestaBasica: 150, uniforme: 40 },
         cargos: [
             { nome: 'Servente 44h', piso: 1900.00, gratificacao: 0, adicionalCopa: 0 },
             { nome: 'Servente 40h', piso: 1727.27, gratificacao: 0, adicionalCopa: 0 },
