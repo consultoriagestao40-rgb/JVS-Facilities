@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { SimuladorState, UserData, ServicoTipo, ConfiguracaoServico } from '@/types/simulador';
+import { SimuladorState, UserData, ServicoTipo, ConfiguracaoServico, ParametrosCustos } from '@/types/simulador';
 
 type SimuladorContextType = {
     state: SimuladorState;
@@ -10,6 +10,7 @@ type SimuladorContextType = {
     updateUserData: (data: UserData) => void;
     toggleServico: (id: ServicoTipo) => void;
     updateConfiguracao: (config: ConfiguracaoServico) => void;
+    updateParametros: (params: ParametrosCustos) => void;
 };
 
 const defaultState: SimuladorState = {
@@ -76,6 +77,13 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
         }));
     };
 
+    const updateParametros = (params: ParametrosCustos) => {
+        setState(prev => ({
+            ...prev,
+            parametros: params
+        }));
+    };
+
     return (
         <SimuladorContext.Provider value={{
             state,
@@ -83,7 +91,8 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
             prevStep,
             updateUserData,
             toggleServico,
-            updateConfiguracao
+            updateConfiguracao,
+            updateParametros
         }}>
             {children}
         </SimuladorContext.Provider>

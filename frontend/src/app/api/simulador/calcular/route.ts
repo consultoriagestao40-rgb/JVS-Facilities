@@ -27,69 +27,106 @@ interface BreakdownCustos {
     totalMensal: number;
 }
 
-// --- Logic (Ported from CalculoService) ---
-const ALIQUOTAS = {
-    INSS: 0.20,
-    FGTS: 0.08,
-    RAT: 0.02,
-    PIS: 0.0165,
-    COFINS: 0.076,
-    ISS_PADRAO: 0.05,
-    MARGEM_LUCRO: 0.15,
-};
-
-const VALORES_BASE = {
-    SALARIO_MINIMO: 1412.00,
-    VALE_REFEICAO_DIA: 25.00,
-    VALE_TRANSPORTE_DIA: 12.00,
-    CESTA_BASICA: 150.00,
-    UNIFORME_MENSAL: 25.00,
-};
-
-function getPisoSalarial(funcao: string): number {
-    const normalized = funcao.toLowerCase();
-    if (normalized.includes('limpeza')) return 1590.00;
-    if (normalized.includes('seguranca') || normalized.includes('vigilante')) return 2100.00;
-    if (normalized.includes('recepcao')) return 1750.00;
-    if (normalized.includes('jardineiro')) return 1800.00;
-    return VALORES_BASE.SALARIO_MINIMO;
+interface ParametrosCustos {
+    salarioMinimo: number;
+    aliquotas: {
+        inss: number;
+        fgts: number;
+        rat: number;
+        pis: number;
+        cofins: number;
+        iss: number;
+        margemLucro: number;
+    };
+    beneficios: {
+        valeRefeicao: number;
+        valeTransporte: number;
+        cestaBasica: number;
+        uniforme: number;
+    };
+    pisosSalariais: {
+        limpeza: number;
+        seguranca: number;
+        recepcao: number;
+        jardinagem: number;
+    };
 }
 
-function calcularAdicionais(base: number, configAdicionais?: BackendConfigPayload['adicionais']): number {
+// --- Logic ---
+
+// Helper to get values from params or defaults
+const getValores = (params?: ParametrosCustos) => {
+    return {
+        ALIQUOTAS: {
+            INSS: params?.aliquotas.inss ?? 0.20,
+            FGTS: params?.aliquotas.fgts ?? 0.08,
+            RAT: params?.aliquotas.rat ?? 0.02,
+            PIS: params?.aliquotas.pis ?? 0.0165,
+            COFINS: params?.aliquotas.cofins ?? 0.076,
+            ISS_PADRAO: params?.aliquotas.iss ?? 0.05,
+            MARGEM_LUCRO: params?.aliquotas.margemLucro ?? 0.15,
+        },
+        VALORES_BASE: {
+            SALARIO_MINIMO: params?.salarioMinimo ?? 1412.00,
+            VALE_REFEICAO_DIA: params?.beneficios.valeRefeicao ?? 25.00,
+            VALE_TRANSPORTE_DIA: params?.beneficios.valeTransporte ?? 12.00,
+            CESTA_BASICA: params?.beneficios.cestaBasica ?? 150.00,
+            UNIFORME_MENSAL: params?.beneficios.uniforme ?? 25.00,
+        },
+        PISOS: params?.pisosSalariais ?? {
+            limpeza: 1590.00,
+            seguranca: 2100.00,
+            recepcao: 1750.00,
+            jardinagem: 1800.00
+        }
+    };
+};
+
+
+function getPisoSalarial(funcao: string, valores: ReturnType<typeof getValores>): number {
+    const normalized = funcao.toLowerCase();
+    if (normalized.includes('limpeza')) return valores.PISOS.limpeza;
+    if (normalized.includes('seguranca') || normalized.includes('vigilante')) return valores.PISOS.seguranca;
+    if (normalized.includes('recepcao')) return valores.PISOS.recepcao;
+    if (normalized.includes('jardineiro')) return valores.PISOS.jardinagem;
+    return valores.VALORES_BASE.SALARIO_MINIMO;
+}
+
+function calcularAdicionais(base: number, valores: ReturnType<typeof getValores>, configAdicionais?: BackendConfigPayload['adicionais']): number {
     let total = 0;
-    if (configAdicionais?.insalubridade) total += VALORES_BASE.SALARIO_MINIMO * 0.20;
+    if (configAdicionais?.insalubridade) total += valores.VALORES_BASE.SALARIO_MINIMO * 0.20;
     if (configAdicionais?.periculosidade) total += base * 0.30;
     return total;
 }
 
-function calcularBeneficios(dias: number): number {
-    const vr = dias * VALORES_BASE.VALE_REFEICAO_DIA;
-    const vt = dias * VALORES_BASE.VALE_TRANSPORTE_DIA;
-    return vr + vt + VALORES_BASE.CESTA_BASICA + VALORES_BASE.UNIFORME_MENSAL;
+function calcularBeneficios(dias: number, valores: ReturnType<typeof getValores>): number {
+    const vr = dias * valores.VALORES_BASE.VALE_REFEICAO_DIA;
+    const vt = dias * valores.VALORES_BASE.VALE_TRANSPORTE_DIA;
+    return vr + vt + valores.VALORES_BASE.CESTA_BASICA + valores.VALORES_BASE.UNIFORME_MENSAL;
 }
 
-function calcularEncargos(baseCalculo: number): number {
-    const { INSS, FGTS, RAT } = ALIQUOTAS;
+function calcularEncargos(baseCalculo: number, valores: ReturnType<typeof getValores>): number {
+    const { INSS, FGTS, RAT } = valores.ALIQUOTAS;
     const provisionRate = 0.35;
     const basicCharges = baseCalculo * (INSS + FGTS + RAT);
     const provisions = baseCalculo * provisionRate;
     return basicCharges + provisions;
 }
 
-function calcularItem(config: BackendConfigPayload) {
+function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
     // 1. Base
-    const salarioBase = getPisoSalarial(config.funcao);
+    const salarioBase = getPisoSalarial(config.funcao, valores);
 
     // 2. Adicionais
-    const adicionais = calcularAdicionais(salarioBase, config.adicionais);
+    const adicionais = calcularAdicionais(salarioBase, valores, config.adicionais);
     const remuneracaoTotal = salarioBase + adicionais;
 
     // 3. Beneficios
     const diasTrabalhados = config.dias.length * 4.33;
-    const beneficios = calcularBeneficios(diasTrabalhados);
+    const beneficios = calcularBeneficios(diasTrabalhados, valores);
 
     // 4. Encargos
-    const encargos = calcularEncargos(remuneracaoTotal);
+    const encargos = calcularEncargos(remuneracaoTotal, valores);
 
     // 5. Insumos
     const insumos = (config.materiais || 0);
@@ -98,11 +135,11 @@ function calcularItem(config: BackendConfigPayload) {
     const custoOperacional = remuneracaoTotal + beneficios + encargos + insumos;
 
     // 6. Lucro
-    const lucro = custoOperacional * ALIQUOTAS.MARGEM_LUCRO;
+    const lucro = custoOperacional * valores.ALIQUOTAS.MARGEM_LUCRO;
 
     // 7. Impostos
     const precoSemImpostos = custoOperacional + lucro;
-    const totalImpostosRate = ALIQUOTAS.PIS + ALIQUOTAS.COFINS + ALIQUOTAS.ISS_PADRAO;
+    const totalImpostosRate = valores.ALIQUOTAS.PIS + valores.ALIQUOTAS.COFINS + valores.ALIQUOTAS.ISS_PADRAO;
     const precoFinal = precoSemImpostos / (1 - totalImpostosRate);
     const tributos = precoFinal - precoSemImpostos;
 
@@ -131,6 +168,7 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         const configs = body.configs as BackendConfigPayload[];
+        const parametros = body.parametros as ParametrosCustos | undefined;
 
         if (!configs || !Array.isArray(configs) || configs.length === 0) {
             return NextResponse.json(
@@ -139,7 +177,10 @@ export async function POST(request: Request) {
             );
         }
 
-        const servicosCalculados = configs.map(config => calcularItem(config));
+        // Initialize values with provided params or defaults
+        const valores = getValores(parametros);
+
+        const servicosCalculados = configs.map(config => calcularItem(config, valores));
 
         const resumo = servicosCalculados.reduce((acc, item) => ({
             custoMensalTotal: acc.custoMensalTotal + item.custoTotal,

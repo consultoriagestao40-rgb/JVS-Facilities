@@ -45,7 +45,10 @@ export const simuladorService = {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ configs }),
+            body: JSON.stringify({
+                configs,
+                parametros: state.parametros // Pass custom params if set
+            }),
         });
 
         if (!response.ok) {

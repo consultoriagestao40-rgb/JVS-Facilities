@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import { useSimulador } from '@/context/SimuladorContext';
 import { simuladorService } from '@/services/simuladorService';
 import { ResultadoSimulacao } from '@/types/simulador';
-import { Download, FileText, CheckCircle, Loader2, ArrowRight } from 'lucide-react';
+import { Download, FileText, CheckCircle, Loader2, ArrowRight, Settings } from 'lucide-react';
+import { generatePropostaPDF } from '@/utils/generatePropostaPDF';
+import ConfiguracaoCustos from '@/components/admin/ConfiguracaoCustos';
 import { motion } from 'framer-motion';
 
 export default function ResumoProposta() {
@@ -12,6 +14,7 @@ export default function ResumoProposta() {
     const [resultado, setResultado] = useState<ResultadoSimulacao | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showConfig, setShowConfig] = useState(false);
 
     useEffect(() => {
         const calcular = async () => {
@@ -59,7 +62,14 @@ export default function ResumoProposta() {
 
     return (
         <div className="space-y-8 animate-fade-in">
-            <div className="text-center">
+            <div className="text-center relative">
+                <button
+                    onClick={() => setShowConfig(true)}
+                    className="absolute right-0 top-0 p-2 text-gray-300 hover:text-gray-600 transition-colors"
+                    title="Configurar Parâmetros de Custo"
+                >
+                    <Settings className="w-5 h-5" />
+                </button>
                 <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-1 rounded-full text-sm font-bold mb-4">
                     <CheckCircle className="w-4 h-4" />
                     Proposta Gerada com Sucesso
@@ -133,7 +143,10 @@ export default function ResumoProposta() {
 
             {/* Actions */}
             <div className="flex flex-col md:flex-row gap-4 justify-center pt-8">
-                <button className="flex items-center justify-center gap-2 px-8 py-4 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors">
+                <button
+                    onClick={() => resultado && generatePropostaPDF(resultado)}
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors"
+                >
                     <Download className="w-5 h-5" />
                     Baixar Proposta em PDF
                 </button>
@@ -143,9 +156,7 @@ export default function ResumoProposta() {
                 </button>
             </div>
 
-            <p className="text-center text-xs text-gray-400 mt-4">
-                Ao clicar em "Quero Contratar", um de nossos executivos entrará em contato para formalização.
-            </p>
+            {showConfig && <ConfiguracaoCustos onClose={() => setShowConfig(false)} />}
         </div>
     );
 }

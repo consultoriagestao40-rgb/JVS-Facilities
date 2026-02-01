@@ -22,12 +22,38 @@ export type ConfiguracaoServico = {
     quantidade: number;
 };
 
+
+export interface ParametrosCustos {
+    salarioMinimo: number;
+    aliquotas: {
+        inss: number;
+        fgts: number;
+        rat: number;
+        pis: number;
+        cofins: number;
+        iss: number;
+        margemLucro: number;
+    };
+    beneficios: {
+        valeRefeicao: number;
+        valeTransporte: number;
+        cestaBasica: number;
+        uniforme: number;
+    };
+    pisosSalariais: {
+        limpeza: number;
+        seguranca: number;
+        recepcao: number;
+        jardinagem: number;
+    };
+}
+
 export type SimuladorState = {
     step: number;
     userData: UserData;
     servicosSelecionados: ServicoTipo[];
     configuracoes: ConfiguracaoServico[];
-    // Future: materiais, equipamentos, etc.
+    parametros?: ParametrosCustos; // Optional for backward compatibility/default loading
 };
 
 // API Types (Matched with Backend)
