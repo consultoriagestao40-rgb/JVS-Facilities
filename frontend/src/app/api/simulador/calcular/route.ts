@@ -7,6 +7,7 @@ interface BackendConfigPayload {
     funcao: string;
     estado: string;
     cidade: string;
+    cargo?: string; // Added cargo
     dias: string[];
     horarioEntrada: string;
     horarioSaida: string;
@@ -53,8 +54,8 @@ function getMatchingRule(
         let score = 0;
 
         // Qualification 1: Location
-        const isCityMatch = r.uf === config.estado && r.cidade?.toLowerCase() === config.cidade?.toLowerCase();
-        const isStateMatch = r.uf === config.estado && (!r.cidade || r.cidade === '*');
+        const isCityMatch = r.uf.toUpperCase() === config.estado.toUpperCase() && r.cidade?.toLowerCase() === config.cidade?.toLowerCase();
+        const isStateMatch = r.uf.toUpperCase() === config.estado.toUpperCase() && (!r.cidade || r.cidade === '*');
 
         if (!isCityMatch && !isStateMatch) continue; // Not valid location
 
@@ -440,15 +441,17 @@ function calcularProvisoes(remuneracao: number, valores: any): DetailedBreakdown
 }
 
 function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
-    const Materials = config.materiais || 0;
+    // Force numbers to avoid string concatenation issues or NaNs
+    const Materials = Number(config.materiais) || 0;
+    const Quantidade = Number(config.quantidade) || 1; // Default to 1 if 0/NaN
+    const AdicionalCopaManual = Number(config.adicionalCopa) || 0;
 
     // 1. Base e Gratificações
     const salarioBase = getPisoSalarial(config.funcao, valores);
     const gratificacoes = valores.VALORES_BASE.GRATIFICACOES || 0;
     // Merge Manual + Rule Copa
     const adicionalCopaRule = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
-    const adicionalCopaManual = config.adicionalCopa || 0;
-    const adicionalCopa = adicionalCopaRule + adicionalCopaManual; // Additive
+    const adicionalCopa = adicionalCopaRule + AdicionalCopaManual; // Additive
 
     // 2. Adicionais
     const adicionaisObj = calcularAdicionais(salarioBase, valores, config); // Adicionais calculados sobre Salário Base geralmente
@@ -469,7 +472,7 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 
     // 6. Insumos & Operacionais
     const custoExames = valores.CUSTOS_OPS?.examesMedicos || 0;
-    const insumos = (config.materiais || 0); // Don't merge anymore
+    const insumos = Materials; // Use enforced number
 
     // Subtotal (Custo Operacional Direto)
     // Now include custoExames explicitly
@@ -486,7 +489,7 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     const tributos = precoFinalUnitario - precoSemImpostos;
 
     // Total Mensal (Multiplicado pela quantidade)
-    const custoTotal = precoFinalUnitario * config.quantidade;
+    const custoTotal = precoFinalUnitario * Quantidade; // Use enforced Quantity
 
     // Detalhamento (Unitário para exibição coerente)
     const detalhamento = {

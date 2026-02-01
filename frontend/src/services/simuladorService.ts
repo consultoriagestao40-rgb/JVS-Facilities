@@ -8,6 +8,7 @@ interface BackendConfigPayload {
     funcao: string;
     estado: string;
     cidade: string;
+    cargo?: string;
     dias: string[];
     horarioEntrada: string;
     horarioSaida: string;
@@ -29,6 +30,7 @@ export const simuladorService = {
             // USE ACTUAL VALUES FROM CONFIG, NOT HARDCODED!
             estado: (config as any).estado || 'PR', // Use config state, fallback to PR
             cidade: (config as any).cidade || 'Curitiba', // Use config city
+            cargo: (config as any).cargo, // Pass selected cargo/role
             dias: config.diasSemana,
             horarioEntrada: config.horarioEntrada,
             horarioSaida: config.horarioSaida,
