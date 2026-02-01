@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  nome      String
+  empresa   String
+  cnpj      String
+  email     String
+  whatsapp  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  propostas Proposta[]
+}
+
+model Proposta {
+  id               String   @id @default(uuid())
+  numeroSequencial String   @unique
+  leadId           String
+  lead             Lead     @relation(fields: [leadId], references: [id])
+  servicos         String   // JSON string of selected services
+  custoMensal      Float
+  custoAnual       Float
+  breakdown        String   // JSON string of detailed costs
+  status           String   @default("DRAFT") // DRAFT, SENT, ACCEPTED, REJECTED
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model EncargoSocial {
+  id        String   @id @default(uuid())
+  nome      String
+  descricao String?
+  valor     Float    // Percentage or fixed value
+  tipo      String   // PERCENTUAL, FIXO
+  vigencia  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TributoFaturamento {
+  id        String   @id @default(uuid())
+  nome      String
+  aliquota  Float
+  municipio String?  // Optional, if specific to a municipality
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConvencaoColetiva {
+  id        String   @id @default(uuid())
+  funcao    String
+  estado    String
+  piso      Float
+  beneficios String // JSON string
+  adicionais String // JSON string
+  vigencia  DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

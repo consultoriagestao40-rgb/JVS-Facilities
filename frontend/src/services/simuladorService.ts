@@ -1,0 +1,58 @@
+import { SimuladorState, ResultadoSimulacao } from '../types/simulador';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
+
+// Backend expects valid payload
+interface BackendConfigPayload {
+    funcao: string;
+    estado: string;
+    cidade: string;
+    dias: string[];
+    horarioEntrada: string;
+    horarioSaida: string;
+    quantidade: number;
+    materiais?: number;
+    adicionais?: {
+        insalubridade?: boolean;
+        periculosidade?: boolean;
+    };
+}
+
+export const simuladorService = {
+    async calcularProposta(state: SimuladorState): Promise<ResultadoSimulacao> {
+        // Map Frontend State to Backend Payload
+        const configs: BackendConfigPayload[] = state.configuracoes.map(config => ({
+            funcao: config.servicoId,
+            estado: 'SP', // Default for MVP
+            cidade: 'São Paulo', // Default for MVP
+            dias: config.diasSemana,
+            horarioEntrada: config.horarioEntrada,
+            horarioSaida: config.horarioSaida,
+            quantidade: config.quantidade,
+            // Assuming we stored materials/adicionais in step 4 in a way we can access here
+            // For MVP, passing defaults or mock values if not in config array yet
+            materiais: 0,
+            adicionais: {
+                insalubridade: false,
+                periculosidade: false
+            }
+        }));
+
+        // Adjust for port 3001 as previously planned (Backend Port)
+        // Note: Ensure Backend is running on 3001 or update this URL
+        const response = await fetch('http://localhost:3001/api/simulador/calcular', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ configs }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Falha ao calcular proposta');
+        }
+
+        return response.json();
+    }
+};
+
