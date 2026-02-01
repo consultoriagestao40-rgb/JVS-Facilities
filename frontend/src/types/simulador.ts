@@ -23,6 +23,34 @@ export type ConfiguracaoServico = {
 };
 
 
+export interface RegraCCT {
+    id: string;
+    uf: string;
+    cidade: string; // '*' for all cities in UF if needed
+    funcao: string; // 'LIMPEZA', 'PORTARIA', etc.
+    dataVigencia: string;
+    salarioPiso: number;
+    beneficios: {
+        valeRefeicao: number;
+        valeTransporte: number;
+        cestaBasica: number;
+        uniforme: number;
+    };
+    aliquotas: {
+        inss: number;
+        fgts: number;
+        rat: number;
+        pis: number;
+        cofins: number;
+        iss: number;
+        margemLucro: number;
+    };
+    adicionais: {
+        insalubridade: boolean;
+        periculosidade: boolean;
+    };
+}
+
 export interface ParametrosCustos {
     salarioMinimo: number;
     aliquotas: {
@@ -53,7 +81,8 @@ export type SimuladorState = {
     userData: UserData;
     servicosSelecionados: ServicoTipo[];
     configuracoes: ConfiguracaoServico[];
-    parametros?: ParametrosCustos; // Optional for backward compatibility/default loading
+    parametros?: ParametrosCustos;
+    regrasCCT?: RegraCCT[]; // List of custom rules
 };
 
 // API Types (Matched with Backend)

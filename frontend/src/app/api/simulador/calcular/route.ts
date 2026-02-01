@@ -53,8 +53,62 @@ interface ParametrosCustos {
 }
 
 // --- Logic ---
+import { ParametrosCustos, RegraCCT } from '@/types/simulador';
 
-// Helper to get values from params or defaults
+// Helper to look up CCT Rule
+// Prioritize: Explicit City Match -> State Match (Wildcard) -> Default Global Param
+const getMatchingRule = (
+    config: BackendConfigPayload,
+    regras: RegraCCT[] | undefined,
+    globalParams: ReturnType<typeof getValores>
+) => {
+    if (!regras || regras.length === 0) return null;
+
+    // 1. Try Exact City Match
+    const cityMatch = regras.find(r =>
+        r.uf === config.estado &&
+        r.cidade?.toLowerCase() === config.cidade?.toLowerCase() &&
+        r.funcao === config.funcao
+    );
+    if (cityMatch) return cityMatch;
+
+    // 2. Try State Match (Empty city or '*')
+    const stateMatch = regras.find(r =>
+        r.uf === config.estado &&
+        (!r.cidade || r.cidade === '*') &&
+        r.funcao === config.funcao
+    );
+    if (stateMatch) return stateMatch;
+
+    return null;
+};
+
+// Helper to get values merging Global + Rule
+const getValoresFinais = (
+    match: RegraCCT | null,
+    global: ReturnType<typeof getValores>
+) => {
+    if (!match) return global;
+
+    return {
+        // Rule overrides global
+        ALIQUOTAS: { ...global.ALIQUOTAS, ...match.aliquotas },
+        VALORES_BASE: {
+            ...global.VALORES_BASE,
+            SALARIO_MINIMO: match.salarioPiso, // Use Floor as Base
+            VALE_REFEICAO_DIA: match.beneficios.valeRefeicao,
+            VALE_TRANSPORTE_DIA: match.beneficios.valeTransporte,
+            CESTA_BASICA: match.beneficios.cestaBasica,
+            UNIFORME_MENSAL: match.beneficios.uniforme
+        },
+        PISOS: {
+            // Override specific role floor in the lookup map, though we usually just use SALARIO_MINIMO from above
+            ...global.PISOS,
+            [match.funcao.toLowerCase()]: match.salarioPiso
+        }
+    };
+};
+
 const getValores = (params?: ParametrosCustos) => {
     return {
         ALIQUOTAS: {
@@ -83,23 +137,20 @@ const getValores = (params?: ParametrosCustos) => {
 };
 
 
-function getPisoSalarial(funcao: string, valores: ReturnType<typeof getValores>): number {
+function getPisoSalarial(funcao: string, valores: any): number {
     const normalized = funcao.toLowerCase();
-    if (normalized.includes('limpeza')) return valores.PISOS.limpeza;
-    if (normalized.includes('seguranca') || normalized.includes('vigilante')) return valores.PISOS.seguranca;
-    if (normalized.includes('recepcao')) return valores.PISOS.recepcao;
-    if (normalized.includes('jardineiro')) return valores.PISOS.jardinagem;
-    return valores.VALORES_BASE.SALARIO_MINIMO;
+    // Use the specific floor if defined in PISOS (merged from rule), otherwise fallback
+    return valores.PISOS[normalized] || valores.VALORES_BASE.SALARIO_MINIMO;
 }
 
-function calcularAdicionais(base: number, valores: ReturnType<typeof getValores>, configAdicionais?: BackendConfigPayload['adicionais']): number {
+function calcularAdicionais(base: number, valores: any, configAdicionais?: BackendConfigPayload['adicionais']): number {
     let total = 0;
     if (configAdicionais?.insalubridade) total += valores.VALORES_BASE.SALARIO_MINIMO * 0.20;
     if (configAdicionais?.periculosidade) total += base * 0.30;
     return total;
 }
 
-function calcularBeneficios(dias: number, valores: ReturnType<typeof getValores>): number {
+function calcularBeneficios(dias: number, valores: any): number {
     const vr = dias * valores.VALORES_BASE.VALE_REFEICAO_DIA;
     const vt = dias * valores.VALORES_BASE.VALE_TRANSPORTE_DIA;
     return vr + vt + valores.VALORES_BASE.CESTA_BASICA + valores.VALORES_BASE.UNIFORME_MENSAL;
@@ -167,20 +218,20 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const configs = body.configs as BackendConfigPayload[];
-        const parametros = body.parametros as ParametrosCustos | undefined;
 
-        if (!configs || !Array.isArray(configs) || configs.length === 0) {
-            return NextResponse.json(
-                { error: 'Invalid Input', message: 'Lista de configurações vazia.' },
-                { status: 400 }
-            );
-        }
+        const servicosCalculados = configs.map(config => {
+            // 1. Get Global Defaults
+            const globalVals = getValores(parametros);
 
-        // Initialize values with provided params or defaults
-        const valores = getValores(parametros);
+            // 2. Try to find Specific CCT Rule (passed in body.regrasCCT)
+            const regras = body.regrasCCT as RegraCCT[] | undefined;
+            const match = getMatchingRule(config, regras, globalVals);
 
-        const servicosCalculados = configs.map(config => calcularItem(config, valores));
+            // 3. Merge
+            const valoresFinais = getValoresFinais(match, globalVals);
+
+            return calcularItem(config, valoresFinais);
+        });
 
         const resumo = servicosCalculados.reduce((acc, item) => ({
             custoMensalTotal: acc.custoMensalTotal + item.custoTotal,

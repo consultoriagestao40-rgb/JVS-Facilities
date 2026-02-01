@@ -47,7 +47,8 @@ export const simuladorService = {
             },
             body: JSON.stringify({
                 configs,
-                parametros: state.parametros // Pass custom params if set
+                parametros: state.parametros,
+                regrasCCT: state.regrasCCT // Pass rules to backend for lookup
             }),
         });
 
