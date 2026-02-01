@@ -96,7 +96,7 @@ function getMatchingRule(
             // If we found a match in the list, we clone the rule and override the Piso
             if (foundSpecificCargoInList && configCargo) {
                 const specificPiso = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase())?.piso || r.salarioPiso;
-                bestMatch = { ...r, salaryPiso: specificPiso, salarioPiso: specificPiso, cargo: configCargo };
+                bestMatch = { ...r, salarioPiso: specificPiso, cargo: configCargo };
             } else {
                 bestMatch = r;
             }

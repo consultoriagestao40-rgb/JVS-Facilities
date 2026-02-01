@@ -416,22 +416,95 @@ export default function RegrasCCTManager() {
                                 />
                             </div>
 
-                            {/* New Fields */}
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Cargo Específico (Opcional)</label>
-                                <input
-                                    type="text"
-                                    value={currentRegra.cargo || ''}
-                                    onChange={e => handleChange(null, 'cargo', e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    placeholder="Ex: Encarregada, Líder..."
-                                />
+                            <div className="md:col-span-2 lg:col-span-3">
+                                <label className="block text-sm font-medium mb-2">Cargos & Salários da Categoria</label>
+                                <div className="bg-white p-4 rounded border space-y-3">
+                                    <div className="flex gap-2 items-end">
+                                        <div className="flex-1">
+                                            <label className="text-xs text-gray-500">Nome do Cargo</label>
+                                            <input
+                                                id="newCargoName"
+                                                type="text"
+                                                placeholder="Ex: Zelador"
+                                                className="w-full p-2 border rounded text-sm"
+                                            />
+                                        </div>
+                                        <div className="w-32">
+                                            <label className="text-xs text-gray-500">Piso (R$)</label>
+                                            <input
+                                                id="newCargoPiso"
+                                                type="number"
+                                                placeholder="0.00"
+                                                className="w-full p-2 border rounded text-sm"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button" // Prevent submit
+                                            onClick={() => {
+                                                const nameInput = document.getElementById('newCargoName') as HTMLInputElement;
+                                                const pisoInput = document.getElementById('newCargoPiso') as HTMLInputElement;
+                                                const nome = nameInput.value;
+                                                const piso = parseFloat(pisoInput.value);
+
+                                                if (nome && piso) {
+                                                    const newCargos = [...(currentRegra.cargos || []), { nome, piso }];
+                                                    setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
+                                                    nameInput.value = '';
+                                                    pisoInput.value = '';
+                                                }
+                                            }}
+                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-bold"
+                                        >
+                                            Adicionar
+                                        </button>
+                                    </div>
+
+                                    {/* List */}
+                                    <div className="max-h-40 overflow-y-auto border rounded">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="bg-gray-50 sticky top-0">
+                                                <tr>
+                                                    <th className="p-2 border-b">Cargo</th>
+                                                    <th className="p-2 border-b">Piso Salarial</th>
+                                                    <th className="p-2 border-b w-10"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {(currentRegra.cargos || []).length === 0 && (
+                                                    <tr><td colSpan={3} className="p-4 text-center text-gray-400 italic">Nenhum cargo específico definido. Usará apenas configurações gerais.</td></tr>
+                                                )}
+                                                {(currentRegra.cargos || []).map((c, idx) => (
+                                                    <tr key={idx} className="border-b hover:bg-gray-50">
+                                                        <td className="p-2">{c.nome}</td>
+                                                        <td className="p-2 font-mono">R$ {c.piso.toFixed(2)}</td>
+                                                        <td className="p-2 text-right">
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newCargos = [...(currentRegra.cargos || [])];
+                                                                    newCargos.splice(idx, 1);
+                                                                    setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
+                                                                }}
+                                                                className="text-red-500 hover:text-red-700"
+                                                            >
+                                                                <Trash className="w-4 h-4" />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">* Se nenhum cargo for selecionado, o sistema usará o Piso Padrão abaixo.</p>
+                                </div>
                             </div>
+
                             <div>
-                                <label className="block text-sm font-medium mb-1">Gratificações (R$)</label>
+                                <label className="block text-sm font-medium mb-1">Piso Padrão (Fallback)</label>
                                 <input
-                                    className="w-full p-2 border rounded"
-                                    placeholder="0.00"
+                                    type="number"
+                                    value={currentRegra.salarioPiso}
+                                    onChange={e => handleChange(null, 'salarioPiso', e.target.value)}
+                                    className="w-full p-2 border rounded font-bold text-gray-600 bg-gray-50"
                                 />
                             </div>
 
