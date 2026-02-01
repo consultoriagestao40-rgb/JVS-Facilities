@@ -270,6 +270,23 @@ export default function RegrasCCTManager() {
                                 </div>
                             ))}
                         </div>
+
+                        {/* Provisões */}
+                        <div className="space-y-4">
+                            <h4 className="font-bold text-sm text-gray-500 uppercase">Provisões (%)</h4>
+                            {currentRegra.provisoes && Object.entries(currentRegra.provisoes).map(([key, val]) => (
+                                <div key={key}>
+                                    <label className="block text-sm font-medium mb-1 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
+                                    <input
+                                        type="number"
+                                        step="0.0001"
+                                        value={val}
+                                        onChange={e => handleChange('provisoes', key, e.target.value)}
+                                        className="w-full p-2 border rounded"
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
 
                     <div className="mt-8 flex justify-end gap-4 border-t pt-6">
