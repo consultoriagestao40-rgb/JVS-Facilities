@@ -19,7 +19,8 @@ const emptyRegra: RegraCCTType = {
         tipoValeRefeicao: 'DIARIO',
         valeTransporte: 12.00,
         cestaBasica: 150.00,
-        uniforme: 25.00
+        uniforme: 40.00,
+        adicionalCopa: 120.00
     },
     configuracoesBeneficios: {
         descontoVT: 0.06,
@@ -90,7 +91,8 @@ export default function RegrasCCTManager() {
         // VA Ferias
         const vaFerias = configBen.vaSobreFerias ? (custoVR / 12) : 0;
 
-        const totalBen = (custoVR + custoVT + cesta + uniforme + vaFerias) - (descontoVT + descontoVA);
+        const copa = Number(ben.adicionalCopa || 0);
+        const totalBen = (custoVR + custoVT + cesta + uniforme + copa + vaFerias) - (descontoVT + descontoVA);
 
         const detailBen = {
             valeRefeicao: custoVR,
@@ -155,7 +157,7 @@ export default function RegrasCCTManager() {
                     noturno: 0,
                     intrajornada: 0,
                     dsr: 0,
-                    copa: 0,
+                    copa: copa,
                     total: 0
                 },
                 beneficios: detailBen,
@@ -598,8 +600,8 @@ export default function RegrasCCTManager() {
                                         <input
                                             type="number"
                                             step="0.01"
-                                            value={currentRegra.configuracoesBeneficios?.descontoVA ?? 0.20}
-                                            onChange={e => handleChange('configuracoesBeneficios', 'descontoVA', e.target.value)}
+                                            value={(currentRegra.configuracoesBeneficios?.descontoVA ?? 0.20) * 100}
+                                            onChange={e => handleChange('configuracoesBeneficios', 'descontoVA', String(Number(e.target.value) / 100))}
                                             className="w-16 p-1 border rounded text-xs"
                                         />
                                     </div>
@@ -619,8 +621,8 @@ export default function RegrasCCTManager() {
                                         <input
                                             type="number"
                                             step="0.01"
-                                            value={currentRegra.configuracoesBeneficios?.descontoVT ?? 0.06}
-                                            onChange={e => handleChange('configuracoesBeneficios', 'descontoVT', e.target.value)}
+                                            value={(currentRegra.configuracoesBeneficios?.descontoVT ?? 0.06) * 100}
+                                            onChange={e => handleChange('configuracoesBeneficios', 'descontoVT', String(Number(e.target.value) / 100))}
                                             className="w-16 p-1 border rounded text-xs"
                                         />
                                     </div>
@@ -628,7 +630,7 @@ export default function RegrasCCTManager() {
 
                                 {/* Outros Beneficios */}
                                 {Object.entries(currentRegra.beneficios).map(([key, val]) => {
-                                    if (['valeRefeicao', 'tipoValeRefeicao', 'valeTransporte'].includes(key)) return null;
+                                    if (['valeRefeicao', 'tipoValeRefeicao', 'valeTransporte', 'adicionalCopa'].includes(key)) return null;
                                     return (
                                         <div key={key}>
                                             <label className="block text-sm font-medium mb-1 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
@@ -641,6 +643,18 @@ export default function RegrasCCTManager() {
                                         </div>
                                     );
                                 })}
+
+                                {/* Adicional de Copa */}
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Adicional de Copa (Fixo/Mês)</label>
+                                    <input
+                                        type="number"
+                                        value={currentRegra.beneficios.adicionalCopa || 0}
+                                        onChange={e => handleChange('beneficios', 'adicionalCopa', e.target.value)}
+                                        className="w-full p-2 border rounded"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Valor fixo mensal (Ex: PR = 120,00)</p>
+                                </div>
                             </div>
 
                             <hr className="border-gray-200" />
@@ -653,9 +667,9 @@ export default function RegrasCCTManager() {
                                         <label className="block text-sm font-medium mb-1 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
                                         <input
                                             type="number"
-                                            step="0.0001"
-                                            value={val}
-                                            onChange={e => handleChange('provisoes', key, e.target.value)}
+                                            step="0.01"
+                                            value={Number(val) * 100} // Display as %
+                                            onChange={e => handleChange('provisoes', key, String(Number(e.target.value) / 100))}
                                             className="w-full p-2 border rounded"
                                         />
                                     </div>
@@ -671,9 +685,9 @@ export default function RegrasCCTManager() {
                                     <label className="block text-sm font-medium mb-1 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
                                     <input
                                         type="number"
-                                        step="0.0001"
-                                        value={val}
-                                        onChange={e => handleChange('aliquotas', key, e.target.value)}
+                                        step="0.01"
+                                        value={Number(val) * 100} // Display as %
+                                        onChange={e => handleChange('aliquotas', key, String(Number(e.target.value) / 100))}
                                         className="w-full p-2 border rounded"
                                     />
                                 </div>

@@ -43,6 +43,7 @@ export interface RegraCCT {
         valeTransporte: number;
         cestaBasica: number;
         uniforme: number; // Will serve as monthly uniform cost
+        adicionalCopa?: number; // New field
     };
     custosOperacionais: {
         examesMedicos: number; // Mensal
