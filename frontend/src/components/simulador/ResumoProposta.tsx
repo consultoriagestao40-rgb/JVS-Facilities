@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSimulador } from '@/context/SimuladorContext';
 import { simuladorService } from '@/services/simuladorService';
 import { ResultadoSimulacao } from '@/types/simulador';
-import { Download, FileText, CheckCircle, Loader2 } from 'lucide-react';
+import { Download, FileText, CheckCircle, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function ResumoProposta() {

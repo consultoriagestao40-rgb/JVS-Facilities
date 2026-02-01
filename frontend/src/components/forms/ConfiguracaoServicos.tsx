@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useSimulador } from '@/context/SimuladorContext';
 import { clsx } from 'clsx';
 import { Clock, Users, Calendar } from 'lucide-react';
+import { ServicoTipo } from '@/types/simulador';
 
 const DAYS = [
     { id: 'seg', label: 'Seg' },
@@ -20,17 +21,17 @@ export default function ConfiguracaoServicos() {
     const [localConfigs, setLocalConfigs] = useState(state.configuracoes);
 
     // Helper to get config for a specific service or return default
-    const getConfig = (serviceId: string) => {
+    const getConfig = (serviceId: ServicoTipo) => {
         return localConfigs.find(c => c.servicoId === serviceId) || {
             servicoId: serviceId,
-            dias: ['seg', 'ter', 'qua', 'qui', 'sex'],
+            diasSemana: ['seg', 'ter', 'qua', 'qui', 'sex'],
             horarioEntrada: '08:00',
             horarioSaida: '18:00',
             quantidade: 1
         };
     };
 
-    const handleUpdate = (serviceId: string, field: string, value: any) => {
+    const handleUpdate = (serviceId: ServicoTipo, field: string, value: any) => {
         setLocalConfigs(prev => {
             const existing = prev.find(c => c.servicoId === serviceId);
             let updated;
@@ -40,7 +41,7 @@ export default function ConfiguracaoServicos() {
             } else {
                 const newConfig = {
                     servicoId: serviceId,
-                    dias: ['seg', 'ter', 'qua', 'qui', 'sex'],
+                    diasSemana: ['seg', 'ter', 'qua', 'qui', 'sex'],
                     horarioEntrada: '08:00',
                     horarioSaida: '18:00',
                     quantidade: 1,
@@ -52,12 +53,12 @@ export default function ConfiguracaoServicos() {
         });
     };
 
-    const toggleDay = (serviceId: string, dayId: string) => {
+    const toggleDay = (serviceId: ServicoTipo, dayId: string) => {
         const config = getConfig(serviceId);
-        const newDays = config.dias.includes(dayId)
-            ? config.dias.filter(d => d !== dayId)
-            : [...config.dias, dayId];
-        handleUpdate(serviceId, 'dias', newDays);
+        const newDays = config.diasSemana.includes(dayId)
+            ? config.diasSemana.filter(d => d !== dayId)
+            : [...config.diasSemana, dayId];
+        handleUpdate(serviceId, 'diasSemana', newDays);
     };
 
     const handleNext = () => {
@@ -93,7 +94,7 @@ export default function ConfiguracaoServicos() {
                                     </label>
                                     <div className="flex gap-2 flex-wrap">
                                         {DAYS.map(day => {
-                                            const isSelected = config.dias.includes(day.id);
+                                            const isSelected = config.diasSemana.includes(day.id);
                                             return (
                                                 <button
                                                     key={day.id}

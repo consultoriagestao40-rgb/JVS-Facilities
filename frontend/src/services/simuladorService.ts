@@ -38,9 +38,8 @@ export const simuladorService = {
             }
         }));
 
-        // Adjust for port 3001 as previously planned (Backend Port)
-        // Note: Ensure Backend is running on 3001 or update this URL
-        const response = await fetch('http://localhost:3001/api/simulador/calcular', {
+        // Use the configured API_URL (from env or default)
+        const response = await fetch(`${API_URL}/simulador/calcular`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
