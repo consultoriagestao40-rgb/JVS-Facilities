@@ -12,7 +12,7 @@ type FormValues = {
 };
 
 export default function ComposicaoCustos() {
-    const { state, dispatch, nextStep, prevStep } = useSimulador();
+    const { state, nextStep, prevStep } = useSimulador();
 
     // Load initial values from context/session if available
     // For MVP, simplified state mapping. Ideally, we would map specific service configs.
@@ -31,7 +31,7 @@ export default function ComposicaoCustos() {
         // Update all selected services with these global settings for now (MVP simplification)
         // In a full version, this would be per-service or aggregated.
         // We will just store this in a generic way or update the first service config as a placeholder
-        // dispatch({ type: 'UPDATE_CONFIG', payload: { ... } });
+        // TODO: Implement updateAdicionais in context in next iteration
 
         // For demonstration, we assume these apply globally or we update the context accordingly
         console.log("Step 4 Data:", data);
