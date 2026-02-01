@@ -161,15 +161,37 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
             copa: adicionalCopa,
             total: adicionaisObj.total + adicionalCopa // Copa is an "Adicional" in breakdown
         },
-        // ... rest ...
+        provisoes: {
+            ferias: provisoesObj.ferias,
+            decimoTerceiro: provisoesObj.decimoTerceiro,
+            rescisao: provisoesObj.rescisao,
+            total: totalProvisoes
+        },
+        custosOperacionais: {
+            examesMedicos: custoExames,
+            total: custoExames
+        },
+        insumos,
+        tributos,
+        lucro,
+        totalMensal: precoFinal
+    };
 
-        // Helper to get values merging Global + Rule
-        function getValoresFinais(
-            match: RegraCCT | null,
-            global: ReturnType<typeof getValores>
-        ) {
-            // If no rule, use defaults + standard provision rates (1/12, etc)
-            if (!match) {
+    return {
+        config,
+        custoUnitario: precoFinal,
+        custoTotal,
+        detalhamento
+    };
+}
+
+// Helper to get values merging Global + Rule
+function getValoresFinais(
+    match: RegraCCT | null,
+    global: ReturnType<typeof getValores>
+) {
+    // If no rule, use defaults + standard provision rates (1/12, etc)
+    if (!match) {
         return {
             ...global,
             PROVISOES: {
