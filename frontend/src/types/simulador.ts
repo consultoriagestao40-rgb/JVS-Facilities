@@ -33,6 +33,7 @@ export interface RegraCCT {
     salarioPiso: number;
     beneficios: {
         valeRefeicao: number;
+        tipoValeRefeicao?: 'DIARIO' | 'MENSAL';
         valeTransporte: number;
         cestaBasica: number;
         uniforme: number;
@@ -54,6 +55,11 @@ export interface RegraCCT {
         ferias: number;
         decimoTerceiro: number;
         rescisao: number;
+    };
+    configuracoesBeneficios?: {
+        descontoVT: number; // e.g. 0.06
+        descontoVA: number; // e.g. 0.20
+        vaSobreFerias: boolean;
     };
 }
 
@@ -107,6 +113,9 @@ export interface BreakdownCustos {
         valeTransporte: number;
         cestaBasica: number;
         uniforme: number;
+        vaSobreFerias: number; // New cost
+        descontoVA: number; // Negative value
+        descontoVT: number; // Negative value
         total: number;
     };
     encargos: number; // INSS + FGTS + RAT
