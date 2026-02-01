@@ -75,7 +75,7 @@ export default function ResumoProposta() {
                     Proposta Gerada com Sucesso
                 </div>
                 <h2 className="text-3xl font-heading font-bold text-gray-900">
-                    Proposta Comercial
+                    Proposta Comercial (v2.1)
                 </h2>
                 <p className="text-gray-500">ID: {resultado.id}</p>
             </div>
