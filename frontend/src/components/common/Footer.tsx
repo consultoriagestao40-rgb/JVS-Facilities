@@ -23,9 +23,9 @@ export default function Footer() {
                             Qualidade, transparência e eficiência para sua empresa.
                         </p>
                         <div className="flex gap-4">
-                            <Link href="#" className="hover:text-primary transition-colors"><Instagram className="w-5 h-5" /></Link>
-                            <Link href="#" className="hover:text-primary transition-colors"><Linkedin className="w-5 h-5" /></Link>
-                            <Link href="#" className="hover:text-primary transition-colors"><Facebook className="w-5 h-5" /></Link>
+                            <Link href="https://www.instagram.com/grupojvsserv" target="_blank" className="hover:text-primary transition-colors"><Instagram className="w-5 h-5" /></Link>
+                            <Link href="https://www.linkedin.com/company/grupojvsserv" target="_blank" className="hover:text-primary transition-colors"><Linkedin className="w-5 h-5" /></Link>
+                            <Link href="https://www.facebook.com/grupojvsserv" target="_blank" className="hover:text-primary transition-colors"><Facebook className="w-5 h-5" /></Link>
                         </div>
                     </div>
 
