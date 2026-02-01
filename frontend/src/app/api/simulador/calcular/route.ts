@@ -122,10 +122,12 @@ function getValoresFinais(
             TIPO_VR: match.beneficios.tipoValeRefeicao || 'DIARIO',
             VALE_TRANSPORTE_DIA: match.beneficios.valeTransporte,
             CESTA_BASICA: match.beneficios.cestaBasica,
-            UNIFORME_MENSAL: match.beneficios.uniforme,
+            UNIFORME_MENSAL: match.custosOperacionais?.uniformeEpis ?? match.beneficios.uniforme, // Prefer new field
             GRATIFICACOES: match.gratificacoes || 0 // New Value
         },
         BENEFICIOS_CONFIG: match.configuracoesBeneficios || { descontoVT: 0.06, descontoVA: 0.20, vaSobreFerias: true },
+        ADICIONAIS_CONFIG: match.adicionais || { insalubridade: false, grauInsalubridade: 0.20, baseInsalubridade: 'SALARIO_MINIMO' },
+        CUSTOS_OPS: match.custosOperacionais || { examesMedicos: 0, uniformeEpis: 0 },
         PISOS: {
             ...global.PISOS,
             [match.funcao.toLowerCase()]: match.salarioPiso
@@ -265,8 +267,12 @@ function calcularAdicionais(
     let dsr = 0;
     let intrajornadaReflexo = 0;
 
-    // Insalubridade is usually on Minimum Wage
-    if (config.adicionais?.insalubridade) insalubridade = valores.VALORES_BASE.SALARIO_MINIMO * 0.20;
+    // Insalubridade
+    if (config.adicionais?.insalubridade) {
+        const grau = valores.ADICIONAIS_CONFIG?.grauInsalubridade ?? 0.20;
+        const baseCalc = valores.ADICIONAIS_CONFIG?.baseInsalubridade === 'SALARIO_BASE' ? base : valores.VALORES_BASE.SALARIO_MINIMO;
+        insalubridade = baseCalc * grau;
+    }
 
     // Periculosidade is on Base Salary
     if (config.adicionais?.periculosidade) periculosidade = base * 0.30;
@@ -415,8 +421,9 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     const provisoesObj = calcularProvisoes(remuneracaoTotal, valores);
     const totalProvisoes = provisoesObj.ferias + provisoesObj.decimoTerceiro + provisoesObj.rescisao;
 
-    // 6. Insumos
-    const insumos = (config.materiais || 0);
+    // 6. Insumos & Operacionais
+    const custoExames = valores.CUSTOS_OPS?.examesMedicos || 0;
+    const insumos = (config.materiais || 0) + custoExames;
 
     // Subtotal (Custo Operacional Direto)
     const custoOperacional = remuneracaoTotal + beneficios.total + encargos + totalProvisoes + insumos;
