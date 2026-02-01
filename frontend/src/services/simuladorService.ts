@@ -13,6 +13,8 @@ interface BackendConfigPayload {
     horarioSaida: string;
     quantidade: number;
     materiais?: number;
+    adicionalCopa?: number;
+    intrajornada?: boolean;
     adicionais?: {
         insalubridade?: boolean;
         periculosidade?: boolean;
@@ -24,18 +26,20 @@ export const simuladorService = {
         // Map Frontend State to Backend Payload
         const configs: BackendConfigPayload[] = state.configuracoes.map(config => ({
             funcao: config.servicoId,
-            estado: 'SP', // Default for MVP
-            cidade: 'São Paulo', // Default for MVP
+            // USE ACTUAL VALUES FROM CONFIG, NOT HARDCODED!
+            estado: (config as any).estado || 'PR', // Use config state, fallback to PR
+            cidade: (config as any).cidade || 'Curitiba', // Use config city
             dias: config.diasSemana,
             horarioEntrada: config.horarioEntrada,
             horarioSaida: config.horarioSaida,
             quantidade: config.quantidade,
-            // Assuming we stored materials/adicionais in step 4 in a way we can access here
-            // For MVP, passing defaults or mock values if not in config array yet
-            materiais: 0,
+            // PASS ACTUAL MATERIALS AND COPA FROM USER INPUT
+            materiais: config.materiais || 0,
+            adicionalCopa: (config as any).adicionalCopa || 0,
+            intrajornada: config.intrajornada || false,
             adicionais: {
-                insalubridade: false,
-                periculosidade: false
+                insalubridade: (config as any).insalubridade || false,
+                periculosidade: (config as any).periculosidade || false
             }
         }));
 
