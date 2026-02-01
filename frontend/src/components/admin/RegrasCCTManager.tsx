@@ -78,14 +78,26 @@ export default function RegrasCCTManager() {
 
     const handleChange = (section: keyof RegraCCTType | null, field: string, value: any) => {
         setCurrentRegra(prev => {
-            if (!section) return { ...prev, [field]: value };
+            // Helper to parse numbers if needed
+            const parseValue = (val: any) => {
+                const num = parseFloat(val);
+                return isNaN(num) ? val : num;
+            };
+
+            if (!section) {
+                // Determine if we should parse based on the current type or field name
+                const originalValue = prev[field as keyof RegraCCTType];
+                const cleanValue = typeof originalValue === 'number' ? parseFloat(value) || 0 : value;
+
+                return { ...prev, [field]: cleanValue };
+            }
 
             // Handle nested
             return {
                 ...prev,
                 [section]: {
                     ...(prev[section] as any),
-                    [field]: parseFloat(value) || value // Keep string if NaN (e.g. date) or number
+                    [field]: parseFloat(value) || value
                 }
             };
         });

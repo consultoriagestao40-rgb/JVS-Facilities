@@ -1,0 +1,1 @@
+curl -X POST https://jvs-facilities.vercel.app/api/simulador/calcular -H "Content-Type: application/json" -d "{\"configs\":[{\"funcao\":\"Limpeza\",\"estado\":\"SP\",\"cidade\":\"São Paulo\",\"dias\":[\"seg\"],\"horarioEntrada\":\"08:00\",\"horarioSaida\":\"17:00\",\"quantidade\":1}]}"
