@@ -438,19 +438,32 @@ export default function RegrasCCTManager() {
                                                 className="w-full p-2 border rounded text-sm"
                                             />
                                         </div>
+                                        <div className="w-32">
+                                            <label className="text-xs text-gray-500">Gratificação (R$)</label>
+                                            <input
+                                                id="newCargoGratificacao"
+                                                type="number"
+                                                placeholder="0.00"
+                                                className="w-full p-2 border rounded text-sm"
+                                            />
+                                        </div>
                                         <button
                                             type="button" // Prevent submit
                                             onClick={() => {
                                                 const nameInput = document.getElementById('newCargoName') as HTMLInputElement;
                                                 const pisoInput = document.getElementById('newCargoPiso') as HTMLInputElement;
+                                                const gratInput = document.getElementById('newCargoGratificacao') as HTMLInputElement;
+
                                                 const nome = nameInput.value;
                                                 const piso = parseFloat(pisoInput.value);
+                                                const gratificacao = parseFloat(gratInput.value) || 0;
 
                                                 if (nome && piso) {
-                                                    const newCargos = [...(currentRegra.cargos || []), { nome, piso }];
+                                                    const newCargos = [...(currentRegra.cargos || []), { nome, piso, gratificacao }];
                                                     setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
                                                     nameInput.value = '';
                                                     pisoInput.value = '';
+                                                    gratInput.value = '';
                                                 }
                                             }}
                                             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-bold"
@@ -466,17 +479,19 @@ export default function RegrasCCTManager() {
                                                 <tr>
                                                     <th className="p-2 border-b">Cargo</th>
                                                     <th className="p-2 border-b">Piso Salarial</th>
+                                                    <th className="p-2 border-b">Gratificação</th>
                                                     <th className="p-2 border-b w-10"></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {(currentRegra.cargos || []).length === 0 && (
-                                                    <tr><td colSpan={3} className="p-4 text-center text-gray-400 italic">Nenhum cargo específico definido. Usará apenas configurações gerais.</td></tr>
+                                                    <tr><td colSpan={4} className="p-4 text-center text-gray-400 italic">Nenhum cargo específico definido. Usará apenas configurações gerais.</td></tr>
                                                 )}
                                                 {(currentRegra.cargos || []).map((c, idx) => (
                                                     <tr key={idx} className="border-b hover:bg-gray-50">
                                                         <td className="p-2">{c.nome}</td>
                                                         <td className="p-2 font-mono">R$ {c.piso.toFixed(2)}</td>
+                                                        <td className="p-2 font-mono text-gray-600">{c.gratificacao ? `R$ ${c.gratificacao.toFixed(2)}` : '-'}</td>
                                                         <td className="p-2 text-right">
                                                             <button
                                                                 onClick={() => {

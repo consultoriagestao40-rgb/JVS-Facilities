@@ -95,8 +95,10 @@ function getMatchingRule(
             maxScore = score;
             // If we found a match in the list, we clone the rule and override the Piso
             if (foundSpecificCargoInList && configCargo) {
-                const specificPiso = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase())?.piso || r.salarioPiso;
-                bestMatch = { ...r, salarioPiso: specificPiso, cargo: configCargo };
+                const specificRole = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
+                const specificPiso = specificRole?.piso || r.salarioPiso;
+                const specificGratificacao = specificRole?.gratificacao ?? r.gratificacoes;
+                bestMatch = { ...r, salarioPiso: specificPiso, gratificacoes: specificGratificacao, cargo: configCargo };
             } else {
                 bestMatch = r;
             }
