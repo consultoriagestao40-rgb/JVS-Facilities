@@ -96,13 +96,45 @@ export default function RegrasCCTManager() {
             total: totalBen
         };
 
+        const piso = currentRegra.salarioPiso;
+        const gratificacoes = currentRegra.gratificacoes || 0;
+
+        // ...
+
         // Encargos (INSS + FGTS + RAT)
         const encRate = currentRegra.aliquotas.inss + currentRegra.aliquotas.fgts + currentRegra.aliquotas.rat;
-        const totalEnc = piso * encRate;
+        // Encargos sobre Piso + Gratificacoes
+        const totalEnc = (piso + gratificacoes) * encRate;
 
         // Provisoes
         const prov = currentRegra.provisoes || { ferias: 0.1111, decimoTerceiro: 0.0833, rescisao: 0.05 };
-        const totalProv = piso * (Number(prov.ferias) + Number(prov.decimoTerceiro) + Number(prov.rescisao));
+        const totalProv = (piso + gratificacoes) * (Number(prov.ferias) + Number(prov.decimoTerceiro) + Number(prov.rescisao));
+        // ... (inside detailProv too)
+
+        const totalOperacional = piso + gratificacoes + totalBen + totalEnc + totalProv;
+
+        // ...
+
+        const mockItem: ItemResultado = {
+            // ...
+            detalhamento: {
+                salarioBase: piso,
+                gratificacoes: gratificacoes,
+                // ...
+            }
+        };
+
+        // ... In Render:
+
+        // Footer Sum:
+        currentRegra.salarioPiso +
+            (currentRegra.gratificacoes || 0) +
+            (Object.values(currentRegra.beneficios)
+                .filter((v): v is number => typeof v === 'number')
+                .reduce((acc, val) => acc + val, 0)) +
+            ((currentRegra.salarioPiso + (currentRegra.gratificacoes || 0)) * (currentRegra.aliquotas.inss + currentRegra.aliquotas.fgts + currentRegra.aliquotas.rat)) +
+            ((currentRegra.salarioPiso + (currentRegra.gratificacoes || 0)) * Object.values(currentRegra.provisoes || {}).reduce((acc, val) => acc + Number(val), 0))
+
         const detailProv = {
             ferias: piso * Number(prov.ferias),
             decimoTerceiro: piso * Number(prov.decimoTerceiro),
@@ -347,6 +379,28 @@ export default function RegrasCCTManager() {
                                     value={currentRegra.salarioPiso}
                                     onChange={e => handleChange(null, 'salarioPiso', e.target.value)}
                                     className="w-full p-2 border rounded font-bold text-green-700"
+                                />
+                            </div>
+
+                            {/* New Fields */}
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Cargo Específico (Opcional)</label>
+                                <input
+                                    type="text"
+                                    value={currentRegra.cargo || ''}
+                                    onChange={e => handleChange(null, 'cargo', e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="Ex: Encarregada, Líder..."
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Gratificações (R$)</label>
+                                <input
+                                    type="number"
+                                    value={currentRegra.gratificacoes || ''}
+                                    onChange={e => handleChange(null, 'gratificacoes', e.target.value)}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="0.00"
                                 />
                             </div>
                         </div>

@@ -29,8 +29,10 @@ export interface RegraCCT {
     uf: string;
     cidade: string; // '*' for all cities in UF if needed
     funcao: string; // 'LIMPEZA', 'PORTARIA', etc.
+    cargo?: string; // Specific Role e.g. 'Encarregada'
     dataVigencia: string;
     salarioPiso: number;
+    gratificacoes?: number; // Extra payment
     beneficios: {
         valeRefeicao: number;
         tipoValeRefeicao?: 'DIARIO' | 'MENSAL';
@@ -100,6 +102,7 @@ export type SimuladorState = {
 // API Types (Matched with Backend)
 export interface BreakdownCustos {
     salarioBase: number;
+    gratificacoes?: number; // New field
     adicionais: {
         insalubridade: number;
         periculosidade: number;

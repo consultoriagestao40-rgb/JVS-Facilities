@@ -84,12 +84,13 @@ function getValoresFinais(
             ...global.VALORES_BASE,
             SALARIO_MINIMO: match.salarioPiso,
             VALE_REFEICAO_DIA: match.beneficios.valeRefeicao,
-            TIPO_VR: match.beneficios.tipoValeRefeicao || 'DIARIO', // Pass Type
+            TIPO_VR: match.beneficios.tipoValeRefeicao || 'DIARIO',
             VALE_TRANSPORTE_DIA: match.beneficios.valeTransporte,
             CESTA_BASICA: match.beneficios.cestaBasica,
-            UNIFORME_MENSAL: match.beneficios.uniforme
+            UNIFORME_MENSAL: match.beneficios.uniforme,
+            GRATIFICACOES: match.gratificacoes || 0 // New Value
         },
-        BENEFICIOS_CONFIG: match.configuracoesBeneficios || { descontoVT: 0.06, descontoVA: 0.20, vaSobreFerias: true }, // Pass Rules
+        BENEFICIOS_CONFIG: match.configuracoesBeneficios || { descontoVT: 0.06, descontoVA: 0.20, vaSobreFerias: true },
         PISOS: {
             ...global.PISOS,
             [match.funcao.toLowerCase()]: match.salarioPiso
@@ -357,12 +358,15 @@ function calcularProvisoes(remuneracao: number, valores: any): DetailedBreakdown
 }
 
 function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
-    // 1. Base
+    // 1. Base e Gratificações
     const salarioBase = getPisoSalarial(config.funcao, valores);
+    const gratificacoes = valores.VALORES_BASE.GRATIFICACOES || 0;
 
     // 2. Adicionais
-    const adicionaisObj = calcularAdicionais(salarioBase, valores, config);
-    const remuneracaoTotal = salarioBase + adicionaisObj.total;
+    const adicionaisObj = calcularAdicionais(salarioBase, valores, config); // Adicionais calculados sobre Salário Base geralmente
+
+    // Remuneração Total para fins de Encargos e Provisões
+    const remuneracaoTotal = salarioBase + gratificacoes + adicionaisObj.total;
 
     // 3. Beneficios
     const diasTrabalhados = config.dias.length * 4.33; // Avg weeks per month
@@ -395,6 +399,7 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 
     const detalhamento: BreakdownCustos = {
         salarioBase,
+        gratificacoes, // New Field
         adicionais: { // Updated structure
             insalubridade: adicionaisObj.insalubridade,
             periculosidade: adicionaisObj.periculosidade,

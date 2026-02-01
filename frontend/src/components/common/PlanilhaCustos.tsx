@@ -34,7 +34,7 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
     const totalAdicionais = d.adicionais.total;
     const totalProvisoes = d.provisoes.total;
     const totalEncargos = d.encargos; // Encargos Sociais only
-    const montanteA = d.salarioBase + totalAdicionais + totalEncargos + totalProvisoes;
+    const montanteA = d.salarioBase + (d.gratificacoes || 0) + totalAdicionais + totalEncargos + totalProvisoes;
 
     // --- Montante B: Insumos ---
     const montanteB = d.insumos;
@@ -86,6 +86,7 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             {/* MONTANTE A */}
                             <SectionHeader title='Montante "A" - Mão-de-obra' total={montanteA} />
                             <LineItem name="1) Salário Base / Piso" value={d.salarioBase} />
+                            {d.gratificacoes && d.gratificacoes > 0 && <LineItem name="Gratificações / Função" value={d.gratificacoes} />}
                             {d.adicionais.insalubridade > 0 && <LineItem name="Adicional Insalubridade" value={d.adicionais.insalubridade} />}
                             {d.adicionais.periculosidade > 0 && <LineItem name="Adicional Periculosidade" value={d.adicionais.periculosidade} />}
                             {d.adicionais.noturno > 0 && <LineItem name="Adicional Noturno (c/ Hora Reduzida)" value={d.adicionais.noturno} />}
