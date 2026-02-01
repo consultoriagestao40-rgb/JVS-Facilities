@@ -14,6 +14,7 @@ interface BackendConfigPayload {
         insalubridade?: boolean;
         periculosidade?: boolean;
     };
+    intrajornada?: boolean; // New
 }
 
 // Detailed Breakdown used internally for calculations
