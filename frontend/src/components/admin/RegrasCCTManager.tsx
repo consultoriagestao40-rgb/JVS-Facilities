@@ -336,7 +336,7 @@ export default function RegrasCCTManager() {
                                 <th className="p-4 font-semibold text-gray-600">Piso (R$)</th>
                                 <th className="p-4 font-semibold text-gray-600">Adicional (R$)</th>
                                 <th className="p-4 font-semibold text-gray-600">Remun. Total (PDF)</th>
-                                <th className="p-4 font-semibold text-gray-600">Custo Mensal Proposto</th>
+                                <th className="p-4 font-semibold text-gray-600">Preço Venda (Final)</th>
                                 <th className="p-4 font-semibold text-gray-600 text-right">Ações</th>
                             </tr>
                         </thead>
@@ -358,7 +358,7 @@ export default function RegrasCCTManager() {
                                         gratificacoes: gratificacao
                                     };
                                     const custoTotal = calculateTotalCost(proxyRegra);
-                                    // const precoVenda = calculateEstimativePrice(proxyRegra);
+                                    const precoVenda = calculateEstimativePrice(proxyRegra);
                                     const totalRemuneracao = piso + gratificacao;
 
                                     return (
@@ -374,8 +374,8 @@ export default function RegrasCCTManager() {
                                             </td>
                                             <td className="p-4 font-mono text-gray-700">R$ {piso.toFixed(2)}</td>
                                             <td className="p-4 font-mono text-gray-700">R$ {gratificacao.toFixed(2)}</td>
-                                            <td className="p-4 font-mono font-bold text-gray-900 bg-yellow-50">R$ {totalRemuneracao.toFixed(2)}</td>
-                                            <td className="p-4 font-mono font-bold text-orange-700">R$ {custoTotal.toFixed(2)}</td>
+                                            <td className="p-4 font-mono font-bold text-gray-900 bg-yellow-50 border-x border-yellow-100">R$ {totalRemuneracao.toFixed(2)}</td>
+                                            <td className="p-4 font-mono font-bold text-green-700">R$ {precoVenda.toFixed(2)}</td>
                                             <td className="p-4 text-right space-x-2">
                                                 <button onClick={() => handleEdit(regra)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-full" title="Editar Regra Completa"><Edit className="w-4 h-4" /></button>
                                                 {!isSubItem && <button onClick={() => handleDelete(regra.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-full"><Trash className="w-4 h-4" /></button>}
