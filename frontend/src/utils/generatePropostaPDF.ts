@@ -1,8 +1,8 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { ResultadoSimulacao } from '@/types/simulador';
+import { ResultadoSimulacao, UserData } from '@/types/simulador';
 
-export const generatePropostaPDF = (resultado: ResultadoSimulacao) => {
+export const generatePropostaPDF = (resultado: ResultadoSimulacao, client: UserData) => {
     const doc = new jsPDF();
     const primaryColor = '#10B981'; // Green
     const secondaryColor = '#1F2937'; // Slate 800
@@ -19,6 +19,19 @@ export const generatePropostaPDF = (resultado: ResultadoSimulacao) => {
     doc.text('Proposta Comercial Personalizada', 14, 26);
     doc.text(`ID: ${resultado.id}`, 14, 30);
     doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 34);
+
+    // Client Info Box
+    doc.setFillColor('#F3F4F6'); // Gray 100
+    doc.rect(120, 15, 76, 25, 'F');
+    doc.setFontSize(9);
+    doc.setTextColor(secondaryColor);
+    doc.text('PREPARADO PARA:', 124, 20);
+    doc.setFont('helvetica', 'bold');
+    doc.text(client.empresa || client.nome, 124, 25);
+    doc.setFont('helvetica', 'normal');
+    doc.text(client.nome.split(' ')[0], 124, 29);
+    doc.text(client.email, 124, 33);
+    if (client.whatsapp) doc.text(client.whatsapp, 124, 37);
 
     // Summary Box
     doc.setFillColor(secondaryColor);
