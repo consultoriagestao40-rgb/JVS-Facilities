@@ -486,7 +486,9 @@ export default function RegrasCCTManager() {
                         <div>
                             <span className="block font-bold uppercase text-xs opacity-70">Total Benefícios</span>
                             <span className="text-lg font-bold">
-                                R$ {Object.values(currentRegra.beneficios).reduce((acc, val) => acc + Number(val), 0).toFixed(2)}
+                                R$ {Object.values(currentRegra.beneficios)
+                                    .filter((v): v is number => typeof v === 'number')
+                                    .reduce((acc, val) => acc + val, 0).toFixed(2)}
                             </span>
                         </div>
                         <div>
@@ -501,7 +503,9 @@ export default function RegrasCCTManager() {
                                 {/* Piso + Beneficios + Encargos (29.68%) + Provisões */}
                                 R$ {(
                                     currentRegra.salarioPiso +
-                                    Object.values(currentRegra.beneficios).reduce((acc, val) => acc + Number(val), 0) +
+                                    Object.values(currentRegra.beneficios)
+                                        .filter((v): v is number => typeof v === 'number')
+                                        .reduce((acc, val) => acc + val, 0) +
                                     (currentRegra.salarioPiso * (currentRegra.aliquotas.inss + currentRegra.aliquotas.fgts + currentRegra.aliquotas.rat)) +
                                     (currentRegra.salarioPiso * Object.values(currentRegra.provisoes || {}).reduce((acc, val) => acc + Number(val), 0))
                                 ).toFixed(2)}
