@@ -169,7 +169,7 @@ function getValores(params?: ParametrosCustos) {
         },
         // Defaults for new structure (merged in getValoresFinais usually, but needed for type inference)
         CUSTOS_OPS: { examesMedicos: 0, uniformeEpis: 0 },
-        ADICIONAIS_CONFIG: { insalubridade: false, grauInsalubridade: 0.20, baseInsalubridade: 'SALARIO_MINIMO' as const }
+        ADICIONAIS_CONFIG: { insalubridade: false, grauInsalubridade: 0.20, baseInsalubridade: 'SALARIO_MINIMO' as 'SALARIO_MINIMO' | 'SALARIO_BASE' }
     };
 }
 

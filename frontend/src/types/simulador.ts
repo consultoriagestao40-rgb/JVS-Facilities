@@ -133,7 +133,6 @@ export interface BreakdownCustos {
         ferias: number;
         decimoTerceiro: number;
         rescisao: number;
-        rescisao: number;
         total: number;
     };
     custosOperacionais: { // New Section
