@@ -49,6 +49,11 @@ export interface RegraCCT {
         insalubridade: boolean;
         periculosidade: boolean;
     };
+    provisoes: {
+        ferias: number;
+        decimoTerceiro: number;
+        rescisao: number;
+    };
 }
 
 export interface ParametrosCustos {

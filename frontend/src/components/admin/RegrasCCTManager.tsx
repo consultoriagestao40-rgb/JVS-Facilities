@@ -30,6 +30,11 @@ const emptyRegra: RegraCCTType = {
     adicionais: {
         insalubridade: false,
         periculosidade: false
+    },
+    provisoes: {
+        ferias: 0.1111, // 1/12 + 1/3
+        decimoTerceiro: 0.0833, // 1/12
+        rescisao: 0.05 // 5%
     }
 };
 
