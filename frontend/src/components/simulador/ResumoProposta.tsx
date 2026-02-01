@@ -127,17 +127,23 @@ export default function ResumoProposta() {
                     <FileText className="w-5 h-5" />
                     Composição Transparente
                 </h4>
-                <div className="h-4 bg-gray-200 rounded-full overflow-hidden flex">
-                    <div style={{ width: '40%' }} className="bg-blue-500 h-full" title="Salários"></div>
-                    <div style={{ width: '25%' }} className="bg-green-500 h-full" title="Encargos"></div>
-                    <div style={{ width: '15%' }} className="bg-yellow-500 h-full" title="Benefícios"></div>
-                    <div style={{ width: '20%' }} className="bg-primary h-full" title="Tributos/Lucro"></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500"></span> Salários</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500"></span> Encargos</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500"></span> Benefícios</span>
-                    <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary"></span> Taxas/Lucro</span>
+                <div className="flex flex-col gap-4 mt-6">
+                    {resultado.servicos.map((servico, idx) => (
+                        <div key={idx} className="border-t pt-4">
+                            <p className="font-bold text-gray-800 mb-2">{servico.config.funcao} (Detalhado)</p>
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm text-gray-600">
+                                <div className="flex justify-between"><span>Salário Base:</span> <span className="font-mono">{formatBRL(servico.detalhamento.salarioBase)}</span></div>
+                                <div className="flex justify-between"><span>Adicionais:</span> <span className="font-mono">{formatBRL(servico.detalhamento.adicionais.total)}</span></div>
+                                <div className="flex justify-between text-blue-600"><span>Encargos Sociais:</span> <span className="font-mono">{formatBRL(servico.detalhamento.encargos)}</span></div>
+                                <div className="flex justify-between text-orange-600 font-medium"><span>Férias (+1/3):</span> <span className="font-mono">{formatBRL(servico.detalhamento.provisoes.ferias)}</span></div>
+                                <div className="flex justify-between text-orange-600 font-medium"><span>13º Salário:</span> <span className="font-mono">{formatBRL(servico.detalhamento.provisoes.decimoTerceiro)}</span></div>
+                                <div className="flex justify-between text-orange-600 font-medium"><span>Rescisão:</span> <span className="font-mono">{formatBRL(servico.detalhamento.provisoes.rescisao)}</span></div>
+                                <div className="flex justify-between"><span>Benefícios:</span> <span className="font-mono">{formatBRL(servico.detalhamento.beneficios)}</span></div>
+                                <div className="flex justify-between"><span>Insumos:</span> <span className="font-mono">{formatBRL(servico.detalhamento.insumos)}</span></div>
+                                <div className="flex justify-between font-bold text-green-700 border-t mt-1 pt-1"><span>Total Fiscal:</span> <span>{formatBRL(servico.detalhamento.totalMensal)}</span></div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
 
