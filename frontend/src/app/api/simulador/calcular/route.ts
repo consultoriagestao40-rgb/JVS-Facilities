@@ -117,73 +117,7 @@ function getMatchingRule(
     return bestMatch;
 }
 
-// ... internal helper updates ...
 
-function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
-    // 1. Base e Gratificações
-    const salarioBase = getPisoSalarial(config.funcao, valores);
-    const gratificacoes = valores.VALORES_BASE.GRATIFICACOES || 0;
-
-    // Extract Copa from the merged match values (which we put in global context via getValoresFinais if we updated it, but let's check).
-    // Actually, getValoresFinais cleans the object. We need to pass copa through.
-    // Let's modify getValoresFinais to accept and pass 'adicionalCopa'.
-    // Or better: access it from 'valores' if we put it there.
-
-    // We need to check if we updated getValoresFinais? We didn't yet.
-    // Let's assume we will update getValoresFinais to map 'adicionalCopa' to VALORES_BASE.ADICIONAL_COPA
-
-    const adicionalCopa = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
-
-    // 2. Adicionais
-    const adicionaisObj = calcularAdicionais(salarioBase, valores, config); // Adicionais calculados sobre Salário Base geralmente
-
-    // Remuneração Total para fins de Encargos e Provisões
-    // Assuming Copa is remunerative (taxable)
-    const remuneracaoTotal = salarioBase + gratificacoes + adicionalCopa + adicionaisObj.total;
-
-    // ... beneficiaries ...
-
-    // Subtotal (Custo Operacional Direto)
-    // Now include custoExames explicitly
-    const custoOperacional = remuneracaoTotal + beneficios.total + encargos + totalProvisoes + insumos + custoExames;
-
-    // ...
-
-    const detalhamento: BreakdownCustos = {
-        salarioBase,
-        gratificacoes, // New Field
-        adicionais: { // Updated structure
-            insalubridade: adicionaisObj.insalubridade,
-            periculosidade: adicionaisObj.periculosidade,
-            noturno: adicionaisObj.noturno,
-            intrajornada: adicionaisObj.intrajornada,
-            dsr: adicionaisObj.dsr,
-            copa: adicionalCopa,
-            total: adicionaisObj.total + adicionalCopa // Copa is an "Adicional" in breakdown
-        },
-        provisoes: {
-            ferias: provisoesObj.ferias,
-            decimoTerceiro: provisoesObj.decimoTerceiro,
-            rescisao: provisoesObj.rescisao,
-            total: totalProvisoes
-        },
-        custosOperacionais: {
-            examesMedicos: custoExames,
-            total: custoExames
-        },
-        insumos,
-        tributos,
-        lucro,
-        totalMensal: precoFinal
-    };
-
-    return {
-        config,
-        custoUnitario: precoFinal,
-        custoTotal,
-        detalhamento
-    };
-}
 
 // Helper to get values merging Global + Rule
 function getValoresFinais(
