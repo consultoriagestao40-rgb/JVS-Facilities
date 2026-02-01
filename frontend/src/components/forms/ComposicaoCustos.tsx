@@ -9,6 +9,7 @@ type FormValues = {
     valorMateriais: number;
     insalubridade: boolean;
     periculosidade: boolean;
+    copa: boolean;
 };
 
 export default function ComposicaoCustos() {
@@ -21,7 +22,8 @@ export default function ComposicaoCustos() {
             necessitaMateriais: false,
             valorMateriais: 0,
             insalubridade: false,
-            periculosidade: false
+            periculosidade: false,
+            copa: false
         }
     });
 
@@ -116,8 +118,22 @@ export default function ComposicaoCustos() {
                             </div>
                         </label>
                     </div>
-                </div>
+                </label>
+
+                <label className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
+                    <input
+                        type="checkbox"
+                        {...register('copa')}
+                        className="w-5 h-5 text-primary rounded focus:ring-primary"
+                    />
+                    <div className="flex flex-col">
+                        <span className="text-gray-700 font-medium">Adicional de Copa</span>
+                        <span className="text-xs text-gray-500">Para funções que manipulam alimentos/copa</span>
+                    </div>
+                </label>
             </div>
+        </div>
+            </div >
 
             <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start gap-3">
                 <HardHat className="w-5 h-5 text-blue-600 mt-0.5" />
@@ -147,6 +163,6 @@ export default function ComposicaoCustos() {
                     <ArrowRight className="w-5 h-5" />
                 </button>
             </div>
-        </form>
+        </form >
     );
 }
