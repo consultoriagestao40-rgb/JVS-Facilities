@@ -11,7 +11,13 @@ export default function Footer() {
 
                     {/* Brand & Resume */}
                     <div className="col-span-1 md:col-span-1">
-                        <h3 className="text-2xl font-bold text-white mb-4">JVS Facilities</h3>
+                        <div className="mb-6">
+                            <img
+                                src="https://grupojvsserv.com.br/wp-content/uploads/2023/11/logo-branco-200px.png"
+                                alt="JVS Facilities"
+                                className="h-10 w-auto"
+                            />
+                        </div>
                         <p className="text-sm text-gray-400 leading-relaxed mb-6">
                             Soluções inteligentes em terceirização de serviços e facilities.
                             Qualidade, transparência e eficiência para sua empresa.
