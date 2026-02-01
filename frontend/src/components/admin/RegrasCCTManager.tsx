@@ -160,6 +160,10 @@ export default function RegrasCCTManager() {
                 beneficios: detailBen,
                 encargos: totalEnc,
                 provisoes: detailProv,
+                custosOperacionais: {
+                    examesMedicos: regra.custosOperacionais?.examesMedicos || 0,
+                    total: (regra.custosOperacionais?.examesMedicos || 0) + (regra.custosOperacionais?.uniformeEpis || 0)
+                },
                 insumos: 0,
                 tributos: impostos,
                 lucro: lucro,
