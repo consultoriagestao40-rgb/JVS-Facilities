@@ -155,6 +155,7 @@ export default function RegrasCCTManager() {
                     noturno: 0,
                     intrajornada: 0,
                     dsr: 0,
+                    copa: 0,
                     total: 0
                 },
                 beneficios: detailBen,
