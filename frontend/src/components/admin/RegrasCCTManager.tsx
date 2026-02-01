@@ -16,9 +16,15 @@ const emptyRegra: RegraCCTType = {
     salarioPiso: 1590.00,
     beneficios: {
         valeRefeicao: 25.00,
+        tipoValeRefeicao: 'DIARIO',
         valeTransporte: 12.00,
         cestaBasica: 150.00,
         uniforme: 25.00
+    },
+    configuracoesBeneficios: {
+        descontoVT: 0.06,
+        descontoVA: 0.20,
+        vaSobreFerias: true
     },
     aliquotas: {
         inss: 0.20,
@@ -56,12 +62,37 @@ export default function RegrasCCTManager() {
 
         // Beneficios
         const ben = currentRegra.beneficios;
-        const totalBen = Number(ben.valeRefeicao) * diasMes + Number(ben.valeTransporte) * diasMes + Number(ben.cestaBasica) + Number(ben.uniforme);
+        const configBen = currentRegra.configuracoesBeneficios || { descontoVT: 0.06, descontoVA: 0.20, vaSobreFerias: true };
+
+        // Logica VR (Fixo vs Diario)
+        let custoVR = 0;
+        if (ben.tipoValeRefeicao === 'MENSAL') {
+            custoVR = Number(ben.valeRefeicao);
+        } else {
+            custoVR = Number(ben.valeRefeicao) * diasMes;
+        }
+
+        const custoVT = Number(ben.valeTransporte) * diasMes;
+        const cesta = Number(ben.cestaBasica);
+        const uniforme = Number(ben.uniforme);
+
+        // Descontos
+        const descontoVT = Math.min(piso * configBen.descontoVT, custoVT);
+        const descontoVA = custoVR * configBen.descontoVA;
+
+        // VA Ferias
+        const vaFerias = configBen.vaSobreFerias ? (custoVR / 12) : 0;
+
+        const totalBen = (custoVR + custoVT + cesta + uniforme + vaFerias) - (descontoVT + descontoVA);
+
         const detailBen = {
-            valeRefeicao: Number(ben.valeRefeicao) * diasMes,
-            valeTransporte: Number(ben.valeTransporte) * diasMes,
-            cestaBasica: Number(ben.cestaBasica),
-            uniforme: Number(ben.uniforme),
+            valeRefeicao: custoVR,
+            valeTransporte: custoVT,
+            cestaBasica: cesta,
+            uniforme: uniforme,
+            vaSobreFerias: vaFerias,
+            descontoVT: -descontoVT,
+            descontoVA: -descontoVA,
             total: totalBen
         };
 
@@ -325,17 +356,89 @@ export default function RegrasCCTManager() {
                             {/* Benefícios */}
                             <div className="space-y-4">
                                 <h4 className="font-bold text-sm text-gray-500 uppercase">Benefícios (R$)</h4>
-                                {Object.entries(currentRegra.beneficios).map(([key, val]) => (
-                                    <div key={key}>
-                                        <label className="block text-sm font-medium mb-1 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
+
+                                {/* Vale Refeição Special Logic */}
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Vale Refeição / Alimentação</label>
+                                    <div className="flex gap-2 mb-2">
+                                        <select
+                                            value={currentRegra.beneficios.tipoValeRefeicao}
+                                            onChange={e => {
+                                                setCurrentRegra(prev => ({
+                                                    ...prev,
+                                                    beneficios: { ...prev.beneficios, tipoValeRefeicao: e.target.value as any }
+                                                }));
+                                            }}
+                                            className="p-2 border rounded text-sm bg-gray-50"
+                                        >
+                                            <option value="DIARIO">R$ / Dia</option>
+                                            <option value="MENSAL">R$ / Mês (Fixo)</option>
+                                        </select>
                                         <input
                                             type="number"
-                                            value={val}
-                                            onChange={e => handleChange('beneficios', key, e.target.value)}
+                                            value={currentRegra.beneficios.valeRefeicao}
+                                            onChange={e => handleChange('beneficios', 'valeRefeicao', e.target.value)}
                                             className="w-full p-2 border rounded"
+                                            placeholder="Valor"
                                         />
                                     </div>
-                                ))}
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={currentRegra.configuracoesBeneficios?.vaSobreFerias ?? true}
+                                            onChange={e => handleChange('configuracoesBeneficios', 'vaSobreFerias', e.target.checked)}
+                                            id="vaFerias"
+                                        />
+                                        <label htmlFor="vaFerias" className="text-xs text-gray-600">Pagar s/ Férias (Provisionar)</label>
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <label className="text-xs text-gray-600">Desc. no VA (%):</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={currentRegra.configuracoesBeneficios?.descontoVA ?? 0.20}
+                                            onChange={e => handleChange('configuracoesBeneficios', 'descontoVA', e.target.value)}
+                                            className="w-16 p-1 border rounded text-xs"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Vale Transporte */}
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Vale Transporte (Diário)</label>
+                                    <input
+                                        type="number"
+                                        value={currentRegra.beneficios.valeTransporte}
+                                        onChange={e => handleChange('beneficios', 'valeTransporte', e.target.value)}
+                                        className="w-full p-2 border rounded"
+                                    />
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <label className="text-xs text-gray-600">Desc. Legal (% do Salário):</label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            value={currentRegra.configuracoesBeneficios?.descontoVT ?? 0.06}
+                                            onChange={e => handleChange('configuracoesBeneficios', 'descontoVT', e.target.value)}
+                                            className="w-16 p-1 border rounded text-xs"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Outros Beneficios */}
+                                {Object.entries(currentRegra.beneficios).map(([key, val]) => {
+                                    if (['valeRefeicao', 'tipoValeRefeicao', 'valeTransporte'].includes(key)) return null;
+                                    return (
+                                        <div key={key}>
+                                            <label className="block text-sm font-medium mb-1 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
+                                            <input
+                                                type="number"
+                                                value={val}
+                                                onChange={e => handleChange('beneficios', key, e.target.value)}
+                                                className="w-full p-2 border rounded"
+                                            />
+                                        </div>
+                                    );
+                                })}
                             </div>
 
                             <hr className="border-gray-200" />

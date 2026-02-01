@@ -108,6 +108,17 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             <LineItem name="2) Vale Transporte" value={d.beneficios.valeTransporte} />
                             <LineItem name="3) Cesta Básica / Assiduidade" value={d.beneficios.cestaBasica} />
                             <LineItem name="4) Uniformes / EPIs (Mensal)" value={d.beneficios.uniforme} />
+                            {d.beneficios.vaSobreFerias > 0 && <LineItem name="5) Provisão VA nas Férias (1/12)" value={d.beneficios.vaSobreFerias} />}
+
+                            {/* Descontos (Values are negative) */}
+                            {d.beneficios.descontoVA < 0 && <tr className="border-b border-gray-100 text-sm hover:bg-gray-50 text-red-600">
+                                <td colSpan={3} className="px-4 py-1">(-) Desconto VA (Funcionario)</td>
+                                <td className="px-4 py-1 text-right font-medium">{formatCurrency(d.beneficios.descontoVA)}</td>
+                            </tr>}
+                            {d.beneficios.descontoVT < 0 && <tr className="border-b border-gray-100 text-sm hover:bg-gray-50 text-red-600">
+                                <td colSpan={3} className="px-4 py-1">(-) Desconto VT (6% Salário)</td>
+                                <td className="px-4 py-1 text-right font-medium">{formatCurrency(d.beneficios.descontoVT)}</td>
+                            </tr>}
 
                             {/* SUBTOTAL */}
                             <tr className="bg-gray-200 font-bold text-gray-800">

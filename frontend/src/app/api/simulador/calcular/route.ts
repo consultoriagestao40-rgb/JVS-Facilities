@@ -84,10 +84,12 @@ function getValoresFinais(
             ...global.VALORES_BASE,
             SALARIO_MINIMO: match.salarioPiso,
             VALE_REFEICAO_DIA: match.beneficios.valeRefeicao,
+            TIPO_VR: match.beneficios.tipoValeRefeicao || 'DIARIO', // Pass Type
             VALE_TRANSPORTE_DIA: match.beneficios.valeTransporte,
             CESTA_BASICA: match.beneficios.cestaBasica,
             UNIFORME_MENSAL: match.beneficios.uniforme
         },
+        BENEFICIOS_CONFIG: match.configuracoesBeneficios || { descontoVT: 0.06, descontoVA: 0.20, vaSobreFerias: true }, // Pass Rules
         PISOS: {
             ...global.PISOS,
             [match.funcao.toLowerCase()]: match.salarioPiso
