@@ -122,14 +122,17 @@ export interface BreakdownCustos {
     totalMensal: number;
 }
 
+// Exported Item Result for component usage
+export interface ItemResultado {
+    config: any;
+    custoUnitario: number;
+    custoTotal: number;
+    detalhamento: BreakdownCustos;
+}
+
 export interface ResultadoSimulacao {
     id: string;
-    servicos: {
-        config: any; // Using any to avoid conflict with frontend specific config type for now, or we define BackendConfiguracaoServico
-        custoUnitario: number;
-        custoTotal: number;
-        detalhamento: BreakdownCustos;
-    }[];
+    servicos: ItemResultado[];
     resumo: {
         custoMensalTotal: number;
         custoAnualTotal: number;
