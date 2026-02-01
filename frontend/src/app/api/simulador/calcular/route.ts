@@ -83,8 +83,9 @@ function getMatchingRule(
             }
         } else {
             // No Cargo requested
-            if (ruleCargo || ruleCargosList.length > 0) continue; // Rule is for specific cargo, skip
-            score += 5; // Perfect generic match
+            // If the rule has specific cargos, we can still use it as a generic fallback IF it has a valid Piso.
+            // We give it a lower score (3) than a specific match (5), but do not skip it.
+            score += 3;
         }
 
         if (score > maxScore) {
