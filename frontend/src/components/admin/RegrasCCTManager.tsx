@@ -296,6 +296,28 @@ export default function RegrasCCTManager() {
 
                     </div>
 
+                    {/* Resumo/Totais */}
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex flex-wrap gap-6 justify-between items-center text-sm text-blue-800">
+                        <div>
+                            <span className="block font-bold uppercase text-xs opacity-70">Total Benefícios</span>
+                            <span className="text-lg font-bold">
+                                R$ {Object.values(currentRegra.beneficios).reduce((acc, val) => acc + Number(val), 0).toFixed(2)}
+                            </span>
+                        </div>
+                        <div>
+                            <span className="block font-bold uppercase text-xs opacity-70">Total Provisões</span>
+                            <span className="text-lg font-bold">
+                                {(Object.values(currentRegra.provisoes || {}).reduce((acc, val) => acc + Number(val), 0) * 100).toFixed(2)}%
+                            </span>
+                        </div>
+                        <div>
+                            <span className="block font-bold uppercase text-xs opacity-70">Total Alíquotas</span>
+                            <span className="text-lg font-bold">
+                                {(Object.values(currentRegra.aliquotas).reduce((acc, val) => acc + Number(val), 0) * 100).toFixed(2)}%
+                            </span>
+                        </div>
+                    </div>
+
                     <div className="mt-8 flex justify-end gap-4 border-t pt-6">
                         <button onClick={() => setIsEditing(false)} className="px-6 py-2 text-gray-600 hover:text-gray-900 font-medium">Cancelar</button>
                         <button onClick={handleSave} className="px-8 py-2 bg-primary text-white rounded-lg hover:bg-green-600 font-bold flex items-center gap-2">

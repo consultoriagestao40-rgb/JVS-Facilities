@@ -274,10 +274,19 @@ function calcularAdicionais(
     };
 }
 
-function calcularBeneficios(dias: number, valores: any): number {
+function calcularBeneficios(dias: number, valores: any) {
     const vr = dias * valores.VALORES_BASE.VALE_REFEICAO_DIA;
     const vt = dias * valores.VALORES_BASE.VALE_TRANSPORTE_DIA;
-    return vr + vt + valores.VALORES_BASE.CESTA_BASICA + valores.VALORES_BASE.UNIFORME_MENSAL;
+    const cesta = valores.VALORES_BASE.CESTA_BASICA;
+    const uniforme = valores.VALORES_BASE.UNIFORME_MENSAL;
+
+    return {
+        valeRefeicao: vr,
+        valeTransporte: vt,
+        cestaBasica: cesta,
+        uniforme: uniforme,
+        total: vr + vt + cesta + uniforme
+    };
 }
 
 function calcularEncargosSociais(remuneracao: number, valores: ReturnType<typeof getValores>): number {
@@ -326,7 +335,7 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     const insumos = (config.materiais || 0);
 
     // Subtotal (Custo Operacional Direto)
-    const custoOperacional = remuneracaoTotal + beneficios + encargos + totalProvisoes + insumos;
+    const custoOperacional = remuneracaoTotal + beneficios.total + encargos + totalProvisoes + insumos;
 
     // 7. Lucro
     const lucro = custoOperacional * valores.ALIQUOTAS.MARGEM_LUCRO;

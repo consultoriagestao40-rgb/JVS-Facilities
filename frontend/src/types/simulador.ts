@@ -102,7 +102,13 @@ export interface BreakdownCustos {
         dsr: number; // New
         total: number;
     };
-    beneficios: number;
+    beneficios: {
+        valeRefeicao: number;
+        valeTransporte: number;
+        cestaBasica: number;
+        uniforme: number;
+        total: number;
+    };
     encargos: number; // INSS + FGTS + RAT
     provisoes: {
         ferias: number;

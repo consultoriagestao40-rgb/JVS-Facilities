@@ -7,7 +7,9 @@ import { ResultadoSimulacao } from '@/types/simulador';
 import { Download, FileText, CheckCircle, Loader2, ArrowRight, Settings } from 'lucide-react';
 import { generatePropostaPDF } from '@/utils/generatePropostaPDF';
 import ConfiguracaoCustos from '@/components/admin/ConfiguracaoCustos';
+import PlanilhaCustos from '@/components/common/PlanilhaCustos';
 import { motion } from 'framer-motion';
+import { ItemResultado } from '@/types/simulador';
 
 export default function ResumoProposta() {
     const { state } = useSimulador();
@@ -15,6 +17,7 @@ export default function ResumoProposta() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showConfig, setShowConfig] = useState(false);
+    const [extractItem, setExtractItem] = useState<ItemResultado | null>(null);
 
     useEffect(() => {
         const calcular = async () => {
@@ -121,30 +124,38 @@ export default function ResumoProposta() {
                 </div>
             </div>
 
-            {/* Breakdown - Simplified Visual */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                <h4 className="font-bold text-gray-700 mb-4 flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    Composição Transparente
-                </h4>
-                <div className="flex flex-col gap-4 mt-6">
-                    {resultado.servicos.map((servico, idx) => (
-                        <div key={idx} className="border-t pt-4">
-                            <p className="font-bold text-gray-800 mb-2">{servico.config.funcao} (Detalhado)</p>
-                            <div className="grid grid-cols-2 gap-x-8 gap-y-1 text-sm text-gray-600">
-                                <div className="flex justify-between"><span>Salário Base:</span> <span className="font-mono">{formatBRL(servico.detalhamento.salarioBase)}</span></div>
-                                <div className="flex justify-between"><span>Adicionais:</span> <span className="font-mono">{formatBRL(servico.detalhamento.adicionais.total)}</span></div>
-                                <div className="flex justify-between text-blue-600"><span>Encargos Sociais:</span> <span className="font-mono">{formatBRL(servico.detalhamento.encargos)}</span></div>
-                                <div className="flex justify-between text-orange-600 font-medium"><span>Férias (+1/3):</span> <span className="font-mono">{formatBRL(servico.detalhamento.provisoes.ferias)}</span></div>
-                                <div className="flex justify-between text-orange-600 font-medium"><span>13º Salário:</span> <span className="font-mono">{formatBRL(servico.detalhamento.provisoes.decimoTerceiro)}</span></div>
-                                <div className="flex justify-between text-orange-600 font-medium"><span>Rescisão:</span> <span className="font-mono">{formatBRL(servico.detalhamento.provisoes.rescisao)}</span></div>
-                                <div className="flex justify-between"><span>Benefícios:</span> <span className="font-mono">{formatBRL(servico.detalhamento.beneficios)}</span></div>
-                                <div className="flex justify-between"><span>Insumos:</span> <span className="font-mono">{formatBRL(servico.detalhamento.insumos)}</span></div>
-                                <div className="flex justify-between font-bold text-green-700 border-t mt-1 pt-1"><span>Total Fiscal:</span> <span>{formatBRL(servico.detalhamento.totalMensal)}</span></div>
+            {/* Services List and Extract */}
+            <div className="space-y-4">
+                {resultado.servicos.map((item, idx) => (
+                    <div key={idx} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div className="flex-1">
+                            <h4 className="font-bold text-lg text-gray-800 flex items-center gap-2">
+                                <span className="bg-blue-100 text-blue-800 p-2 rounded-lg"><FileText size={20} /></span>
+                                {item.config.funcao}
+                            </h4>
+                            <p className="text-gray-500 text-sm mt-1 ml-11">
+                                {item.config.quantidade} profissional(is) • {item.config.horarioEntrada} às {item.config.horarioSaida} ({item.config.dias.join(', ')})
+                            </p>
+                            {/* Tags de Inteligencia */}
+                            <div className="flex gap-2 ml-11 mt-2">
+                                {item.detalhamento.adicionais.noturno > 0 && <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">🌙 Adic. Noturno Real</span>}
+                                {item.detalhamento.adicionais.intrajornada > 0 && <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-bold">🍽️ Intrajornada</span>}
                             </div>
                         </div>
-                    ))}
-                </div>
+
+                        <div className="text-right">
+                            <p className="text-sm text-gray-400 font-medium uppercase tracking-wider">Custo Unitário Final</p>
+                            <p className="text-2xl font-bold text-gray-900">{formatBRL(item.custoUnitario)}</p>
+                        </div>
+
+                        <button
+                            onClick={() => setExtractItem(item)}
+                            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium text-sm transition-colors border border-gray-200"
+                        >
+                            Ver Extrato Detalhado
+                        </button>
+                    </div>
+                ))}
             </div>
 
             {/* Actions */}
@@ -163,6 +174,7 @@ export default function ResumoProposta() {
             </div>
 
             {showConfig && <ConfiguracaoCustos onClose={() => setShowConfig(false)} />}
+            {extractItem && <PlanilhaCustos item={extractItem} onClose={() => setExtractItem(null)} />}
         </div>
     );
 }
