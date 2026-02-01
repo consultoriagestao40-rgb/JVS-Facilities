@@ -50,6 +50,34 @@ const MOCK_REGRAS: RegraCCT[] = [
             { nome: 'Zelador', piso: 2100.00, gratificacao: 150, adicionalCopa: 0 }
         ],
         ...MOCK_DEFAULTS
+    },
+    {
+        id: '4',
+        uf: 'PR',
+        cidade: 'Curitiba',
+        funcao: 'PORTARIA',
+        dataVigencia: '2025-01-01',
+        salarioPiso: 1900.00,
+        beneficios: { valeRefeicao: 28, valeTransporte: 12, cestaBasica: 150, uniforme: 0 },
+        cargos: [
+            { nome: 'Porteiro Diurno', piso: 1900.00, gratificacao: 0, adicionalCopa: 0 },
+            { nome: 'Porteiro Noturno', piso: 1900.00, gratificacao: 0, adicionalCopa: 0 }
+        ],
+        ...MOCK_DEFAULTS
+    },
+    {
+        id: '5',
+        uf: 'SP',
+        cidade: 'São Paulo',
+        funcao: 'PORTARIA',
+        dataVigencia: '2025-01-01',
+        salarioPiso: 2100.00,
+        beneficios: { valeRefeicao: 35, valeTransporte: 18, cestaBasica: 200, uniforme: 0 },
+        cargos: [
+            { nome: 'Porteiro Controlador', piso: 2100.00, gratificacao: 100, adicionalCopa: 0 },
+            { nome: 'Vigia', piso: 2000.00, gratificacao: 0, adicionalCopa: 0 }
+        ],
+        ...MOCK_DEFAULTS
     }
 ];
 
