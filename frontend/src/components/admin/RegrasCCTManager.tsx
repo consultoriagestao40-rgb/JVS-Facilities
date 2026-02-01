@@ -333,38 +333,77 @@ export default function RegrasCCTManager() {
                                 <th className="p-4 font-semibold text-gray-600">Local (UF/Cidade)</th>
                                 <th className="p-4 font-semibold text-gray-600">Função</th>
                                 <th className="p-4 font-semibold text-gray-600">Cargo</th>
-                                <th className="p-4 font-semibold text-gray-600">Piso Salarial</th>
-                                <th className="p-4 font-semibold text-gray-600">Custo Total</th>
-                                <th className="p-4 font-semibold text-gray-600">Preço Venda</th>
-                                <th className="p-4 font-semibold text-gray-600">Vigência</th>
+                                <th className="p-4 font-semibold text-gray-600">Piso (R$)</th>
+                                <th className="p-4 font-semibold text-gray-600">Adicional (R$)</th>
+                                <th className="p-4 font-semibold text-gray-600">Remun. Total (PDF)</th>
+                                <th className="p-4 font-semibold text-gray-600">Custo Mensal Proposto</th>
                                 <th className="p-4 font-semibold text-gray-600 text-right">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredRegras.map(regra => (
-                                <tr key={regra.id} className="border-b hover:bg-gray-50 transition-colors">
-                                    <td className="p-4">
-                                        <span className="font-bold text-gray-800">{regra.uf}</span>
-                                        <span className="text-gray-500 mx-2">-</span>
-                                        {regra.cidade || '(Todas as Cidades)'}
-                                    </td>
-                                    <td className="p-4 badge"><span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold">{regra.funcao}</span></td>
-                                    <td className="p-4 text-sm text-gray-700 font-medium">
-                                        {regra.cargo || <span className="text-gray-400 italic">Padrão</span>}
-                                    </td>
-                                    <td className="p-4 font-mono text-gray-700">R$ {regra.salarioPiso.toFixed(2)}</td>
-                                    <td className="p-4 font-mono font-bold text-orange-700">R$ {calculateTotalCost(regra).toFixed(2)}</td>
-                                    <td className="p-4 font-mono font-bold text-green-700">R$ {calculateEstimativePrice(regra).toFixed(2)}</td>
-                                    <td className="p-4 text-sm text-gray-500">{new Date(regra.dataVigencia).toLocaleDateString('pt-BR')}</td>
-                                    <td className="p-4 text-right space-x-2">
-                                        <button onClick={() => handleEdit(regra)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"><Edit className="w-4 h-4" /></button>
-                                        <button onClick={() => handleDelete(regra.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-full"><Trash className="w-4 h-4" /></button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {filteredRegras.flatMap(regra => {
+                                // Helper to render a row
+                                const renderRow = (
+                                    key: string,
+                                    cargoLabel: string,
+                                    piso: number,
+                                    gratificacao: number,
+                                    isSubItem: boolean
+                                ) => {
+                                    // Calculate specifics for this row
+                                    // We temporarily create a 'proxy' rule to calculate cost for this specific cargo
+                                    const proxyRegra = {
+                                        ...regra,
+                                        salarioPiso: piso,
+                                        gratificacoes: gratificacao
+                                    };
+                                    const custoTotal = calculateTotalCost(proxyRegra);
+                                    // const precoVenda = calculateEstimativePrice(proxyRegra);
+                                    const totalRemuneracao = piso + gratificacao;
+
+                                    return (
+                                        <tr key={key} className={`border-b hover:bg-gray-50 transition-colors ${isSubItem ? 'bg-gray-50/50' : ''}`}>
+                                            <td className="p-4">
+                                                <span className="font-bold text-gray-800">{regra.uf}</span>
+                                                <span className="text-gray-500 mx-2">-</span>
+                                                {regra.cidade || '(Todas)'}
+                                            </td>
+                                            <td className="p-4 badge"><span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold">{regra.funcao}</span></td>
+                                            <td className="p-4 text-sm text-gray-700 font-medium">
+                                                {cargoLabel}
+                                            </td>
+                                            <td className="p-4 font-mono text-gray-700">R$ {piso.toFixed(2)}</td>
+                                            <td className="p-4 font-mono text-gray-700">R$ {gratificacao.toFixed(2)}</td>
+                                            <td className="p-4 font-mono font-bold text-gray-900 bg-yellow-50">R$ {totalRemuneracao.toFixed(2)}</td>
+                                            <td className="p-4 font-mono font-bold text-orange-700">R$ {custoTotal.toFixed(2)}</td>
+                                            <td className="p-4 text-right space-x-2">
+                                                <button onClick={() => handleEdit(regra)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-full" title="Editar Regra Completa"><Edit className="w-4 h-4" /></button>
+                                                {!isSubItem && <button onClick={() => handleDelete(regra.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-full"><Trash className="w-4 h-4" /></button>}
+                                            </td>
+                                        </tr>
+                                    );
+                                };
+
+                                // If the Rule has specific Cargos defined (Table from CCT)
+                                if (regra.cargos && regra.cargos.length > 0) {
+                                    return regra.cargos.map((c, idx) =>
+                                        renderRow(
+                                            `${regra.id}_${idx}`,
+                                            c.nome,
+                                            c.piso,
+                                            c.gratificacao || 0,
+                                            true
+                                        )
+                                    );
+                                }
+
+                                // Fallback for rules without specific cargos (Generic)
+                                return [renderRow(regra.id, regra.cargo || 'Padrão (Genérico)', regra.salarioPiso, regra.gratificacoes || 0, false)];
+                            })}
+
                             {filteredRegras.length === 0 && (
                                 <tr>
-                                    <td colSpan={5} className="p-8 text-center text-gray-400">Nenhuma regra encontrada. Cadastre a primeira!</td>
+                                    <td colSpan={8} className="p-8 text-center text-gray-400">Nenhuma regra encontrada. Cadastre a primeira!</td>
                                 </tr>
                             )}
                         </tbody>
