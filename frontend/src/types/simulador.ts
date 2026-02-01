@@ -22,6 +22,7 @@ export type ConfiguracaoServico = {
     quantidade: number;
     intrajornada?: boolean; // Suppress break?
     cargo?: string; // Selected Sub-role (e.g. 'Zelador')
+    materiais?: number; // Cost of materials
 };
 
 
