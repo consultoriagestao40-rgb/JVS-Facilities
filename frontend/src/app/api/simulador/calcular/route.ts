@@ -213,6 +213,95 @@ function calcularHorasNoturnas(entrada: string, saida: string) {
     return nightHoursPaid;
 }
 
+// Returns detailed additionals
+function calcularAdicionais(
+    base: number,
+    valores: any,
+    config: BackendConfigPayload
+) {
+    let insalubridade = 0;
+    let periculosidade = 0;
+    let adicionalNoturno = 0;
+    let dsr = 0;
+    let intrajornadaReflexo = 0;
+
+    // Insalubridade is usually on Minimum Wage
+    if (config.adicionais?.insalubridade) insalubridade = valores.VALORES_BASE.SALARIO_MINIMO * 0.20;
+
+    // Periculosidade is on Base Salary
+    if (config.adicionais?.periculosidade) periculosidade = base * 0.30;
+
+    // --- Intelligent Calculations ---
+
+    // 1. Adicional Noturno
+    if (config.horarioEntrada && config.horarioSaida) {
+        const horasNoturnas = calcularHorasNoturnas(config.horarioEntrada, config.horarioSaida);
+        // Premium: 20% on Base Hourly Rate
+        const hourlyRate = base / 220; // Standard CLT divisor
+        const nightPremium = hourlyRate * 0.20 * horasNoturnas * 22; // * 22 days per month (avg)
+
+        adicionalNoturno = nightPremium;
+    }
+
+    // 2. Intrajornada (Indemnified Lunch Break)
+    if (config.intrajornada) {
+        // 1 Hour Extra per day at 50% premium
+        const hourlyRate = base / 220;
+        const dailyCost = hourlyRate * 1.5; // 1h + 50%
+        intrajornadaReflexo = dailyCost * 22; // 22 days
+    }
+
+    // 3. DSR (Descanso Semanal Remunerado)
+    // Only on variable stuff (Noturno + Intrajornada + Periculosidade sometimes?)
+    // Usually Periculosidade/Insalubridade are monthly and include DSR.
+    // But Noturno and Overtime generate DSR.
+    const variaveisParaDSR = adicionalNoturno + intrajornadaReflexo;
+    if (variaveisParaDSR > 0) {
+        // Formula: (Variables / Dias Úteis * Domingos/Feriados)
+        // Standard Estimate: (Var / 22) * 4 approx 18-20%
+        // Using 1/6 for simplicity (common approximation)
+        dsr = variaveisParaDSR / 6;
+    }
+
+    return {
+        insalubridade,
+        periculosidade,
+        noturno: adicionalNoturno,
+        intrajornada: intrajornadaReflexo,
+        dsr,
+        total: insalubridade + periculosidade + adicionalNoturno + intrajornadaReflexo + dsr
+    };
+}
+
+function calcularBeneficios(dias: number, valores: any): number {
+    const vr = dias * valores.VALORES_BASE.VALE_REFEICAO_DIA;
+    const vt = dias * valores.VALORES_BASE.VALE_TRANSPORTE_DIA;
+    return vr + vt + valores.VALORES_BASE.CESTA_BASICA + valores.VALORES_BASE.UNIFORME_MENSAL;
+}
+
+function calcularEncargosSociais(remuneracao: number, valores: ReturnType<typeof getValores>): number {
+    const { INSS, FGTS, RAT } = valores.ALIQUOTAS;
+    // INSS (e.g., 20%), FGTS (8%), RAT (e.g., 2%)
+    // Also include 'Sistema S', 'Salário Educação', 'Incra'? Usually encompassed in 'RAT' or 'Outros' in simplified views, 
+    // but assuming INSS passed includes Employer part.
+    return remuneracao * (INSS + FGTS + RAT);
+}
+
+function calcularProvisoes(remuneracao: number, valores: any): DetailedBreakdown {
+    // PROVISOES now available in 'valores' object constructed by getValoresFinais
+    const rates = valores.PROVISOES || { FERIAS: 0.1111, DECIMO_TERCEIRO: 0.0833, RESCISAO: 0.05 };
+
+    const ferias = remuneracao * rates.FERIAS;
+    const decimoTerceiro = remuneracao * rates.DECIMO_TERCEIRO;
+    const rescisao = remuneracao * rates.RESCISAO;
+
+    return {
+        ferias,
+        decimoTerceiro,
+        rescisao
+    };
+}
+
 function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
     // 1. Base
     const salarioBase = getPisoSalarial(config.funcao, valores);
