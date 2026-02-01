@@ -70,12 +70,26 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
     };
 
     const updateConfiguracao = (config: ConfiguracaoServico) => {
-        // Logic to add/update config will go here
-        // For now simple placeholder
-        setState(prev => ({
-            ...prev,
-            configuracoes: [...prev.configuracoes, config]
-        }));
+        setState(prev => {
+            // Check if config for this service already exists
+            const existingIndex = prev.configuracoes.findIndex(c => c.servicoId === config.servicoId);
+
+            let newConfigs;
+            if (existingIndex !== -1) {
+                // UPDATE existing config
+                newConfigs = prev.configuracoes.map((c, i) =>
+                    i === existingIndex ? config : c
+                );
+            } else {
+                // ADD new config
+                newConfigs = [...prev.configuracoes, config];
+            }
+
+            return {
+                ...prev,
+                configuracoes: newConfigs
+            };
+        });
     };
 
     const updateParametros = (params: ParametrosCustos) => {
