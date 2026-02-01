@@ -296,7 +296,10 @@ export default function RegrasCCTManager() {
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 min-h-[600px]">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Gerenciador de Regras (CCT)</h2>
+                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    Gerenciador de Regras (CCT)
+                    <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full border border-green-200">v2.1 (Atualizado)</span>
+                </h2>
                 <div className="flex gap-4">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />

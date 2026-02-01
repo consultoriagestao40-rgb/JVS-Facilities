@@ -14,7 +14,7 @@ const MOCK_DEFAULTS = {
 const MOCK_REGRAS: RegraCCT[] = [
     // --- PARANÁ (PR) ---
     {
-        id: '1',
+        id: 'PR_LIMPEZA_2025',
         uf: 'PR',
         cidade: 'Curitiba',
         funcao: 'LIMPEZA',
