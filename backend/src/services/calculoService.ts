@@ -42,24 +42,28 @@ export class CalculoService {
     /**
      * Calculates costs for a single service item
      */
+    /**
+     * Calculates costs for a single service item
+     */
     private async calcularItem(config: ConfiguracaoServico) {
         // 1. Fetch Rule from DB
         const regra = await this.getRegra(config.funcao, config.estado);
 
         // Parse JSON fields from Rule or use Fallbacks
         const beneficiosRule = regra ? JSON.parse(regra.beneficios) : {};
+        // Placeholder for future aliquotas logic
         const aliquotasRule = {};
 
         // 2. Determine Base Salary
         const salarioBase = regra?.piso || (config.funcao.toLowerCase().includes('limpeza') ? 1590 : 1412);
 
         // 3. Calculate Additionals
-        const adicionaisVal = this.calcularAdicionais(salarioBase, config.adicionais);
-        const remuneracaoTotal = salarioBase + adicionaisVal;
+        const adicionaisObj = this.calcularAdicionais(salarioBase, config.adicionais);
+        const remuneracaoTotal = salarioBase + adicionaisObj.total;
 
         // 4. Benefits
         const diasTrabalhados = 22; // Avg
-        const beneficiosVal = this.calcularBeneficios(diasTrabalhados, beneficiosRule);
+        const beneficiosObj = this.calcularBeneficios(diasTrabalhados, beneficiosRule, salarioBase);
 
         // 5. Encargos (Standard 20% + 8% + 2% + Provisions)
         const encargosVal = this.calcularEncargos(remuneracaoTotal);
@@ -68,7 +72,7 @@ export class CalculoService {
         const insumosVal = (config.materiais || 0);
 
         // Subtotal
-        const custoOperacional = remuneracaoTotal + beneficiosVal + encargosVal + insumosVal;
+        const custoOperacional = remuneracaoTotal + beneficiosObj.total + encargosVal + insumosVal;
 
         // 7. Profit (15% default)
         const margenLucro = 0.15;
@@ -84,13 +88,16 @@ export class CalculoService {
 
         const detalhamento: BreakdownCustos = {
             salarioBase,
-            adicionais: adicionaisVal,
-            beneficios: beneficiosVal,
+            adicionais: adicionaisObj, // detailed object
+            beneficios: beneficiosObj, // detailed object
             encargos: encargosVal,
             insumos: insumosVal,
             tributos,
             lucro,
-            totalMensal: precoFinal
+            totalMensal: precoFinal,
+            provisoes: { // Mock breakdown for provisions embedded in encargos for now just to satisfy type
+                ferias: 0, decimoTerceiro: 0, rescisao: 0, total: 0
+            }
         };
 
         return {
@@ -101,22 +108,51 @@ export class CalculoService {
         };
     }
 
-    private calcularAdicionais(base: number, configAdicionais?: any): number {
-        let total = 0;
-        if (configAdicionais?.insalubridade) total += 1412 * 0.20;
-        if (configAdicionais?.periculosidade) total += base * 0.30;
-        return total;
+    private calcularAdicionais(base: number, configAdicionais?: any) {
+        let insalubridade = 0;
+        let periculosidade = 0;
+
+        if (configAdicionais?.insalubridade) insalubridade = 1412 * 0.20;
+        if (configAdicionais?.periculosidade) periculosidade = base * 0.30;
+
+        return {
+            insalubridade,
+            periculosidade,
+            noturno: 0,
+            intrajornada: 0,
+            dsr: 0,
+            total: insalubridade + periculosidade
+        };
     }
 
-    private calcularBeneficios(dias: number, ruleBeneficios: any): number {
+    private calcularBeneficios(dias: number, ruleBeneficios: any, salarioBase: number) {
         const vr = Number(ruleBeneficios.valeRefeicao || 25) * dias;
         const vt = Number(ruleBeneficios.valeTransporte || 12) * dias;
         const cesta = Number(ruleBeneficios.cestaBasica || 150);
         const uniforme = Number(ruleBeneficios.uniforme || 25);
-        const copa = Number(ruleBeneficios.adicionalCopa || 0); // HERE IS THE FIX
+        const copa = Number(ruleBeneficios.adicionalCopa || 0);
+        const vaFerias = (Number(ruleBeneficios.vaSobreFerias || 0) > 0) ? (vr / 12) : 0; // Approx logic if boolean
 
-        return vr + vt + cesta + uniforme + copa;
+        // Discounts
+        const descVT = salarioBase * 0.06; // 6% of base
+        const descVA = 0; // Assuming 0 for now as it varies
+
+        const total = vr + vt + cesta + uniforme + copa + vaFerias - descVT - descVA;
+
+        return {
+            valeRefeicao: vr,
+            valeTransporte: vt,
+            cestaBasica: cesta,
+            uniforme: uniforme,
+            adicionalCopa: copa,
+            vaSobreFerias: vaFerias,
+            descontoVA: -descVA,
+            descontoVT: -descVT,
+            total
+        };
     }
+
+
 
     private calcularEncargos(base: number): number {
         const rate = 0.30 + 0.35; // Encargos + Provisoes simple approx

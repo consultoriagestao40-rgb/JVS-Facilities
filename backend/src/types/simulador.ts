@@ -17,9 +17,37 @@ export interface ConfiguracaoServico {
 
 export interface BreakdownCustos {
     salarioBase: number;
-    adicionais: number;
-    beneficios: number;
-    encargos: number;
+    gratificacoes?: number; // New field
+    adicionais: {
+        insalubridade: number;
+        periculosidade: number;
+        noturno: number; // New
+        intrajornada: number; // New
+        dsr: number; // New
+        total: number;
+    };
+    beneficios: {
+        valeRefeicao: number;
+        valeTransporte: number;
+        cestaBasica: number;
+        uniforme: number;
+        adicionalCopa: number; // Moved from adicionais
+        vaSobreFerias: number; // New cost
+        descontoVA: number; // Negative value
+        descontoVT: number; // Negative value
+        total: number;
+    };
+    encargos: number; // INSS + FGTS + RAT
+    provisoes?: { // Optional for now to avoid breaking too much logic
+        ferias: number;
+        decimoTerceiro: number;
+        rescisao: number;
+        total: number;
+    };
+    custosOperacionais?: { // New Section, optional
+        examesMedicos: number;
+        total: number;
+    };
     insumos: number; // Materiais + Equipamentos
     tributos: number;
     lucro: number;
