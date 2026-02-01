@@ -260,6 +260,16 @@ export default function RegrasCCTManager() {
         return receitaBruta;
     };
 
+    const calculateEstimativePrice = (regra: RegraCCTType) => {
+        const custoOperacional = calculateTotalCost(regra);
+        const lucro = custoOperacional * regra.aliquotas.margemLucro;
+        const taxRate = regra.aliquotas.pis + regra.aliquotas.cofins + regra.aliquotas.iss;
+
+        // Gross Up: (Custeio + Lucro) / (1 - Impostos)
+        const receitaBruta = (custoOperacional + lucro) / (1 - taxRate);
+        return receitaBruta;
+    };
+
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 min-h-[600px]">
             {/* ... Header & Search ... */}
