@@ -50,7 +50,12 @@ export default function ConfiguracaoServicos() {
             quantidade: 1,
             // Force Defaults on new item to avoid "SP" mismatch if random logic exists elsewhere
             estado: 'PR',
-            cidade: 'Curitiba'
+            cidade: 'Curitiba',
+            // Include all optional properties to satisfy TypeScript
+            materiais: 0,
+            adicionalCopa: 0,
+            cargo: undefined,
+            intrajornada: false
         };
     };
 
@@ -275,7 +280,7 @@ export default function ConfiguracaoServicos() {
                                         min="0"
                                         step="0.01"
                                         placeholder="0,00"
-                                        value={config.materiais || ''}
+                                        value={(config as any).materiais || ''}
                                         onChange={(e) => handleUpdate(serviceId, 'materiais', parseFloat(e.target.value) || 0)}
                                         className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
                                     />
@@ -301,7 +306,7 @@ export default function ConfiguracaoServicos() {
                                     <input
                                         type="checkbox"
                                         id={`intrajornada-${serviceId}`}
-                                        checked={!!config.intrajornada}
+                                        checked={!!(config as any).intrajornada}
                                         onChange={(e) => handleUpdate(serviceId, 'intrajornada', e.target.checked)}
                                         className="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300"
                                     />
