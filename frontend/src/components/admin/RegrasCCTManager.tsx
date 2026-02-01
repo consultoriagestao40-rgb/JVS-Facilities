@@ -667,23 +667,35 @@ export default function RegrasCCTManager() {
                                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                         />
                                     </div>
+                                    <div className="flex-1">
+                                        <label className="text-sm font-semibold text-gray-600 mb-1 block">Adicional Copa (R$)</label>
+                                        <input
+                                            id="newCargoCopa"
+                                            type="number"
+                                            placeholder="0.00"
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={() => {
                                             const nameInput = document.getElementById('newCargoName') as HTMLInputElement;
                                             const pisoInput = document.getElementById('newCargoPiso') as HTMLInputElement;
                                             const gratInput = document.getElementById('newCargoGratificacao') as HTMLInputElement;
+                                            const copaInput = document.getElementById('newCargoCopa') as HTMLInputElement;
 
                                             const nome = nameInput.value;
                                             const piso = parseFloat(pisoInput.value);
                                             const gratificacao = parseFloat(gratInput.value) || 0;
+                                            const adicionalCopa = parseFloat(copaInput.value) || 0;
 
                                             if (nome && piso) {
-                                                const newCargos = [...(currentRegra.cargos || []), { nome, piso, gratificacao }];
+                                                const newCargos = [...(currentRegra.cargos || []), { nome, piso, gratificacao, adicionalCopa }];
                                                 setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
                                                 nameInput.value = '';
                                                 pisoInput.value = '';
                                                 gratInput.value = '';
+                                                copaInput.value = '';
                                             }
                                         }}
                                         className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-bold shadow transition-all h-[50px] flex items-center"
@@ -700,18 +712,20 @@ export default function RegrasCCTManager() {
                                             <th className="p-4 font-bold border-b">Cargo</th>
                                             <th className="p-4 font-bold border-b">Piso Salarial</th>
                                             <th className="p-4 font-bold border-b">Gratificação</th>
+                                            <th className="p-4 font-bold border-b">Adc. Copa</th>
                                             <th className="p-4 font-bold border-b w-20 text-center">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
                                         {(currentRegra.cargos || []).length === 0 && (
-                                            <tr><td colSpan={4} className="p-8 text-center text-gray-400 bg-white italic">Nenhum cargo específico cadastrado nesta categoria.</td></tr>
+                                            <tr><td colSpan={5} className="p-8 text-center text-gray-400 bg-white italic">Nenhum cargo específico cadastrado nesta categoria.</td></tr>
                                         )}
                                         {(currentRegra.cargos || []).map((c, idx) => (
                                             <tr key={idx} className="hover:bg-blue-50 transition-colors bg-white">
                                                 <td className="p-4 font-medium text-gray-800">{c.nome}</td>
                                                 <td className="p-4 font-mono text-green-700 font-bold">R$ {c.piso.toFixed(2)}</td>
                                                 <td className="p-4 font-mono text-gray-600">{c.gratificacao ? `R$ ${c.gratificacao.toFixed(2)}` : '-'}</td>
+                                                <td className="p-4 font-mono text-gray-600">{c.adicionalCopa ? `R$ ${c.adicionalCopa.toFixed(2)}` : '-'}</td>
                                                 <td className="p-4 text-center">
                                                     <button
                                                         onClick={() => {

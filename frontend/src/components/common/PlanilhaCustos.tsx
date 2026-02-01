@@ -87,6 +87,7 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             <SectionHeader title='Montante "A" - Mão-de-obra' total={montanteA} />
                             <LineItem name="1) Salário Base / Piso" value={d.salarioBase} />
                             {d.gratificacoes && d.gratificacoes > 0 && <LineItem name="Gratificações / Função" value={d.gratificacoes} />}
+                            {d.adicionais.copa && d.adicionais.copa > 0 && <LineItem name="Adicional de Copa (Não Gratificação)" value={d.adicionais.copa} />}
                             <LineItem name="Adicional Insalubridade" value={d.adicionais.insalubridade} />
                             <LineItem name="Adicional Periculosidade" value={d.adicionais.periculosidade} />
                             <LineItem name="Adicional Noturno (c/ Hora Reduzida)" value={d.adicionais.noturno} />

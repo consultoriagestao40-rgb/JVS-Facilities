@@ -31,7 +31,7 @@ export interface RegraCCT {
     cidade: string; // '*' for all cities in UF if needed
     funcao: string; // 'LIMPEZA', 'PORTARIA', etc.
     cargo?: string; // Legacy: Specific Role
-    cargos?: { nome: string; piso: number; gratificacao?: number }[]; // New: List of Roles
+    cargos?: { nome: string; piso: number; gratificacao?: number; adicionalCopa?: number }[]; // New: List of Roles
     dataVigencia: string;
     salarioPiso: number; // Default Floor
     gratificacoes?: number; // Extra payment
@@ -117,6 +117,7 @@ export interface BreakdownCustos {
         noturno: number; // New
         intrajornada: number; // New
         dsr: number; // New
+        copa: number; // New: Adicional de Copa
         total: number;
     };
     beneficios: {

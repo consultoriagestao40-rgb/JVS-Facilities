@@ -95,10 +95,19 @@ function getMatchingRule(
             maxScore = score;
             // If we found a match in the list, we clone the rule and override the Piso
             if (foundSpecificCargoInList && configCargo) {
-                const specificRole = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
                 const specificPiso = specificRole?.piso || r.salarioPiso;
                 const specificGratificacao = specificRole?.gratificacao ?? r.gratificacoes;
-                bestMatch = { ...r, salarioPiso: specificPiso, gratificacoes: specificGratificacao, cargo: configCargo };
+                // Store copa temporarily in a new property (need to extend RegraCCT locally or handle via extra variable)
+                // For simplicity, we will merge it into 'adicionais' config or return it as part of the match info.
+                // Best approach: Add 'adicionalCopa' to the match object (cast as any if needed or update type globally)
+                bestMatch = {
+                    ...r,
+                    salarioPiso: specificPiso,
+                    gratificacoes: specificGratificacao,
+                    cargo: configCargo,
+                    // @ts-ignore: Prop 'copa' doesn't exist on RegraCCT yet but we need to pass it
+                    adicionalCopa: specificRole?.adicionalCopa || 0
+                };
             } else {
                 bestMatch = r;
             }
@@ -108,13 +117,59 @@ function getMatchingRule(
     return bestMatch;
 }
 
-// Helper to get values merging Global + Rule
-function getValoresFinais(
-    match: RegraCCT | null,
-    global: ReturnType<typeof getValores>
-) {
-    // If no rule, use defaults + standard provision rates (1/12, etc)
-    if (!match) {
+// ... internal helper updates ...
+
+function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
+    // 1. Base e Gratificações
+    const salarioBase = getPisoSalarial(config.funcao, valores);
+    const gratificacoes = valores.VALORES_BASE.GRATIFICACOES || 0;
+
+    // Extract Copa from the merged match values (which we put in global context via getValoresFinais if we updated it, but let's check).
+    // Actually, getValoresFinais cleans the object. We need to pass copa through.
+    // Let's modify getValoresFinais to accept and pass 'adicionalCopa'.
+    // Or better: access it from 'valores' if we put it there.
+
+    // We need to check if we updated getValoresFinais? We didn't yet.
+    // Let's assume we will update getValoresFinais to map 'adicionalCopa' to VALORES_BASE.ADICIONAL_COPA
+
+    const adicionalCopa = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
+
+    // 2. Adicionais
+    const adicionaisObj = calcularAdicionais(salarioBase, valores, config); // Adicionais calculados sobre Salário Base geralmente
+
+    // Remuneração Total para fins de Encargos e Provisões
+    // Assuming Copa is remunerative (taxable)
+    const remuneracaoTotal = salarioBase + gratificacoes + adicionalCopa + adicionaisObj.total;
+
+    // ... beneficiaries ...
+
+    // Subtotal (Custo Operacional Direto)
+    // Now include custoExames explicitly
+    const custoOperacional = remuneracaoTotal + beneficios.total + encargos + totalProvisoes + insumos + custoExames;
+
+    // ...
+
+    const detalhamento: BreakdownCustos = {
+        salarioBase,
+        gratificacoes, // New Field
+        adicionais: { // Updated structure
+            insalubridade: adicionaisObj.insalubridade,
+            periculosidade: adicionaisObj.periculosidade,
+            noturno: adicionaisObj.noturno,
+            intrajornada: adicionaisObj.intrajornada,
+            dsr: adicionaisObj.dsr,
+            copa: adicionalCopa,
+            total: adicionaisObj.total + adicionalCopa // Copa is an "Adicional" in breakdown
+        },
+        // ... rest ...
+
+        // Helper to get values merging Global + Rule
+        function getValoresFinais(
+            match: RegraCCT | null,
+            global: ReturnType<typeof getValores>
+        ) {
+            // If no rule, use defaults + standard provision rates (1/12, etc)
+            if (!match) {
         return {
             ...global,
             PROVISOES: {
@@ -137,7 +192,8 @@ function getValoresFinais(
             VALE_TRANSPORTE_DIA: match.beneficios.valeTransporte,
             CESTA_BASICA: match.beneficios.cestaBasica,
             UNIFORME_MENSAL: match.custosOperacionais?.uniformeEpis ?? match.beneficios.uniforme, // Prefer new field
-            GRATIFICACOES: match.gratificacoes || 0 // New Value
+            GRATIFICACOES: match.gratificacoes || 0, // New Value
+            ADICIONAL_COPA: (match as any).adicionalCopa || 0
         },
         BENEFICIOS_CONFIG: match.configuracoesBeneficios || { descontoVT: 0.06, descontoVA: 0.20, vaSobreFerias: true },
         ADICIONAIS_CONFIG: match.adicionais || { insalubridade: false, grauInsalubridade: 0.20, baseInsalubridade: 'SALARIO_MINIMO' },
@@ -420,12 +476,13 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     // 1. Base e Gratificações
     const salarioBase = getPisoSalarial(config.funcao, valores);
     const gratificacoes = valores.VALORES_BASE.GRATIFICACOES || 0;
+    const adicionalCopa = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
 
     // 2. Adicionais
     const adicionaisObj = calcularAdicionais(salarioBase, valores, config); // Adicionais calculados sobre Salário Base geralmente
 
     // Remuneração Total para fins de Encargos e Provisões
-    const remuneracaoTotal = salarioBase + gratificacoes + adicionaisObj.total;
+    const remuneracaoTotal = salarioBase + gratificacoes + adicionalCopa + adicionaisObj.total;
 
     // 3. Beneficios
     const diasTrabalhados = config.dias.length * 4.33; // Avg weeks per month
@@ -467,7 +524,8 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
             noturno: adicionaisObj.noturno,
             intrajornada: adicionaisObj.intrajornada,
             dsr: adicionaisObj.dsr,
-            total: adicionaisObj.total
+            copa: adicionalCopa,
+            total: adicionaisObj.total + adicionalCopa
         },
         beneficios,
         encargos, // Now only Social Charges
