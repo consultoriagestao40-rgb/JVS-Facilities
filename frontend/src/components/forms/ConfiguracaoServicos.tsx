@@ -263,6 +263,22 @@ export default function ConfiguracaoServicos() {
                                     />
                                 </div>
 
+                                {/* Materiais e Equipamentos */}
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                                        <Briefcase size={16} /> Materiais e Equipamentos (R$)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        placeholder="0,00"
+                                        value={config.materiais || ''}
+                                        onChange={(e) => handleUpdate(serviceId, 'materiais', parseFloat(e.target.value) || 0)}
+                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                    />
+                                </div>
+
                                 <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100 mt-4">
                                     <input
                                         type="checkbox"
