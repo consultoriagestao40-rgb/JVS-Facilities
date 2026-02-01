@@ -2,15 +2,30 @@ import { NextResponse } from 'next/server';
 import { ParametrosCustos, RegraCCT, BreakdownCustos } from '@/types/simulador';
 import { MOCK_REGRAS } from '@/data/regrasCCT';
 
-// ... (rest of imports/types)
+// --- Types ---
+interface BackendConfigPayload {
+    funcao: string;
+    estado: string;
+    cidade: string;
+    dias: string[];
+    horarioEntrada: string;
+    horarioSaida: string;
+    quantidade: number;
+    materiais?: number;
+    adicionais?: {
+        insalubridade?: boolean;
+        periculosidade?: boolean;
+    };
+    intrajornada?: boolean; // New
+}
 
-// ...
+// Detailed Breakdown used internally for calculations
+interface DetailedBreakdown {
+    ferias: number;
+    decimoTerceiro: number;
+    rescisao: number;
+}
 
-// In POST function
-// 2. Try to find Specific CCT Rule (passed in body.regrasCCT OR use server fallback)
-const regras = (body.regrasCCT && body.regrasCCT.length > 0) ? body.regrasCCT : MOCK_REGRAS;
-const match = getMatchingRule(config, regras, globalVals);
-if (!regras || regras.length === 0) return null;
 
 // Helper for specificity score
 // 3 points = Explicit City + Explicit Cargo
@@ -498,12 +513,6 @@ export async function POST(request: Request) {
         const servicosCalculados = configs.map(config => {
             // 1. Get Global Defaults
             const globalVals = getValores(parametros);
-
-            import { MOCK_REGRAS } from '@/data/regrasCCT';
-
-            // ...
-
-            // In POST function:
 
             // 2. Try to find Specific CCT Rule (passed in body.regrasCCT OR use server fallback)
             const regras = (body.regrasCCT as RegraCCT[] && (body.regrasCCT as RegraCCT[]).length > 0) ? body.regrasCCT as RegraCCT[] : MOCK_REGRAS;
