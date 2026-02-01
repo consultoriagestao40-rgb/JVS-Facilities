@@ -20,7 +20,8 @@ export type ConfiguracaoServico = {
     horarioEntrada: string; // '08:00'
     horarioSaida: string; // '17:00'
     quantidade: number;
-    intrajornada?: boolean; // New: Suppress break?
+    intrajornada?: boolean; // Suppress break?
+    cargo?: string; // Selected Sub-role (e.g. 'Zelador')
 };
 
 

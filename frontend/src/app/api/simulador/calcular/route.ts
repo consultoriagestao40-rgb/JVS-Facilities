@@ -40,23 +40,58 @@ function getMatchingRule(
 ) {
     if (!regras || regras.length === 0) return null;
 
-    // 1. Try Exact City Match
-    const cityMatch = regras.find(r =>
-        r.uf === config.estado &&
-        r.cidade?.toLowerCase() === config.cidade?.toLowerCase() &&
-        r.funcao === config.funcao
-    );
-    if (cityMatch) return cityMatch;
+    // Helper for specificity score
+    // 3 points = Explicit City + Explicit Cargo
+    // 2 points = State + Explicit Cargo
+    // 1 point = Explicit City + No Cargo (Generic) / State + No Cargo
 
-    // 2. Try State Match (Empty city or '*')
-    const stateMatch = regras.find(r =>
-        r.uf === config.estado &&
-        (!r.cidade || r.cidade === '*') &&
-        r.funcao === config.funcao
-    );
-    if (stateMatch) return stateMatch;
+    // Filter by Function first (Essential)
+    const validRules = regras.filter(r => r.funcao === config.funcao);
 
-    return null;
+    // Find Best Match
+    let bestMatch: RegraCCT | null = null;
+    let maxScore = -1;
+
+    for (const r of validRules) {
+        let score = 0;
+
+        // Qualification 1: Location
+        const isCityMatch = r.uf === config.estado && r.cidade?.toLowerCase() === config.cidade?.toLowerCase();
+        const isStateMatch = r.uf === config.estado && (!r.cidade || r.cidade === '*');
+
+        if (!isCityMatch && !isStateMatch) continue; // Not valid location
+
+        score += isCityMatch ? 20 : 10; // City is tighter than State
+
+        // Qualification 2: Cargo (Sub-function)
+        // If config has cargo ('Zelador') and rule has cargo ('Zelador') -> High Score
+        // If config has cargo ('Zelador') and rule has NO cargo -> Low Score (Fallback)
+        // If config has NO cargo and rule has cargo -> NO MATCH (Should not apply specialized rule to generic)
+
+        const configCargo = (config as any).cargo; // Cast if type incomplete
+        const ruleCargo = r.cargo;
+
+        if (configCargo) {
+            if (ruleCargo && ruleCargo.toLowerCase() === configCargo.toLowerCase()) {
+                score += 5; // Exact Cargo Match
+            } else if (!ruleCargo) {
+                score += 1; // Generic Rule is acceptable fallback
+            } else {
+                continue; // Rule is for DIFFERENT cargo, skip.
+            }
+        } else {
+            // No Cargo requested
+            if (ruleCargo) continue; // Rule is for specific cargo, skip (don't use Zelador rule for generic Limpeza)
+            score += 5; // Perfect generic match
+        }
+
+        if (score > maxScore) {
+            maxScore = score;
+            bestMatch = r;
+        }
+    }
+
+    return bestMatch;
 }
 
 // Helper to get values merging Global + Rule
