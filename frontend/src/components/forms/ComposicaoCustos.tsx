@@ -117,37 +117,49 @@ export default function ComposicaoCustos() {
                                 <span className="text-xs text-gray-500">Risco acentuado (30%)</span>
                             </div>
                         </label>
+                        <label className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
+                            <input
+                                type="checkbox"
+                                {...register('copa')}
+                                className="w-5 h-5 text-primary rounded focus:ring-primary"
+                            />
+                            <div className="flex flex-col">
+                                <span className="text-gray-700 font-medium">Adicional de Copa</span>
+                                <span className="text-xs text-gray-500">Para funções que manipulam alimentos/copa</span>
+                            </div>
+                        </label>
                     </div>
                 </div>
+            </div>
 
-                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start gap-3">
-                    <HardHat className="w-5 h-5 text-blue-600 mt-0.5" />
-                    <div>
-                        <h4 className="font-bold text-blue-800 text-sm">Importante</h4>
-                        <p className="text-sm text-blue-700 mt-1">
-                            Os adicionais serão calculados automaticamente sobre o piso salarial da categoria selecionada, conforme a Convenção Coletiva vigente.
-                        </p>
-                    </div>
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex items-start gap-3">
+                <HardHat className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                    <h4 className="font-bold text-blue-800 text-sm">Importante</h4>
+                    <p className="text-sm text-blue-700 mt-1">
+                        Os adicionais serão calculados automaticamente sobre o piso salarial da categoria selecionada, conforme a Convenção Coletiva vigente.
+                    </p>
                 </div>
+            </div>
 
-                <div className="flex justify-between pt-6 border-t border-gray-100">
-                    <button
-                        type="button"
-                        onClick={prevStep}
-                        className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 font-medium transition-colors"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                        Voltar
-                    </button>
+            <div className="flex justify-between pt-6 border-t border-gray-100">
+                <button
+                    type="button"
+                    onClick={prevStep}
+                    className="flex items-center gap-2 px-6 py-3 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                    Voltar
+                </button>
 
-                    <button
-                        type="submit"
-                        className="flex items-center gap-2 px-8 py-3 bg-primary hover:bg-green-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
-                    >
-                        Ver Proposta Final
-                        <ArrowRight className="w-5 h-5" />
-                    </button>
-                </div>
+                <button
+                    type="submit"
+                    className="flex items-center gap-2 px-8 py-3 bg-primary hover:bg-green-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                >
+                    Ver Proposta Final
+                    <ArrowRight className="w-5 h-5" />
+                </button>
+            </div>
         </form >
     );
 }
