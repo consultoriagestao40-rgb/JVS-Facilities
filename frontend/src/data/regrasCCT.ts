@@ -3,7 +3,7 @@ import { RegraCCT } from '@/types/simulador';
 
 const MOCK_DEFAULTS = {
     aliquotas: { inss: 0.20, fgts: 0.08, rat: 0.02, pis: 0.0165, cofins: 0.076, iss: 0.05, margemLucro: 0.15 },
-    custosOperacionais: { examesMedicos: 15, uniformeEpis: 30 },
+    custosOperacionais: { examesMedicos: 15, uniformeEpis: 40 },
     adicionais: { insalubridade: false, grauInsalubridade: 0.20, baseInsalubridade: 'SALARIO_MINIMO' as const, periculosidade: false },
     provisoes: { ferias: 0.1111, decimoTerceiro: 0.0833, rescisao: 0.05 }
 };
