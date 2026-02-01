@@ -398,11 +398,13 @@ function calcularBeneficios(
 
     const cesta = valores.VALORES_BASE.CESTA_BASICA;
     const uniforme = valores.VALORES_BASE.UNIFORME_MENSAL;
+    const copa = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0; // Fix: Include Copa
 
     // Total = (Costs) - (Discounts) + (Provisions)
     // Note: Discounts are subtracted from the company cost because the employee pays them.
+    // ADD COPA TO TOTAL
     const total =
-        (custoVR + custoVT + cesta + uniforme + vaSobreFerias) -
+        (custoVR + custoVT + cesta + uniforme + copa + vaSobreFerias) -
         (descontoVAReal + descontoVTReal);
 
     return {
@@ -410,6 +412,7 @@ function calcularBeneficios(
         valeTransporte: custoVT,
         cestaBasica: cesta,
         uniforme: uniforme,
+        adicionalCopa: copa, // Return field
         vaSobreFerias: vaSobreFerias,
         descontoVA: -descontoVAReal, // Return as negative for display consistency
         descontoVT: -descontoVTReal, // Return as negative for display consistency
