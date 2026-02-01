@@ -284,7 +284,31 @@ export default function RegrasCCTManager() {
 
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 min-h-[600px]">
-            {/* ... Header & Search ... */}
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-800">Gerenciador de Regras (CCT)</h2>
+                <div className="flex gap-4">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <input
+                            type="text"
+                            placeholder="Buscar por Cidade ou Função..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 pr-4 py-2 border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                        />
+                    </div>
+                    <button
+                        onClick={() => {
+                            setCurrentRegra(emptyRegra);
+                            setIsEditing(true);
+                        }}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all shadow-md hover:shadow-lg"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Nova Regra
+                    </button>
+                </div>
+            </div>
 
             {/* List */}
             {!isEditing ? (
