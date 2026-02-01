@@ -30,11 +30,13 @@ import { ParametrosCustos, RegraCCT, BreakdownCustos } from '@/types/simulador';
 
 // Helper to look up CCT Rule
 // Prioritize: Explicit City Match -> State Match (Wildcard) -> Default Global Param
-const getMatchingRule = (
+// Helper to look up CCT Rule
+// Prioritize: Explicit City Match -> State Match (Wildcard) -> Default Global Param
+function getMatchingRule(
     config: BackendConfigPayload,
     regras: RegraCCT[] | undefined,
     globalParams: ReturnType<typeof getValores>
-) => {
+) {
     if (!regras || regras.length === 0) return null;
 
     // 1. Try Exact City Match
@@ -54,13 +56,13 @@ const getMatchingRule = (
     if (stateMatch) return stateMatch;
 
     return null;
-};
+}
 
 // Helper to get values merging Global + Rule
-const getValoresFinais = (
+function getValoresFinais(
     match: RegraCCT | null,
     global: ReturnType<typeof getValores>
-) => {
+) {
     // If no rule, use defaults + standard provision rates (1/12, etc)
     if (!match) {
         return {
@@ -96,25 +98,119 @@ const getValoresFinais = (
             RESCISAO: match.provisoes?.rescisao ?? 0.05
         }
     };
+}
+
+// Helper: Get Values (Hoisted)
+function getValores(params?: ParametrosCustos) {
+    return {
+        ALIQUOTAS: {
+            INSS: params?.aliquotas.inss ?? 0.20,
+            FGTS: params?.aliquotas.fgts ?? 0.08,
+            RAT: params?.aliquotas.rat ?? 0.02,
+            PIS: params?.aliquotas.pis ?? 0.0165,
+            COFINS: params?.aliquotas.cofins ?? 0.076,
+            ISS_PADRAO: params?.aliquotas.iss ?? 0.05,
+            MARGEM_LUCRO: params?.aliquotas.margemLucro ?? 0.15,
+        },
+        VALORES_BASE: {
+            SALARIO_MINIMO: params?.salarioMinimo ?? 1412.00,
+            VALE_REFEICAO_DIA: params?.beneficios.valeRefeicao ?? 25.00,
+            VALE_TRANSPORTE_DIA: params?.beneficios.valeTransporte ?? 12.00,
+            CESTA_BASICA: params?.beneficios.cestaBasica ?? 150.00,
+            UNIFORME_MENSAL: params?.beneficios.uniforme ?? 25.00,
+        },
+        PISOS: params?.pisosSalariais ?? {
+            limpeza: 1590.00,
+            seguranca: 2100.00,
+            recepcao: 1750.00,
+            jardinagem: 1800.00
+        }
+    };
+}
+
+
+function getPisoSalarial(funcao: string, valores: any): number {
+    const normalized = funcao.toLowerCase();
+    // Use the specific floor if defined in PISOS (merged from rule), otherwise fallback
+    return valores.PISOS[normalized] || valores.VALORES_BASE.SALARIO_MINIMO;
+}
+
+// Helper to parse "HH:MM" to minutes from midnight
+const timeToMinutes = (time: string) => {
+    const [h, m] = time.split(':').map(Number);
+    return h * 60 + m;
 };
 
-// ... (getValores remains same, only getValoresFinais changes structure return)
+// Calculate Night Hours (22:00 - 05:00) with Reduction Factor
+function calcularHorasNoturnas(entrada: string, saida: string) {
+    let start = timeToMinutes(entrada);
+    let end = timeToMinutes(saida);
 
-// ...
+    // Handle overnight shift (e.g. 23:00 to 07:00)
+    if (end < start) end += 24 * 60;
 
-function calcularProvisoes(remuneracao: number, valores: any): DetailedBreakdown {
-    // PROVISOES now available in 'valores' object constructed by getValoresFinais
-    const rates = valores.PROVISOES || { FERIAS: 0.1111, DECIMO_TERCEIRO: 0.0833, RESCISAO: 0.05 };
+    const nightStart = 22 * 60; // 22:00 -> 1320
+    const nightEnd = (24 + 5) * 60; // 05:00 next day -> 1740 (29h)
 
-    const ferias = remuneracao * rates.FERIAS;
-    const decimoTerceiro = remuneracao * rates.DECIMO_TERCEIRO;
-    const rescisao = remuneracao * rates.RESCISAO;
+    // Check overlap
+    // Shift is [start, end]
+    // Night Window is [nightStart, nightEnd] (simplified for standard overnight)
 
-    return {
-        ferias,
-        decimoTerceiro,
-        rescisao
-    };
+    // We strictly care about 22:00 to 05:00.
+    // If shift is 18:00 to 02:00. Overlap is 22:00 to 02:00.
+
+    // Logic: normalize shift to absolute scale matching night window
+    const overlapStart = Math.max(start, nightStart);
+    const overlapEnd = Math.min(end, nightEnd); // Cap at 05:00
+
+    let nightMinutes = 0;
+
+    // Case 1: Standard Night Window Overlap (e.g. 22:00 - 05:00)
+    if (overlapEnd > overlapStart) {
+        nightMinutes += (overlapEnd - overlapStart);
+    }
+
+    // Also check "Early Morning" pre-05:00 if shift started previous day? 
+    // Simplified: Just check intersection with 22h-05h window for single shift cycle.
+    // If [start, end] crosses 22:00 (1320) or 05:00 (300 or 1740)
+
+    // Robust approach: Iterate minutes? No too slow.
+    // Range approach:
+    // Window A: 22:00 (1320) to 24:00 (1440)
+    // Window B: 00:00 (0 or 1440) to 05:00 (300 or 1740)
+
+    // Since we added 24h to 'end' if it wrapped, 'end' is always > 'start'.
+
+    // Intersection with 22:00-05:00 (next day)
+    // Night start is 1320. Night end is 1740 (05:00 + 24h).
+
+    const blockStart = Math.max(start, 1320); // max(start, 22:00)
+    const blockEnd = Math.min(end, 1740);     // min(end, 05:00 next day)
+
+    if (blockEnd > blockStart) {
+        nightMinutes = blockEnd - blockStart;
+    }
+
+    // What if shift is 00:00 to 06:00? (Start 0, End 360) versus 22:00-05:00?
+    // We normalized overnight shifts to be > 24h, but a standard starts-at-midnight shift is just 0-360.
+    // In that case, start=0, end=360.
+    // Night window can also be 00:00 to 05:00 (0 to 300).
+    if (start < 1320 && end < 1320) {
+        // Pure morning shift? 00:00 to 12:00.
+        // Intersect [0, 300] (05:00)
+        const earlyEnd = Math.min(end, 300);
+        if (earlyEnd > start) {
+            nightMinutes += (earlyEnd - start);
+        }
+    }
+
+    const nightHoursClock = nightMinutes / 60;
+
+    // Apply Reduction Factor: 52m30s (52.5) -> 60m
+    // Factor = 60 / 52.5 = 1.142857
+    const nightHoursPaid = nightHoursClock * 1.142857;
+
+    return nightHoursPaid;
 }
 
 function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
