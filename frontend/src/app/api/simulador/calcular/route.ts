@@ -185,7 +185,7 @@ function getValores(params?: ParametrosCustos) {
             GRATIFICACOES: 0 // Default
         },
         PISOS: params?.pisosSalariais ?? {
-            limpeza: 1590.00,
+            limpeza: 1900.00, // Updated Default from 1590
             seguranca: 2100.00,
             recepcao: 1750.00,
             jardinagem: 1800.00
