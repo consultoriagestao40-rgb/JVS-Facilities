@@ -32,6 +32,7 @@ export interface RegraCCT {
     funcao: string; // 'LIMPEZA', 'PORTARIA', etc.
     cargo?: string; // Legacy: Specific Role
     cargos?: { nome: string; piso: number }[]; // New: List of Roles
+    dataVigencia: string;
     salarioPiso: number; // Default Floor
     gratificacoes?: number; // Extra payment
     beneficios: {

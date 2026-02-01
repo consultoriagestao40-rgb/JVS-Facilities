@@ -63,31 +63,43 @@ function getMatchingRule(
 
         score += isCityMatch ? 20 : 10; // City is tighter than State
 
-        // Qualification 2: Cargo (Sub-function)
-        // If config has cargo ('Zelador') and rule has cargo ('Zelador') -> High Score
-        // If config has cargo ('Zelador') and rule has NO cargo -> Low Score (Fallback)
-        // If config has NO cargo and rule has cargo -> NO MATCH (Should not apply specialized rule to generic)
-
+        // Qualification 2: Cargo (Sub-function or List)
         const configCargo = (config as any).cargo; // Cast if type incomplete
         const ruleCargo = r.cargo;
+        const ruleCargosList = r.cargos || [];
+
+        let foundSpecificCargoInList = false;
 
         if (configCargo) {
+            // Check legacy single field
             if (ruleCargo && ruleCargo.toLowerCase() === configCargo.toLowerCase()) {
                 score += 5; // Exact Cargo Match
-            } else if (!ruleCargo) {
-                score += 1; // Generic Rule is acceptable fallback
+            }
+            // Check new array field
+            else if (ruleCargosList.some(c => c.nome.toLowerCase() === configCargo.toLowerCase())) {
+                score += 5;
+                foundSpecificCargoInList = true;
+            }
+            else if (!ruleCargo && ruleCargosList.length === 0) {
+                score += 1; // Generic Rule is acceptable fallback if no specific cargo defined
             } else {
-                continue; // Rule is for DIFFERENT cargo, skip.
+                continue; // Rule is for DIFFERENT cargo(s), skip.
             }
         } else {
             // No Cargo requested
-            if (ruleCargo) continue; // Rule is for specific cargo, skip (don't use Zelador rule for generic Limpeza)
+            if (ruleCargo || ruleCargosList.length > 0) continue; // Rule is for specific cargo, skip
             score += 5; // Perfect generic match
         }
 
         if (score > maxScore) {
             maxScore = score;
-            bestMatch = r;
+            // If we found a match in the list, we clone the rule and override the Piso
+            if (foundSpecificCargoInList && configCargo) {
+                const specificPiso = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase())?.piso || r.salarioPiso;
+                bestMatch = { ...r, salaryPiso: specificPiso, salarioPiso: specificPiso, cargo: configCargo };
+            } else {
+                bestMatch = r;
+            }
         }
     }
 
