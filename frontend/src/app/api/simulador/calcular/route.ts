@@ -527,8 +527,14 @@ export async function POST(request: Request) {
             // 1. Get Global Defaults
             const globalVals = getValores(parametros);
 
-            // 2. Try to find Specific CCT Rule (passed in body.regrasCCT)
-            const regras = body.regrasCCT as RegraCCT[] | undefined;
+            import { MOCK_REGRAS } from '@/data/regrasCCT';
+
+            // ...
+
+            // In POST function:
+
+            // 2. Try to find Specific CCT Rule (passed in body.regrasCCT OR use server fallback)
+            const regras = (body.regrasCCT && body.regrasCCT.length > 0) ? body.regrasCCT : MOCK_REGRAS;
             const match = getMatchingRule(config, regras, globalVals);
 
             // 3. Merge
