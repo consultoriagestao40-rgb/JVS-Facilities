@@ -416,102 +416,6 @@ export default function RegrasCCTManager() {
                                 />
                             </div>
 
-                            <div className="md:col-span-2 lg:col-span-3">
-                                <label className="block text-sm font-medium mb-2">Cargos & Salários da Categoria</label>
-                                <div className="bg-white p-4 rounded border space-y-3">
-                                    <div className="flex gap-2 items-end">
-                                        <div className="flex-1">
-                                            <label className="text-xs text-gray-500">Nome do Cargo</label>
-                                            <input
-                                                id="newCargoName"
-                                                type="text"
-                                                placeholder="Ex: Zelador"
-                                                className="w-full p-2 border rounded text-sm"
-                                            />
-                                        </div>
-                                        <div className="w-32">
-                                            <label className="text-xs text-gray-500">Piso (R$)</label>
-                                            <input
-                                                id="newCargoPiso"
-                                                type="number"
-                                                placeholder="0.00"
-                                                className="w-full p-2 border rounded text-sm"
-                                            />
-                                        </div>
-                                        <div className="w-32">
-                                            <label className="text-xs text-gray-500">Gratificação (R$)</label>
-                                            <input
-                                                id="newCargoGratificacao"
-                                                type="number"
-                                                placeholder="0.00"
-                                                className="w-full p-2 border rounded text-sm"
-                                            />
-                                        </div>
-                                        <button
-                                            type="button" // Prevent submit
-                                            onClick={() => {
-                                                const nameInput = document.getElementById('newCargoName') as HTMLInputElement;
-                                                const pisoInput = document.getElementById('newCargoPiso') as HTMLInputElement;
-                                                const gratInput = document.getElementById('newCargoGratificacao') as HTMLInputElement;
-
-                                                const nome = nameInput.value;
-                                                const piso = parseFloat(pisoInput.value);
-                                                const gratificacao = parseFloat(gratInput.value) || 0;
-
-                                                if (nome && piso) {
-                                                    const newCargos = [...(currentRegra.cargos || []), { nome, piso, gratificacao }];
-                                                    setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
-                                                    nameInput.value = '';
-                                                    pisoInput.value = '';
-                                                    gratInput.value = '';
-                                                }
-                                            }}
-                                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm font-bold"
-                                        >
-                                            Adicionar
-                                        </button>
-                                    </div>
-
-                                    {/* List */}
-                                    <div className="max-h-40 overflow-y-auto border rounded">
-                                        <table className="w-full text-sm text-left">
-                                            <thead className="bg-gray-50 sticky top-0">
-                                                <tr>
-                                                    <th className="p-2 border-b">Cargo</th>
-                                                    <th className="p-2 border-b">Piso Salarial</th>
-                                                    <th className="p-2 border-b">Gratificação</th>
-                                                    <th className="p-2 border-b w-10"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {(currentRegra.cargos || []).length === 0 && (
-                                                    <tr><td colSpan={4} className="p-4 text-center text-gray-400 italic">Nenhum cargo específico definido. Usará apenas configurações gerais.</td></tr>
-                                                )}
-                                                {(currentRegra.cargos || []).map((c, idx) => (
-                                                    <tr key={idx} className="border-b hover:bg-gray-50">
-                                                        <td className="p-2">{c.nome}</td>
-                                                        <td className="p-2 font-mono">R$ {c.piso.toFixed(2)}</td>
-                                                        <td className="p-2 font-mono text-gray-600">{c.gratificacao ? `R$ ${c.gratificacao.toFixed(2)}` : '-'}</td>
-                                                        <td className="p-2 text-right">
-                                                            <button
-                                                                onClick={() => {
-                                                                    const newCargos = [...(currentRegra.cargos || [])];
-                                                                    newCargos.splice(idx, 1);
-                                                                    setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
-                                                                }}
-                                                                className="text-red-500 hover:text-red-700"
-                                                            >
-                                                                <Trash className="w-4 h-4" />
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <p className="text-xs text-gray-500 mt-1">* Se nenhum cargo for selecionado, o sistema usará o Piso Padrão abaixo.</p>
-                                </div>
-                            </div>
 
                             <div>
                                 <label className="block text-sm font-medium mb-1">Piso Padrão (Fallback)</label>
@@ -724,6 +628,112 @@ export default function RegrasCCTManager() {
                         </div>
 
 
+                    </div>
+
+                    {/* Cargos & Salários (Full Width Section) */}
+                    <div className="mt-8 mb-8">
+                        <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                            <h4 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                                <span className="bg-blue-100 text-blue-800 p-1 rounded">📋</span>
+                                Tabela de Cargos & Salários da Categoria
+                            </h4>
+
+                            <div className="bg-gray-50 p-4 rounded border border-gray-100 mb-4">
+                                <div className="flex gap-4 items-end">
+                                    <div className="flex-[2]">
+                                        <label className="text-sm font-semibold text-gray-600 mb-1 block">Nome do Cargo</label>
+                                        <input
+                                            id="newCargoName"
+                                            type="text"
+                                            placeholder="Ex: Zelador Líder"
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="text-sm font-semibold text-gray-600 mb-1 block">Piso Salarial (R$)</label>
+                                        <input
+                                            id="newCargoPiso"
+                                            type="number"
+                                            placeholder="0.00"
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="text-sm font-semibold text-gray-600 mb-1 block">Gratificação (R$)</label>
+                                        <input
+                                            id="newCargoGratificacao"
+                                            type="number"
+                                            placeholder="0.00"
+                                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const nameInput = document.getElementById('newCargoName') as HTMLInputElement;
+                                            const pisoInput = document.getElementById('newCargoPiso') as HTMLInputElement;
+                                            const gratInput = document.getElementById('newCargoGratificacao') as HTMLInputElement;
+
+                                            const nome = nameInput.value;
+                                            const piso = parseFloat(pisoInput.value);
+                                            const gratificacao = parseFloat(gratInput.value) || 0;
+
+                                            if (nome && piso) {
+                                                const newCargos = [...(currentRegra.cargos || []), { nome, piso, gratificacao }];
+                                                setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
+                                                nameInput.value = '';
+                                                pisoInput.value = '';
+                                                gratInput.value = '';
+                                            }
+                                        }}
+                                        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-bold shadow transition-all h-[50px] flex items-center"
+                                    >
+                                        ADICIONAR
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="overflow-hidden border rounded-lg shadow-sm">
+                                <table className="w-full text-left">
+                                    <thead className="bg-gray-100 text-gray-700 uppercase text-sm">
+                                        <tr>
+                                            <th className="p-4 font-bold border-b">Cargo</th>
+                                            <th className="p-4 font-bold border-b">Piso Salarial</th>
+                                            <th className="p-4 font-bold border-b">Gratificação</th>
+                                            <th className="p-4 font-bold border-b w-20 text-center">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {(currentRegra.cargos || []).length === 0 && (
+                                            <tr><td colSpan={4} className="p-8 text-center text-gray-400 bg-white italic">Nenhum cargo específico cadastrado nesta categoria.</td></tr>
+                                        )}
+                                        {(currentRegra.cargos || []).map((c, idx) => (
+                                            <tr key={idx} className="hover:bg-blue-50 transition-colors bg-white">
+                                                <td className="p-4 font-medium text-gray-800">{c.nome}</td>
+                                                <td className="p-4 font-mono text-green-700 font-bold">R$ {c.piso.toFixed(2)}</td>
+                                                <td className="p-4 font-mono text-gray-600">{c.gratificacao ? `R$ ${c.gratificacao.toFixed(2)}` : '-'}</td>
+                                                <td className="p-4 text-center">
+                                                    <button
+                                                        onClick={() => {
+                                                            const newCargos = [...(currentRegra.cargos || [])];
+                                                            newCargos.splice(idx, 1);
+                                                            setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
+                                                        }}
+                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-all"
+                                                        title="Remover Cargo"
+                                                    >
+                                                        <Trash className="w-5 h-5" />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p className="text-sm text-gray-500 mt-2 bg-yellow-50 p-2 rounded border border-yellow-100 inline-block">
+                                ℹ️ Se o cliente selecionar um cargo que não esteja nesta lista, o sistema usará o <strong>Piso Padrão</strong> definido acima.
+                            </p>
+                        </div>
                     </div>
 
                     {/* Resumo/Totais */}
