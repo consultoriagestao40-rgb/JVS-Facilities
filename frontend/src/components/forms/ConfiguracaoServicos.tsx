@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSimulador } from '@/context/SimuladorContext';
 import { clsx } from 'clsx';
-import { Clock, Users, Calendar } from 'lucide-react';
-import { ServicoTipo } from '@/types/simulador';
+import { Clock, Users, Calendar, MapPin, Briefcase } from 'lucide-react';
+import { ServicoTipo, RegraCCT } from '@/types/simulador';
 
 const DAYS = [
     { id: 'seg', label: 'Seg' },
@@ -19,6 +19,26 @@ const DAYS = [
 export default function ConfiguracaoServicos() {
     const { state, updateConfiguracao, nextStep, prevStep } = useSimulador();
     const [localConfigs, setLocalConfigs] = useState(state.configuracoes);
+    const [availableRules, setAvailableRules] = useState<RegraCCT[]>([]);
+    const [loadingRules, setLoadingRules] = useState(true);
+
+    // Fetch Rules on Mount
+    useEffect(() => {
+        async function fetchRules() {
+            try {
+                const res = await fetch('/api/simulador/regras');
+                if (res.ok) {
+                    const data = await res.json();
+                    setAvailableRules(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch CCT rules", error);
+            } finally {
+                setLoadingRules(false);
+            }
+        }
+        fetchRules();
+    }, []);
 
     // Helper to get config for a specific service or return default
     const getConfig = (serviceId: ServicoTipo) => {
@@ -27,7 +47,8 @@ export default function ConfiguracaoServicos() {
             diasSemana: ['seg', 'ter', 'qua', 'qui', 'sex'],
             horarioEntrada: '08:00',
             horarioSaida: '18:00',
-            quantidade: 1
+            quantidade: 1,
+            // Default first available rule values will be set if missing
         };
     };
 
@@ -74,12 +95,44 @@ export default function ConfiguracaoServicos() {
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
             <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">Configure os Serviços</h2>
-                <p className="text-gray-500">Defina os dias, horários e quantidade de profissionais para cada serviço.</p>
+                <p className="text-gray-500">Defina localização, cargo, dias e horários para cada serviço.</p>
             </div>
 
             <div className="space-y-6">
                 {state.servicosSelecionados.map(serviceId => {
                     const config = getConfig(serviceId);
+
+                    // Filter rules for this service type
+                    const serviceRules = availableRules.filter(r => r.funcao === serviceId);
+                    // Extract unique UFs
+                    const uniqueUfs = Array.from(new Set(serviceRules.map(r => r.uf))).filter(Boolean); // Filter out undefined/null
+
+                    // Get currently selected Rule based on State (if selected)
+                    // We assume State is selected first.
+                    // Actually, 'config' might not have 'estado' yet. We need to store it in 'config'.
+                    // We will piggyback on 'state' in backend payload, here let's add it to localConfig.
+                    // But 'ConfiguracaoServico' type might need update? No, we can just pass it as extra props for now, 
+                    // or ideally update the type. Backend expects 'estado', 'cidade'.
+
+                    const selectedUF = (config as any).estado || '';
+                    const selectedCargo = config.cargo || '';
+
+                    // Filter Cargos based on UF
+                    const rulesForUF = serviceRules.filter(r => r.uf === selectedUF);
+
+                    // Aggregate Roles from rules
+                    let availableRoles: { label: string, value: string }[] = [];
+                    rulesForUF.forEach(r => {
+                        if (r.cargos && r.cargos.length > 0) {
+                            r.cargos.forEach(c => availableRoles.push({ label: c.nome, value: c.nome }));
+                        } else if (r.cargo) {
+                            availableRoles.push({ label: r.cargo, value: r.cargo });
+                        }
+                    });
+                    // Unique roles
+                    availableRoles = Array.from(new Set(availableRoles.map(a => a.value)))
+                        .map(value => availableRoles.find(a => a.value === value)!);
+
                     return (
                         <div key={serviceId} className="border border-gray-200 rounded-xl p-6 bg-white shadow-sm hover:shadow-md transition-shadow">
                             <h3 className="font-bold text-lg mb-6 flex items-center gap-2 text-primary border-b border-gray-100 pb-2">
@@ -87,6 +140,63 @@ export default function ConfiguracaoServicos() {
                             </h3>
 
                             <div className="space-y-6">
+                                {/* Location & Role Section */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                                    {/* Estado */}
+                                    <div>
+                                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                                            <MapPin size={16} /> Estado (UF)
+                                        </label>
+                                        <select
+                                            value={selectedUF}
+                                            onChange={(e) => {
+                                                handleUpdate(serviceId, 'estado', e.target.value);
+                                                handleUpdate(serviceId, 'cargo', ''); // Reset cargo
+                                            }}
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                        >
+                                            <option value="">Selecione...</option>
+                                            {uniqueUfs.map(uf => (
+                                                <option key={uf} value={uf}>{uf}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Cidade */}
+                                    <div>
+                                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                                            Cidade
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={(config as any).cidade || ''}
+                                            onChange={(e) => handleUpdate(serviceId, 'cidade', e.target.value)}
+                                            placeholder="Ex: Curitiba"
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                        />
+                                        <span className="text-xs text-gray-400 mt-1">Deixe vazio para regra geral do Estado</span>
+                                    </div>
+
+                                    {/* Cargo */}
+                                    <div className="md:col-span-2">
+                                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                                            <Briefcase size={16} /> Cargo / Função
+                                        </label>
+                                        <select
+                                            value={selectedCargo}
+                                            onChange={(e) => handleUpdate(serviceId, 'cargo', e.target.value)}
+                                            disabled={!selectedUF}
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                                        >
+                                            <option value="">{selectedUF ? 'Selecione o Cargo...' : 'Selecione o Estado primeiro'}</option>
+                                            {availableRoles.map(role => (
+                                                <option key={role.value} value={role.value}>{role.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+
                                 {/* Dias da Semana */}
                                 <div>
                                     <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
@@ -100,55 +210,57 @@ export default function ConfiguracaoServicos() {
                                                     key={day.id}
                                                     onClick={() => toggleDay(serviceId, day.id)}
                                                     className={clsx(
-                                                        "px-3 py-2 rounded-lg text-sm font-medium border transition-all duration-200",
+                                                        "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                                                         isSelected
-                                                            ? "bg-primary text-white border-primary shadow-sm"
-                                                            : "bg-gray-50 text-gray-600 border-gray-200 hover:border-gray-300"
+                                                            ? "bg-primary text-white shadow-sm"
+                                                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                                                     )}
                                                 >
                                                     {day.label}
                                                 </button>
-                                            )
+                                            );
                                         })}
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Horários */}
-                                    <div className="space-y-3">
-                                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                                            <Clock size={18} /> Horário de Trabalho
-                                        </label>
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                                type="time"
-                                                value={config.horarioEntrada}
-                                                onChange={(e) => handleUpdate(serviceId, 'horarioEntrada', e.target.value)}
-                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                            />
-                                            <span className="text-gray-400">às</span>
-                                            <input
-                                                type="time"
-                                                value={config.horarioSaida}
-                                                onChange={(e) => handleUpdate(serviceId, 'horarioSaida', e.target.value)}
-                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Quantidade */}
-                                    <div className="space-y-3">
-                                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                                            <Users size={18} /> Profissionais
+                                {/* Horários */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                                            <Clock size={16} /> Entrada
                                         </label>
                                         <input
-                                            type="number"
-                                            min="1"
-                                            value={config.quantidade}
-                                            onChange={(e) => handleUpdate(serviceId, 'quantidade', parseInt(e.target.value))}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                                            type="time"
+                                            value={config.horarioEntrada}
+                                            onChange={(e) => handleUpdate(serviceId, 'horarioEntrada', e.target.value)}
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
                                         />
                                     </div>
+                                    <div>
+                                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                                            <Clock size={16} /> Saída
+                                        </label>
+                                        <input
+                                            type="time"
+                                            value={config.horarioSaida}
+                                            onChange={(e) => handleUpdate(serviceId, 'horarioSaida', e.target.value)}
+                                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Quantidade */}
+                                <div>
+                                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-1">
+                                        <Users size={16} /> Quantidade de Profissionais
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        value={config.quantidade}
+                                        onChange={(e) => handleUpdate(serviceId, 'quantidade', parseInt(e.target.value) || 1)}
+                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                    />
                                 </div>
 
                                 <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100 mt-4">
