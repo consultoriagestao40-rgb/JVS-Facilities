@@ -161,8 +161,8 @@ export default function RegrasCCTManager() {
                 encargos: totalEnc,
                 provisoes: detailProv,
                 custosOperacionais: {
-                    examesMedicos: regra.custosOperacionais?.examesMedicos || 0,
-                    total: (regra.custosOperacionais?.examesMedicos || 0) + (regra.custosOperacionais?.uniformeEpis || 0)
+                    examesMedicos: currentRegra.custosOperacionais?.examesMedicos || 0,
+                    total: (currentRegra.custosOperacionais?.examesMedicos || 0) + (currentRegra.custosOperacionais?.uniformeEpis || 0)
                 },
                 insumos: 0,
                 tributos: impostos,
