@@ -165,7 +165,6 @@ function getValores(params?: ParametrosCustos) {
             limpeza: 1590.00,
             seguranca: 2100.00,
             recepcao: 1750.00,
-            recepcao: 1750.00,
             jardinagem: 1800.00
         },
         // Defaults for new structure (merged in getValoresFinais usually, but needed for type inference)
