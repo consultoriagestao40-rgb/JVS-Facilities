@@ -250,6 +250,16 @@ export default function RegrasCCTManager() {
         return piso + gratificacoes + totalBen + totalEnc + totalProv;
     };
 
+    const calculateEstimativePrice = (regra: RegraCCTType) => {
+        const custoOperacional = calculateTotalCost(regra);
+        const lucro = custoOperacional * regra.aliquotas.margemLucro;
+        const taxRate = regra.aliquotas.pis + regra.aliquotas.cofins + regra.aliquotas.iss;
+
+        // Gross Up: (Custeio + Lucro) / (1 - Impostos)
+        const receitaBruta = (custoOperacional + lucro) / (1 - taxRate);
+        return receitaBruta;
+    };
+
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 min-h-[600px]">
             {/* ... Header & Search ... */}
@@ -264,7 +274,8 @@ export default function RegrasCCTManager() {
                                 <th className="p-4 font-semibold text-gray-600">Função</th>
                                 <th className="p-4 font-semibold text-gray-600">Cargo</th>
                                 <th className="p-4 font-semibold text-gray-600">Piso Salarial</th>
-                                <th className="p-4 font-semibold text-gray-600">Custo Est.</th>
+                                <th className="p-4 font-semibold text-gray-600">Custo Total</th>
+                                <th className="p-4 font-semibold text-gray-600">Preço Venda</th>
                                 <th className="p-4 font-semibold text-gray-600">Vigência</th>
                                 <th className="p-4 font-semibold text-gray-600 text-right">Ações</th>
                             </tr>
@@ -282,7 +293,8 @@ export default function RegrasCCTManager() {
                                         {regra.cargo || <span className="text-gray-400 italic">Padrão</span>}
                                     </td>
                                     <td className="p-4 font-mono text-gray-700">R$ {regra.salarioPiso.toFixed(2)}</td>
-                                    <td className="p-4 font-mono font-bold text-green-700">R$ {calculateTotalCost(regra).toFixed(2)}</td>
+                                    <td className="p-4 font-mono font-bold text-orange-700">R$ {calculateTotalCost(regra).toFixed(2)}</td>
+                                    <td className="p-4 font-mono font-bold text-green-700">R$ {calculateEstimativePrice(regra).toFixed(2)}</td>
                                     <td className="p-4 text-sm text-gray-500">{new Date(regra.dataVigencia).toLocaleDateString('pt-BR')}</td>
                                     <td className="p-4 text-right space-x-2">
                                         <button onClick={() => handleEdit(regra)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"><Edit className="w-4 h-4" /></button>
