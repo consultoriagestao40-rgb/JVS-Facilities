@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { SimuladorState, UserData, ServicoTipo, ConfiguracaoServico, ParametrosCustos } from '@/types/simulador';
+import { SimuladorState, UserData, ServicoTipo, ConfiguracaoServico, ParametrosCustos, RegraCCT } from '@/types/simulador';
 
 type SimuladorContextType = {
     state: SimuladorState;
