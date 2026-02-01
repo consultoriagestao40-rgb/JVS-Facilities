@@ -27,82 +27,91 @@ interface DetailedBreakdown {
 }
 
 
-// Helper for specificity score
-// 3 points = Explicit City + Explicit Cargo
-// 2 points = State + Explicit Cargo
-// 1 point = Explicit City + No Cargo (Generic) / State + No Cargo
+// Helper to look up CCT Rule
+// Prioritize: Explicit City Match -> State Match (Wildcard) -> Default Global Param
+function getMatchingRule(
+    config: BackendConfigPayload,
+    regras: RegraCCT[] | undefined,
+    globalParams: ReturnType<typeof getValores>
+) {
+    if (!regras || regras.length === 0) return null;
 
-// Filter by Function first (Essential)
-const validRules = regras.filter(r => r.funcao === config.funcao);
+    // Helper for specificity score
+    // 3 points = Explicit City + Explicit Cargo
+    // 2 points = State + Explicit Cargo
+    // 1 point = Explicit City + No Cargo (Generic) / State + No Cargo
 
-// Find Best Match
-let bestMatch: RegraCCT | null = null;
-let maxScore = -1;
+    // Filter by Function first (Essential)
+    const validRules = regras.filter(r => r.funcao === config.funcao);
 
-for (const r of validRules) {
-    let score = 0;
+    // Find Best Match
+    let bestMatch: RegraCCT | null = null;
+    let maxScore = -1;
 
-    // Qualification 1: Location
-    const isCityMatch = r.uf === config.estado && r.cidade?.toLowerCase() === config.cidade?.toLowerCase();
-    const isStateMatch = r.uf === config.estado && (!r.cidade || r.cidade === '*');
+    for (const r of validRules) {
+        let score = 0;
 
-    if (!isCityMatch && !isStateMatch) continue; // Not valid location
+        // Qualification 1: Location
+        const isCityMatch = r.uf === config.estado && r.cidade?.toLowerCase() === config.cidade?.toLowerCase();
+        const isStateMatch = r.uf === config.estado && (!r.cidade || r.cidade === '*');
 
-    score += isCityMatch ? 20 : 10; // City is tighter than State
+        if (!isCityMatch && !isStateMatch) continue; // Not valid location
 
-    // Qualification 2: Cargo (Sub-function or List)
-    const configCargo = (config as any).cargo; // Cast if type incomplete
-    const ruleCargo = r.cargo;
-    const ruleCargosList = r.cargos || [];
+        score += isCityMatch ? 20 : 10; // City is tighter than State
 
-    let foundSpecificCargoInList = false;
+        // Qualification 2: Cargo (Sub-function or List)
+        const configCargo = (config as any).cargo; // Cast if type incomplete
+        const ruleCargo = r.cargo;
+        const ruleCargosList = r.cargos || [];
 
-    if (configCargo) {
-        // Check legacy single field
-        if (ruleCargo && ruleCargo.toLowerCase() === configCargo.toLowerCase()) {
-            score += 5; // Exact Cargo Match
-        }
-        // Check new array field
-        else if (ruleCargosList.some(c => c.nome.toLowerCase() === configCargo.toLowerCase())) {
-            score += 5;
-            foundSpecificCargoInList = true;
-        }
-        else if (!ruleCargo && ruleCargosList.length === 0) {
-            score += 1; // Generic Rule is acceptable fallback if no specific cargo defined
+        let foundSpecificCargoInList = false;
+
+        if (configCargo) {
+            // Check legacy single field
+            if (ruleCargo && ruleCargo.toLowerCase() === configCargo.toLowerCase()) {
+                score += 5; // Exact Cargo Match
+            }
+            // Check new array field
+            else if (ruleCargosList.some(c => c.nome.toLowerCase() === configCargo.toLowerCase())) {
+                score += 5;
+                foundSpecificCargoInList = true;
+            }
+            else if (!ruleCargo && ruleCargosList.length === 0) {
+                score += 1; // Generic Rule is acceptable fallback if no specific cargo defined
+            } else {
+                continue; // Rule is for DIFFERENT cargo(s), skip.
+            }
         } else {
-            continue; // Rule is for DIFFERENT cargo(s), skip.
+            // No Cargo requested
+            if (ruleCargo || ruleCargosList.length > 0) continue; // Rule is for specific cargo, skip
+            score += 5; // Perfect generic match
         }
-    } else {
-        // No Cargo requested
-        if (ruleCargo || ruleCargosList.length > 0) continue; // Rule is for specific cargo, skip
-        score += 5; // Perfect generic match
+
+        if (score > maxScore) {
+            maxScore = score;
+            // If we found a match in the list, we clone the rule and override the Piso
+            if (foundSpecificCargoInList && configCargo) {
+                const specificRole = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
+                const specificPiso = specificRole?.piso || r.salarioPiso;
+                const specificGratificacao = specificRole?.gratificacao ?? r.gratificacoes;
+                // Store copa temporarily in a new property (need to extend RegraCCT locally or handle via extra variable)
+                // For simplicity, we will merge it into 'adicionais' config or return it as part of the match info.
+                // Best approach: Add 'adicionalCopa' to the match object (cast as any if needed or update type globally)
+                bestMatch = {
+                    ...r,
+                    salarioPiso: specificPiso,
+                    gratificacoes: specificGratificacao,
+                    cargo: configCargo,
+                    // @ts-ignore: Prop 'copa' doesn't exist on RegraCCT yet but we need to pass it
+                    adicionalCopa: specificRole?.adicionalCopa || 0
+                };
+            } else {
+                bestMatch = r;
+            }
+        }
     }
 
-    if (score > maxScore) {
-        maxScore = score;
-        // If we found a match in the list, we clone the rule and override the Piso
-        if (foundSpecificCargoInList && configCargo) {
-            const specificRole = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
-            const specificPiso = specificRole?.piso || r.salarioPiso;
-            const specificGratificacao = specificRole?.gratificacao ?? r.gratificacoes;
-            // Store copa temporarily in a new property (need to extend RegraCCT locally or handle via extra variable)
-            // For simplicity, we will merge it into 'adicionais' config or return it as part of the match info.
-            // Best approach: Add 'adicionalCopa' to the match object (cast as any if needed or update type globally)
-            bestMatch = {
-                ...r,
-                salarioPiso: specificPiso,
-                gratificacoes: specificGratificacao,
-                cargo: configCargo,
-                // @ts-ignore: Prop 'copa' doesn't exist on RegraCCT yet but we need to pass it
-                adicionalCopa: specificRole?.adicionalCopa || 0
-            };
-        } else {
-            bestMatch = r;
-        }
-    }
-}
-
-return bestMatch;
+    return bestMatch;
 }
 
 
