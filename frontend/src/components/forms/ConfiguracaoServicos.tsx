@@ -48,7 +48,9 @@ export default function ConfiguracaoServicos() {
             horarioEntrada: '08:00',
             horarioSaida: '18:00',
             quantidade: 1,
-            // Default first available rule values will be set if missing
+            // Force Defaults on new item to avoid "SP" mismatch if random logic exists elsewhere
+            estado: 'PR',
+            cidade: 'Curitiba'
         };
     };
 
