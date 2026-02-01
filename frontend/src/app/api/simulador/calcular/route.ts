@@ -95,6 +95,7 @@ function getMatchingRule(
             maxScore = score;
             // If we found a match in the list, we clone the rule and override the Piso
             if (foundSpecificCargoInList && configCargo) {
+                const specificRole = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
                 const specificPiso = specificRole?.piso || r.salarioPiso;
                 const specificGratificacao = specificRole?.gratificacao ?? r.gratificacoes;
                 // Store copa temporarily in a new property (need to extend RegraCCT locally or handle via extra variable)
