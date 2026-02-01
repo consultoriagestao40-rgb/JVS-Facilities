@@ -233,30 +233,26 @@ export default function RegrasCCTManager() {
         r.funcao.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const calculateTotalCost = (regra: RegraCCTType) => {
+        const piso = regra.salarioPiso;
+        const gratificacoes = regra.gratificacoes || 0;
+
+        const totalBen = Object.values(regra.beneficios)
+            .filter((v): v is number => typeof v === 'number')
+            .reduce((acc, val) => acc + val, 0);
+
+        const encRate = regra.aliquotas.inss + regra.aliquotas.fgts + regra.aliquotas.rat;
+        const totalEnc = (piso + gratificacoes) * encRate;
+
+        const provRate = Object.values(regra.provisoes || {}).reduce((acc, val) => acc + Number(val), 0);
+        const totalProv = (piso + gratificacoes) * provRate;
+
+        return piso + gratificacoes + totalBen + totalEnc + totalProv;
+    };
+
     return (
         <div className="bg-white rounded-xl shadow-lg p-6 min-h-[600px]">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Gerenciador de Convenções Coletivas (CCT)</h2>
-                <button
-                    onClick={() => { setCurrentRegra(emptyRegra); setIsEditing(true); }}
-                    className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
-                >
-                    <Plus className="w-4 h-4" />
-                    Nova Regra
-                </button>
-            </div>
-
-            {/* Search */}
-            <div className="relative mb-6">
-                <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                <input
-                    type="text"
-                    placeholder="Buscar por Estado, Cidade ou Função..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none"
-                />
-            </div>
+            {/* ... Header & Search ... */}
 
             {/* List */}
             {!isEditing ? (
@@ -266,7 +262,9 @@ export default function RegrasCCTManager() {
                             <tr className="bg-gray-50 border-b">
                                 <th className="p-4 font-semibold text-gray-600">Local (UF/Cidade)</th>
                                 <th className="p-4 font-semibold text-gray-600">Função</th>
+                                <th className="p-4 font-semibold text-gray-600">Cargo</th>
                                 <th className="p-4 font-semibold text-gray-600">Piso Salarial</th>
+                                <th className="p-4 font-semibold text-gray-600">Custo Est.</th>
                                 <th className="p-4 font-semibold text-gray-600">Vigência</th>
                                 <th className="p-4 font-semibold text-gray-600 text-right">Ações</th>
                             </tr>
@@ -280,7 +278,11 @@ export default function RegrasCCTManager() {
                                         {regra.cidade || '(Todas as Cidades)'}
                                     </td>
                                     <td className="p-4 badge"><span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-bold">{regra.funcao}</span></td>
+                                    <td className="p-4 text-sm text-gray-700 font-medium">
+                                        {regra.cargo || <span className="text-gray-400 italic">Padrão</span>}
+                                    </td>
                                     <td className="p-4 font-mono text-gray-700">R$ {regra.salarioPiso.toFixed(2)}</td>
+                                    <td className="p-4 font-mono font-bold text-green-700">R$ {calculateTotalCost(regra).toFixed(2)}</td>
                                     <td className="p-4 text-sm text-gray-500">{new Date(regra.dataVigencia).toLocaleDateString('pt-BR')}</td>
                                     <td className="p-4 text-right space-x-2">
                                         <button onClick={() => handleEdit(regra)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"><Edit className="w-4 h-4" /></button>
