@@ -1,31 +1,29 @@
 import { ConfiguracaoServico, BreakdownCustos, ResultadoSimulacao } from '../types/simulador';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export class CalculoService {
 
-    // Mock constants based on average market values/Technical Doc examples
-    private static readonly ALIQUOTAS = {
-        INSS: 0.20,
-        FGTS: 0.08,
-        RAT: 0.02,
-        PIS: 0.0165,
-        COFINS: 0.076,
-        ISS_PADRAO: 0.05,
-        MARGEM_LUCRO: 0.15, // 15% Profit Margin
-    };
-
-    private static readonly VALORES_BASE = {
-        SALARIO_MINIMO: 1412.00,
-        VALE_REFEICAO_DIA: 25.00,
-        VALE_TRANSPORTE_DIA: 12.00, // Average round trip
-        CESTA_BASICA: 150.00,
-        UNIFORME_MENSAL: 25.00, // Amortized
-    };
+    // Helper to get rule from DB
+    private async getRegra(funcao: string, estado: string) {
+        // Find specific rule or fallback
+        const regra = await prisma.convencaoColetiva.findFirst({
+            where: {
+                funcao: { equals: funcao },
+                estado: { equals: estado }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+        return regra;
+    }
 
     /**
      * Orchestrates the calculation for a full proposal request
      */
     public async calcularProposta(configs: ConfiguracaoServico[]): Promise<ResultadoSimulacao> {
-        const servicosCalculados = configs.map(config => this.calcularItem(config));
+        // We need to async map
+        const servicosCalculados = await Promise.all(configs.map(config => this.calcularItem(config)));
 
         const resumo = servicosCalculados.reduce((acc, item) => ({
             custoMensalTotal: acc.custoMensalTotal + item.custoTotal,
@@ -42,52 +40,57 @@ export class CalculoService {
     }
 
     /**
-     * Calculates costs for a single service item (e.g., 2 Cleaners)
+     * Calculates costs for a single service item
      */
-    private calcularItem(config: ConfiguracaoServico) {
-        // 1. Determine Base Salary (Mock logic based on role)
-        const salarioBase = this.getPisoSalarial(config.funcao);
+    private async calcularItem(config: ConfiguracaoServico) {
+        // 1. Fetch Rule from DB
+        const regra = await this.getRegra(config.funcao, config.estado);
 
-        // 2. Calculate Additionals (Insalubridade, Night shift, etc.)
-        const adicionais = this.calcularAdicionais(salarioBase, config.adicionais);
-        const remuneracaoTotal = salarioBase + adicionais;
+        // Parse JSON fields from Rule or use Fallbacks
+        const beneficiosRule = regra ? JSON.parse(regra.beneficios) : {};
+        const aliquotasRule = {};
 
-        // 3. Benefits (VR, VT, Cesta, Uniforme)
-        const diasTrabalhados = config.dias.length * 4.33; // Average weeks/month
-        const beneficios = this.calcularBeneficios(diasTrabalhados);
+        // 2. Determine Base Salary
+        const salarioBase = regra?.piso || (config.funcao.toLowerCase().includes('limpeza') ? 1590 : 1412);
 
-        // 4. Social Charges (Encargos on Salary + Additionals)
-        const encargos = this.calcularEncargos(remuneracaoTotal);
+        // 3. Calculate Additionals
+        const adicionaisVal = this.calcularAdicionais(salarioBase, config.adicionais);
+        const remuneracaoTotal = salarioBase + adicionaisVal;
 
-        // 5. Inputs (Materials)
-        const insumos = (config.materiais || 0);
+        // 4. Benefits
+        const diasTrabalhados = 22; // Avg
+        const beneficiosVal = this.calcularBeneficios(diasTrabalhados, beneficiosRule);
 
-        // Subtotal before Taxes and Profit
-        const custoOperacional = remuneracaoTotal + beneficios + encargos + insumos;
+        // 5. Encargos (Standard 20% + 8% + 2% + Provisions)
+        const encargosVal = this.calcularEncargos(remuneracaoTotal);
 
-        // 6. Profit Margin (Markup)
-        const lucro = custoOperacional * CalculoService.ALIQUOTAS.MARGEM_LUCRO;
+        // 6. Insumos
+        const insumosVal = (config.materiais || 0);
 
-        // Price before taxes
+        // Subtotal
+        const custoOperacional = remuneracaoTotal + beneficiosVal + encargosVal + insumosVal;
+
+        // 7. Profit (15% default)
+        const margenLucro = 0.15;
+        const lucro = custoOperacional * margenLucro;
+
+        // 8. Taxes (16.25%)
+        const impostosRate = 0.1625; // 1.65 + 7.6 + 5 + 2 (approx)
         const precoSemImpostos = custoOperacional + lucro;
-
-        // 7. Taxes (Gross up calculation to include taxes inside the final price)
-        // Formula: Price = Cost / (1 - TaxRate)
-        const totalImpostosRate = CalculoService.ALIQUOTAS.PIS + CalculoService.ALIQUOTAS.COFINS + CalculoService.ALIQUOTAS.ISS_PADRAO;
-        const precoFinal = precoSemImpostos / (1 - totalImpostosRate);
+        const precoFinal = precoSemImpostos / (1 - impostosRate);
         const tributos = precoFinal - precoSemImpostos;
 
         const custoTotal = precoFinal * config.quantidade;
 
         const detalhamento: BreakdownCustos = {
             salarioBase,
-            adicionais,
-            beneficios,
-            encargos,
-            insumos,
+            adicionais: adicionaisVal,
+            beneficios: beneficiosVal,
+            encargos: encargosVal,
+            insumos: insumosVal,
             tributos,
             lucro,
-            totalMensal: precoFinal // Unitary total price
+            totalMensal: precoFinal
         };
 
         return {
@@ -98,39 +101,25 @@ export class CalculoService {
         };
     }
 
-    private getPisoSalarial(funcao: string): number {
-        // Simplified lookup. In real app, this comes from DB/Parametrization
-        const normalized = funcao.toLowerCase();
-        if (normalized.includes('limpeza')) return 1590.00;
-        if (normalized.includes('seguranca') || normalized.includes('vigilante')) return 2100.00;
-        if (normalized.includes('recepcao')) return 1750.00;
-        if (normalized.includes('jardineiro')) return 1800.00;
-        return CalculoService.VALORES_BASE.SALARIO_MINIMO;
-    }
-
-    private calcularAdicionais(base: number, configAdicionais?: ConfiguracaoServico['adicionais']): number {
+    private calcularAdicionais(base: number, configAdicionais?: any): number {
         let total = 0;
-        if (configAdicionais?.insalubridade) total += CalculoService.VALORES_BASE.SALARIO_MINIMO * 0.20; // 20% on Min Wage
-        if (configAdicionais?.periculosidade) total += base * 0.30; // 30% on Base Salary
-        // Night shift logic would be more complex (hours calculation), skipping for MVP
+        if (configAdicionais?.insalubridade) total += 1412 * 0.20;
+        if (configAdicionais?.periculosidade) total += base * 0.30;
         return total;
     }
 
-    private calcularBeneficios(dias: number): number {
-        const vr = dias * CalculoService.VALORES_BASE.VALE_REFEICAO_DIA;
-        const vt = dias * CalculoService.VALORES_BASE.VALE_TRANSPORTE_DIA;
-        // Discount 6% VT from employee (ignored for simplified cost to client, assumed full cost for safety)
-        return vr + vt + CalculoService.VALORES_BASE.CESTA_BASICA + CalculoService.VALORES_BASE.UNIFORME_MENSAL;
+    private calcularBeneficios(dias: number, ruleBeneficios: any): number {
+        const vr = Number(ruleBeneficios.valeRefeicao || 25) * dias;
+        const vt = Number(ruleBeneficios.valeTransporte || 12) * dias;
+        const cesta = Number(ruleBeneficios.cestaBasica || 150);
+        const uniforme = Number(ruleBeneficios.uniforme || 25);
+        const copa = Number(ruleBeneficios.adicionalCopa || 0); // HERE IS THE FIX
+
+        return vr + vt + cesta + uniforme + copa;
     }
 
-    private calcularEncargos(baseCalculo: number): number {
-        const { INSS, FGTS, RAT } = CalculoService.ALIQUOTAS;
-        // Add 13th, Vacation (1/3), Rescisão provision (~30% simplified)
-        const provisionRate = 0.35;
-
-        const basicCharges = baseCalculo * (INSS + FGTS + RAT);
-        const provisions = baseCalculo * provisionRate;
-
-        return basicCharges + provisions;
+    private calcularEncargos(base: number): number {
+        const rate = 0.30 + 0.35; // Encargos + Provisoes simple approx
+        return base * rate;
     }
 }
