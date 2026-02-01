@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     description: "Website de alta conversão para JVS Facilities",
 };
 
+import { SimuladorProvider } from '@/context/SimuladorContext';
 import Footer from "@/components/common/Footer";
 
 export default function RootLayout({
@@ -20,12 +21,14 @@ export default function RootLayout({
     return (
         <html lang="pt-BR">
             <body className={`${inter.variable} ${poppins.variable} font-sans`}>
-                <div className="flex flex-col min-h-screen">
-                    <main className="flex-grow">
-                        {children}
-                    </main>
-                    <Footer />
-                </div>
+                <SimuladorProvider>
+                    <div className="flex flex-col min-h-screen">
+                        <main className="flex-grow">
+                            {children}
+                        </main>
+                        <Footer />
+                    </div>
+                </SimuladorProvider>
             </body>
         </html>
     );
