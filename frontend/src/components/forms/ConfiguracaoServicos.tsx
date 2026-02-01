@@ -117,7 +117,7 @@ export default function ConfiguracaoServicos() {
                     // or ideally update the type. Backend expects 'estado', 'cidade'.
 
                     const selectedUF = (config as any).estado || '';
-                    const selectedCargo = config.cargo || '';
+                    const selectedCargo = (config as any).cargo || '';
 
                     // Filter Cargos based on UF
                     const rulesForUF = serviceRules.filter(r => r.uf === selectedUF);
