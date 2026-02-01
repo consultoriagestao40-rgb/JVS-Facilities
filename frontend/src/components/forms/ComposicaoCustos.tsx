@@ -13,7 +13,7 @@ type FormValues = {
 };
 
 export default function ComposicaoCustos() {
-    const { state, nextStep, prevStep } = useSimulador();
+    const { state, nextStep, prevStep, updateConfiguracao } = useSimulador();
 
     // Load initial values from context/session if available
     // For MVP, simplified state mapping. Ideally, we would map specific service configs.
@@ -30,13 +30,27 @@ export default function ComposicaoCustos() {
     const necessitaMateriais = watch('necessitaMateriais');
 
     const onSubmit = (data: FormValues) => {
-        // Update all selected services with these global settings for now (MVP simplification)
-        // In a full version, this would be per-service or aggregated.
-        // We will just store this in a generic way or update the first service config as a placeholder
-        // TODO: Implement updateAdicionais in context in next iteration
+        // Update all selected services with these global settings
+        // Convert checkbox + value to actual numbers
+        const materiaisValue = data.necessitaMateriais ? data.valorMateriais : 0;
 
-        // For demonstration, we assume these apply globally or we update the context accordingly
-        console.log("Step 4 Data:", data);
+        // Update each service configuration with these values
+        state.configuracoes.forEach(config => {
+            const updatedConfig = {
+                ...config,
+                materiais: materiaisValue,
+                // Store copa as a boolean flag or as a number
+                // Since backend expects adicionalCopa as number, we need to get it from rules
+                // For now, just mark it as a flag - backend will calculate based on rules
+                adicionalCopa: undefined, // Copa value comes from CCT rules, not user input
+                // Store adicionais flags (will be used by backend to enable calculations)
+                insalubridade: data.insalubridade,
+                periculosidade: data.periculosidade,
+                copa: data.copa // Boolean flag to enable copa calculation
+            };
+            updateConfiguracao(updatedConfig);
+        });
+
         nextStep();
     };
 
