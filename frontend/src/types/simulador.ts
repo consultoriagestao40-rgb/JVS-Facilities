@@ -88,9 +88,19 @@ export type SimuladorState = {
 // API Types (Matched with Backend)
 export interface BreakdownCustos {
     salarioBase: number;
-    adicionais: number;
+    adicionais: {
+        insalubridade: number;
+        periculosidade: number;
+        total: number;
+    };
     beneficios: number;
-    encargos: number;
+    encargos: number; // INSS + FGTS + RAT
+    provisoes: {
+        ferias: number;
+        decimoTerceiro: number;
+        rescisao: number;
+        total: number;
+    };
     insumos: number; // Materiais + Equipamentos
     tributos: number;
     lucro: number;

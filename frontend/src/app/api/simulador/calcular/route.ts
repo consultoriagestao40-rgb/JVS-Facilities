@@ -16,6 +16,13 @@ interface BackendConfigPayload {
     };
 }
 
+// Detailed Breakdown used internally for calculations
+interface DetailedBreakdown {
+    ferias: number;
+    decimoTerceiro: number;
+    rescisao: number;
+}
+
 
 // --- Logic ---
 // --- Logic ---
@@ -109,11 +116,22 @@ function getPisoSalarial(funcao: string, valores: any): number {
     return valores.PISOS[normalized] || valores.VALORES_BASE.SALARIO_MINIMO;
 }
 
-function calcularAdicionais(base: number, valores: any, configAdicionais?: BackendConfigPayload['adicionais']): number {
-    let total = 0;
-    if (configAdicionais?.insalubridade) total += valores.VALORES_BASE.SALARIO_MINIMO * 0.20;
-    if (configAdicionais?.periculosidade) total += base * 0.30;
-    return total;
+// Returns detailed additionals
+function calcularAdicionais(base: number, valores: any, configAdicionais?: BackendConfigPayload['adicionais']) {
+    let insalubridade = 0;
+    let periculosidade = 0;
+
+    // Insalubridade is usually on Minimum Wage
+    if (configAdicionais?.insalubridade) insalubridade = valores.VALORES_BASE.SALARIO_MINIMO * 0.20;
+
+    // Periculosidade is on Base Salary
+    if (configAdicionais?.periculosidade) periculosidade = base * 0.30;
+
+    return {
+        insalubridade,
+        periculosidade,
+        total: insalubridade + periculosidade
+    };
 }
 
 function calcularBeneficios(dias: number, valores: any): number {
@@ -122,12 +140,39 @@ function calcularBeneficios(dias: number, valores: any): number {
     return vr + vt + valores.VALORES_BASE.CESTA_BASICA + valores.VALORES_BASE.UNIFORME_MENSAL;
 }
 
-function calcularEncargos(baseCalculo: number, valores: ReturnType<typeof getValores>): number {
+function calcularEncargosSociais(remuneracao: number, valores: ReturnType<typeof getValores>): number {
     const { INSS, FGTS, RAT } = valores.ALIQUOTAS;
-    const provisionRate = 0.35;
-    const basicCharges = baseCalculo * (INSS + FGTS + RAT);
-    const provisions = baseCalculo * provisionRate;
-    return basicCharges + provisions;
+    // INSS (e.g., 20%), FGTS (8%), RAT (e.g., 2%)
+    // Also include 'Sistema S', 'Salário Educação', 'Incra'? Usually encompassed in 'RAT' or 'Outros' in simplified views, 
+    // but assuming INSS passed includes Employer part.
+    return remuneracao * (INSS + FGTS + RAT);
+}
+
+function calcularProvisoes(remuneracao: number, valores: any): DetailedBreakdown {
+    // 1. Férias + 1/3 (1/12 per month)
+    // 8.33% + 2.78% = ~11.11%
+    const ferias = (remuneracao / 12) + (remuneracao / 12 / 3);
+
+    // 2. 13º Salário (1/12 per month)
+    // 8.33%
+    const decimoTerceiro = remuneracao / 12;
+
+    // 3. Rescisão (Multa FGTS 40% + 10% Social = 50% over monthly deposit?)
+    // Simplified Provision for Monthly Cost: ~4% of salary for Fine + ~1/12/2 for Notice?
+    // Using standard market provisioning aprox:
+    // Multa FGTS (4% of Remuneration) + Aviso Prévio Indenizado (1/12 of Remuneration / 12? No, huge variance).
+    // Let's use a standard 5% for Fine + 2% for Notice provisioning = ~7%
+    // Or better: Multa FGTS (5% of 8% FGTS deposit? No).
+    // Market Standard Provision: ~3.5% to 4% for FGTS Fine.
+    // Aviso Prévio: ~1/12 of salary / 12? = ~0.7%?
+    // Let's set a combined "Rescisão" provision of 5% of Remuneration.
+    const rescisao = remuneracao * 0.05;
+
+    return {
+        ferias,
+        decimoTerceiro,
+        rescisao
+    };
 }
 
 function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof getValores>) {
@@ -135,26 +180,31 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     const salarioBase = getPisoSalarial(config.funcao, valores);
 
     // 2. Adicionais
-    const adicionais = calcularAdicionais(salarioBase, valores, config.adicionais);
-    const remuneracaoTotal = salarioBase + adicionais;
+    const adicionaisObj = calcularAdicionais(salarioBase, valores, config.adicionais);
+    const remuneracaoTotal = salarioBase + adicionaisObj.total;
 
     // 3. Beneficios
-    const diasTrabalhados = config.dias.length * 4.33;
+    const diasTrabalhados = config.dias.length * 4.33; // Avg weeks per month
     const beneficios = calcularBeneficios(diasTrabalhados, valores);
 
-    // 4. Encargos
-    const encargos = calcularEncargos(remuneracaoTotal, valores);
+    // 4. Encargos Sociais (Sobre Remuneração)
+    const encargos = calcularEncargosSociais(remuneracaoTotal, valores);
 
-    // 5. Insumos
+    // 5. Provisões (Sobre Remuneração)
+    const provisoesObj = calcularProvisoes(remuneracaoTotal, valores);
+    const totalProvisoes = provisoesObj.ferias + provisoesObj.decimoTerceiro + provisoesObj.rescisao;
+
+    // 6. Insumos
     const insumos = (config.materiais || 0);
 
-    // Subtotal
-    const custoOperacional = remuneracaoTotal + beneficios + encargos + insumos;
+    // Subtotal (Custo Operacional Direto)
+    const custoOperacional = remuneracaoTotal + beneficios + encargos + totalProvisoes + insumos;
 
-    // 6. Lucro
+    // 7. Lucro
     const lucro = custoOperacional * valores.ALIQUOTAS.MARGEM_LUCRO;
 
-    // 7. Impostos
+    // 8. Impostos
+    // Preço de Venda = (Custo + Lucro) / (1 - TaxaImpostos)
     const precoSemImpostos = custoOperacional + lucro;
     const totalImpostosRate = valores.ALIQUOTAS.PIS + valores.ALIQUOTAS.COFINS + valores.ALIQUOTAS.ISS_PADRAO;
     const precoFinal = precoSemImpostos / (1 - totalImpostosRate);
@@ -164,9 +214,19 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 
     const detalhamento: BreakdownCustos = {
         salarioBase,
-        adicionais,
+        adicionais: { // Updated structure
+            insalubridade: adicionaisObj.insalubridade,
+            periculosidade: adicionaisObj.periculosidade,
+            total: adicionaisObj.total
+        },
         beneficios,
-        encargos,
+        encargos, // Now only Social Charges
+        provisoes: { // New Field
+            ferias: provisoesObj.ferias,
+            decimoTerceiro: provisoesObj.decimoTerceiro,
+            rescisao: provisoesObj.rescisao,
+            total: totalProvisoes
+        },
         insumos,
         tributos,
         lucro,
