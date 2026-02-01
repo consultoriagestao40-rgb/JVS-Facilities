@@ -276,18 +276,60 @@ function calcularAdicionais(
     };
 }
 
-function calcularBeneficios(dias: number, valores: any) {
-    const vr = dias * valores.VALORES_BASE.VALE_REFEICAO_DIA;
-    const vt = dias * valores.VALORES_BASE.VALE_TRANSPORTE_DIA;
+// ----------------------------------------------------------------------
+// 4. HELPER: Calculate Benefits (With Discounts and Fixed/Daily Logic)
+// ----------------------------------------------------------------------
+function calcularBeneficios(
+    dias: number,
+    valores: any
+) {
+    const salarioBase = valores.VALORES_BASE.SALARIO_MINIMO; // Actually Piso
+
+    // 1. Vale Transporte
+    // Cost: Days * Daily Value
+    const custoVT = dias * valores.VALORES_BASE.VALE_TRANSPORTE_DIA;
+
+    // Discount: 6% of Base Salary (Limited to Cost)
+    const percentVT = valores.BENEFICIOS_CONFIG?.descontoVT ?? 0.06;
+    const descontoPotencialVT = salarioBase * percentVT;
+    const descontoVTReal = Math.min(descontoPotencialVT, custoVT);
+
+    // 2. Vale Refeição / Alimentação
+    let custoVR = 0;
+    if (valores.VALORES_BASE.TIPO_VR === 'MENSAL') {
+        custoVR = valores.VALORES_BASE.VALE_REFEICAO_DIA; // Stores Monthly Value
+    } else {
+        custoVR = dias * valores.VALORES_BASE.VALE_REFEICAO_DIA;
+    }
+
+    // Discount VA
+    const percentVA = valores.BENEFICIOS_CONFIG?.descontoVA ?? 0.20; // Default 20%
+    const descontoVAReal = custoVR * percentVA;
+
+    // VA on Vacation (Provision 1/12)
+    let vaSobreFerias = 0;
+    if (valores.BENEFICIOS_CONFIG?.vaSobreFerias) { // Default true
+        vaSobreFerias = custoVR / 12;
+    }
+
     const cesta = valores.VALORES_BASE.CESTA_BASICA;
     const uniforme = valores.VALORES_BASE.UNIFORME_MENSAL;
 
+    // Total = (Costs) - (Discounts) + (Provisions)
+    // Note: Discounts are subtracted from the company cost because the employee pays them.
+    const total =
+        (custoVR + custoVT + cesta + uniforme + vaSobreFerias) -
+        (descontoVAReal + descontoVTReal);
+
     return {
-        valeRefeicao: vr,
-        valeTransporte: vt,
+        valeRefeicao: custoVR,
+        valeTransporte: custoVT,
         cestaBasica: cesta,
         uniforme: uniforme,
-        total: vr + vt + cesta + uniforme
+        vaSobreFerias: vaSobreFerias,
+        descontoVA: -descontoVAReal, // Return as negative for display consistency
+        descontoVT: -descontoVTReal, // Return as negative for display consistency
+        total: total
     };
 }
 
