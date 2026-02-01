@@ -30,9 +30,9 @@ export interface RegraCCT {
     uf: string;
     cidade: string; // '*' for all cities in UF if needed
     funcao: string; // 'LIMPEZA', 'PORTARIA', etc.
-    cargo?: string; // Specific Role e.g. 'Encarregada'
-    dataVigencia: string;
-    salarioPiso: number;
+    cargo?: string; // Legacy: Specific Role
+    cargos?: { nome: string; piso: number }[]; // New: List of Roles
+    salarioPiso: number; // Default Floor
     gratificacoes?: number; // Extra payment
     beneficios: {
         valeRefeicao: number;
