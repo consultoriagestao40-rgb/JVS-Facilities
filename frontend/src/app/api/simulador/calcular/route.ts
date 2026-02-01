@@ -16,44 +16,10 @@ interface BackendConfigPayload {
     };
 }
 
-interface BreakdownCustos {
-    salarioBase: number;
-    adicionais: number;
-    beneficios: number;
-    encargos: number;
-    insumos: number;
-    tributos: number;
-    lucro: number;
-    totalMensal: number;
-}
-
-interface ParametrosCustos {
-    salarioMinimo: number;
-    aliquotas: {
-        inss: number;
-        fgts: number;
-        rat: number;
-        pis: number;
-        cofins: number;
-        iss: number;
-        margemLucro: number;
-    };
-    beneficios: {
-        valeRefeicao: number;
-        valeTransporte: number;
-        cestaBasica: number;
-        uniforme: number;
-    };
-    pisosSalariais: {
-        limpeza: number;
-        seguranca: number;
-        recepcao: number;
-        jardinagem: number;
-    };
-}
 
 // --- Logic ---
-import { ParametrosCustos, RegraCCT } from '@/types/simulador';
+// --- Logic ---
+import { ParametrosCustos, RegraCCT, BreakdownCustos } from '@/types/simulador';
 
 // Helper to look up CCT Rule
 // Prioritize: Explicit City Match -> State Match (Wildcard) -> Default Global Param
@@ -218,6 +184,15 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 export async function POST(request: Request) {
     try {
         const body = await request.json();
+        const configs = body.configs as BackendConfigPayload[];
+        const parametros = body.parametros as ParametrosCustos | undefined;
+
+        if (!configs || !Array.isArray(configs) || configs.length === 0) {
+            return NextResponse.json(
+                { error: 'Invalid Input', message: 'Lista de configurações vazia.' },
+                { status: 400 }
+            );
+        }
 
         const servicosCalculados = configs.map(config => {
             // 1. Get Global Defaults
