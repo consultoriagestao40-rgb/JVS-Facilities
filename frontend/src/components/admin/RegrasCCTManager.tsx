@@ -84,12 +84,15 @@ export default function RegrasCCTManager() {
         const uniforme = Number(ben.uniforme);
 
         // Descontos
-        // VT 6% do Piso (não inclui gratificações legalmente, mas depende da CCT. Padrão é salário base)
-        const descontoVT = Math.min(piso * configBen.descontoVT, custoVT);
-        const descontoVA = custoVR * configBen.descontoVA;
-
         // VA Ferias
         const vaFerias = configBen.vaSobreFerias ? (custoVR / 12) : 0;
+
+        // Descontos
+        // VT 6% do Piso (não inclui gratificações legalmente, mas depende da CCT. Padrão é salário base)
+        const descontoVT = Math.min(piso * configBen.descontoVT, custoVT);
+
+        // Discount VA (Includes VA on Vacation)
+        const descontoVA = (custoVR + vaFerias) * configBen.descontoVA;
 
         const copa = Number(ben.adicionalCopa || 0);
         const totalBen = (custoVR + custoVT + cesta + uniforme + vaFerias) - (descontoVT + descontoVA);

@@ -395,15 +395,15 @@ function calcularBeneficios(
         custoVR = dias * valores.VALORES_BASE.VALE_REFEICAO_DIA;
     }
 
-    // Discount VA
-    const percentVA = valores.BENEFICIOS_CONFIG?.descontoVA ?? 0.20; // Default 20%
-    const descontoVAReal = custoVR * percentVA;
-
     // VA on Vacation (Provision 1/12)
     let vaSobreFerias = 0;
     if (valores.BENEFICIOS_CONFIG?.vaSobreFerias) { // Default true
         vaSobreFerias = custoVR / 12;
     }
+
+    // Discount VA (Includes VA on Vacation)
+    const percentVA = valores.BENEFICIOS_CONFIG?.descontoVA ?? 0.20; // Default 20%
+    const descontoVAReal = (custoVR + vaSobreFerias) * percentVA;
 
     const cesta = valores.VALORES_BASE.CESTA_BASICA;
     const uniforme = valores.VALORES_BASE.UNIFORME_MENSAL;
