@@ -2,228 +2,280 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ResultadoSimulacao, UserData } from '@/types/simulador';
 
-export const generatePropostaPDF = (resultado: ResultadoSimulacao, client: UserData) => {
-    const doc = new jsPDF();
+export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client: UserData) => {
+    // 1. Initialize Landscape PDF (A4 Landscape: 297mm x 210mm)
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const primaryColor = '#10B981'; // Green
     const secondaryColor = '#1F2937'; // Slate 800
+    const pageWidth = doc.internal.pageSize.width; // ~297mm
+    const pageHeight = doc.internal.pageSize.height; // ~210mm
 
-    // Header
-    // Add Logo placeholder or text
+    // --- SLIDE 1: COVER (Dynamic) ---
+    // Header Logo/Text
     doc.setTextColor(secondaryColor);
-    doc.setFontSize(22);
+    doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
-    doc.text('JVS Facilities', 14, 20);
+    doc.text('JVS Facilities', 20, 30);
 
-    doc.setFontSize(10);
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'normal');
-    doc.text('Proposta Comercial Personalizada', 14, 26);
-    doc.text(`ID: ${resultado.id}`, 14, 30);
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 14, 34);
+    // doc.text('Proposta Comercial Personalizada', 20, 40);
+    // doc.text(`PROPOSTA #${resultado.id}`, 20, 50);
 
-    // Client Info Box
-    doc.setFillColor('#F3F4F6'); // Gray 100
-    doc.rect(120, 15, 76, 25, 'F');
-    doc.setFontSize(9);
-    doc.setTextColor(secondaryColor);
-    doc.text('PREPARADO PARA:', 124, 20);
-    doc.setFont('helvetica', 'bold');
-    doc.text(client.empresa || client.nome, 124, 25);
-    doc.setFont('helvetica', 'normal');
-    doc.text(client.nome.split(' ')[0], 124, 29);
-    doc.text(client.email, 124, 33);
-    if (client.whatsapp) doc.text(client.whatsapp, 124, 37);
-
-    // Summary Box
+    // Main Cover Box
     doc.setFillColor(secondaryColor);
-    doc.rect(14, 45, 182, 30, 'F');
+    doc.rect(0, 0, 80, pageHeight, 'F'); // Left sidebar
 
-    doc.setTextColor('#10B981'); // Primary
+    // Sidebar Content
+    doc.setTextColor('#FFFFFF');
+    doc.setFontSize(32);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Proposta', 10, 80);
+    doc.text('Comercial', 10, 92);
+
     doc.setFontSize(12);
-    doc.text('INVESTIMENTO MENSAL', 20, 55);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`ID: ${resultado.id}`, 10, 110);
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 10, 116);
 
+    // Client Info (Right Side)
+    doc.setTextColor(secondaryColor);
+    doc.setFontSize(12);
+    doc.text('PREPARADO PARA:', 100, 80);
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    const valorMensal = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.resumo.custoMensalTotal);
-    doc.text(valorMensal, 20, 68);
+    doc.text(client.empresa || client.nome, 100, 92);
 
-    doc.setTextColor('#FFFFFF');
-    doc.setFontSize(10);
-    doc.text('Investimento Anual:', 120, 55);
-    doc.text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.resumo.custoAnualTotal), 120, 68);
-
-    // Services Table
-    doc.setTextColor(secondaryColor);
     doc.setFontSize(14);
+    doc.setFont('helvetica', 'normal');
+    doc.text(client.nome, 100, 102);
+    doc.text(client.email, 100, 110);
+    if (client.whatsapp) doc.text(client.whatsapp, 100, 118);
+
+    // Totals Box (Bottom Right)
+    doc.setFillColor('#F3F4F6');
+    doc.rect(100, 140, 180, 50, 'F');
+
+    doc.setTextColor(primaryColor);
+    doc.setFontSize(12);
+    doc.text('INVESTIMENTO MENSAL', 110, 155);
+    doc.setFontSize(32);
     doc.setFont('helvetica', 'bold');
-    doc.text('Detalhamento dos Serviços', 14, 90);
+    const valorMensal = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.resumo.custoMensalTotal);
+    doc.text(valorMensal, 110, 172);
+
+    doc.setFontSize(12);
+    doc.setTextColor(secondaryColor);
+    doc.text('Anual:', 220, 155);
+    doc.text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.resumo.custoAnualTotal), 220, 172);
+
+
+    // --- SLIDES 2-8: INSTITUTIONAL ---
+    const slideImages = [
+        'slide-01-quem-somos.png',
+        'slide-02-valores.png',
+        'slide-03-servicos.png',
+        'slide-04-setores.png',
+        'slide-05-diferenciais.png',
+        'slide-06-responsabilidades.png',
+        'slide-07-ferramentas.png'
+    ];
+
+    for (const imgName of slideImages) {
+        doc.addPage();
+        try {
+            // In a real app, you might need to fetch the blob if it's external, 
+            // but for public folder assets in client-side jsPDF, we often need to load them first or use an <img> tag trick.
+            // Since this is a browser run, we can try to use a Helper to load the image.
+            // For simplicity in this environment, assuming standardized assets are accessible.
+            const imgPath = window.location.origin + `/assets/slides/${imgName}`;
+
+            // We need to wait for image loading? jsPDF addImage supports HTMLImageElement
+            const img = new Image();
+            img.src = imgPath;
+            await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+
+            // Full Page Image (Fit)
+            doc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
+        } catch (e) {
+            doc.text(`[Slide Institucional: ${imgName} não carregado]`, 20, 20);
+        }
+    }
+
+
+    // --- SLIDE 9+: COST TABLES ---
+    // Services Summary Table
+    doc.addPage();
+    doc.setTextColor(secondaryColor);
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Detalhamento dos Serviços Contratados', 20, 20);
 
     const tableData = resultado.servicos.map(item => [
         item.config.cargo ? `${item.config.funcao.toUpperCase()} - ${item.config.cargo.toUpperCase()}` : item.config.funcao.toUpperCase(),
-        `${item.config.quantidade} profissional(is)`,
+        `${item.config.quantidade}`,
         `${item.config.dias.join(', ')} - ${item.config.horarioEntrada} às ${item.config.horarioSaida}`,
         new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.custoTotal)
     ]);
 
     autoTable(doc, {
-        startY: 95,
-        head: [['Serviço', 'Quantidade', 'Escala', 'Valor Mensal']],
+        startY: 30,
+        head: [['Serviço / Cargo', 'Qtd', 'Escala / Horário', 'Valor Mensal Total']],
         body: tableData,
-        headStyles: { fillColor: primaryColor },
-        styles: { fontSize: 10 },
+        headStyles: { fillColor: primaryColor, fontSize: 12 },
+        styles: { fontSize: 11, cellPadding: 3 },
         columnStyles: {
             3: { halign: 'right', fontStyle: 'bold' }
-        }
+        },
+        margin: { left: 20, right: 20 }
     });
 
-    // Breakdown (Simplified for Client)
     const finalY = (doc as any).lastAutoTable.finalY + 15;
-
-    doc.setFontSize(12);
-    doc.text('Transparência de Custos (Composição Estimada)', 14, finalY);
-
-    doc.setFontSize(9);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Nossa proposta respeita rigorosamente todas as convenções coletivas e legislação trabalhista.', 14, finalY + 6);
-    doc.text('Inclui: Salários, Encargos (INSS, FGTS), Benefícios (VR, VT, Cesta), Uniformes e Equipamentos.', 14, finalY + 11);
+    doc.text('Nota: Esta proposta tem validade de 10 dias.', 20, finalY);
 
-    // ... (Existing Summary Table Code) ...
 
-    // --- DETAILED BREAKDOWN PAGES ---
+    // --- DETAILED BREAKDOWN (One per Page/Slide) ---
     resultado.servicos.forEach((item, index) => {
         doc.addPage();
         const d = item.detalhamento;
 
-        // Header: Function - Role
+        // Header Strip
         doc.setFillColor(secondaryColor);
-        doc.rect(0, 0, 210, 20, 'F');
+        doc.rect(0, 0, pageWidth, 25, 'F');
         doc.setTextColor('#FFFFFF');
-        doc.setFontSize(16);
+        doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
         const roleTitle = item.config.cargo ? `${item.config.funcao} - ${item.config.cargo}` : item.config.funcao;
-        doc.text(`Extrato de Custos: ${roleTitle}`, 14, 13);
+        doc.text(`EXTRATO DE CUSTOS: ${roleTitle}`, 20, 16);
 
-        // Helper for Currency
         const fmt = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 
+        // Layout: 2 Columns for Data Tables (A/B Left, C/D Right) to use Landscape width
+        const leftColX = 20;
+        const rightColX = pageWidth / 2 + 10;
+        const colWidth = (pageWidth / 2) - 30;
+
+        // --- LEFT COLUMN ---
+
         // Group A: Labor
-        // Copied Logic from PlanilhaCustos.tsx:
-        // Montante A = Base + Gratificacoes + Copa (Adicional) + Adicionais (Insalub/Peric/Noturno/DSR) + Encargos + Provisoes
-        // Copa is in d.adicionais.copa
         const totalAdicionais = d.adicionais.total;
         const totalProvisoes = d.provisoes.total;
         const totalEncargos = d.encargos;
         const montanteA = d.salarioBase + (d.gratificacoes || 0) + totalAdicionais + totalEncargos + totalProvisoes;
 
         const bodyA = [
-            ['1) Salário Base / Piso', fmt(d.salarioBase)],
-            ...(d.gratificacoes ? [['Gratificações / Função', fmt(d.gratificacoes)]] : []),
-            ...(d.adicionais.copa ? [['Adicional de Copa (Acúmulo Função)', fmt(d.adicionais.copa)]] : []), // COPA IN GROUP A
-            ...(d.adicionais.insalubridade ? [['Adicional Insalubridade', fmt(d.adicionais.insalubridade)]] : []),
-            ...(d.adicionais.periculosidade ? [['Adicional Periculosidade', fmt(d.adicionais.periculosidade)]] : []),
-            ...(d.adicionais.noturno ? [['Adicional Noturno', fmt(d.adicionais.noturno)]] : []),
-            ...(d.adicionais.intrajornada ? [['H.E. Intrajornada', fmt(d.adicionais.intrajornada)]] : []),
-            ...(d.adicionais.dsr ? [['Reflexo DSR', fmt(d.adicionais.dsr)]] : []),
-            ['2) Encargos Sociais (INSS, FGTS...)', fmt(d.encargos)],
-            ['3) Provisão Férias + 1/3', fmt(d.provisoes.ferias)],
-            ['4) Provisão 13º Salário', fmt(d.provisoes.decimoTerceiro)],
-            ['5) Provisão Rescisão', fmt(d.provisoes.rescisao)]
+            ['Salário Base / Piso', fmt(d.salarioBase)],
+            ...(d.gratificacoes ? [['Gratificações', fmt(d.gratificacoes)]] : []),
+            ...(d.adicionais.copa ? [['Adicional Copa', fmt(d.adicionais.copa)]] : []),
+            ...(d.adicionais.insalubridade ? [['Adic. Insalubridade', fmt(d.adicionais.insalubridade)]] : []),
+            ...(d.adicionais.periculosidade ? [['Adic. Periculosidade', fmt(d.adicionais.periculosidade)]] : []),
+            ...(d.adicionais.noturno ? [['Adic. Noturno', fmt(d.adicionais.noturno)]] : []),
+            ...(d.adicionais.intrajornada ? [['Intrajornada', fmt(d.adicionais.intrajornada)]] : []),
+            ...(d.adicionais.dsr ? [['DSR', fmt(d.adicionais.dsr)]] : []),
+            ['Encargos Sociais', fmt(d.encargos)],
+            ['Provisão Férias+1/3', fmt(d.provisoes.ferias)],
+            ['Provisão 13º Salário', fmt(d.provisoes.decimoTerceiro)],
+            ['Provisão Rescisão', fmt(d.provisoes.rescisao)]
         ];
 
         autoTable(doc, {
-            startY: 25,
+            startY: 40,
+            margin: { left: leftColX },
+            tableWidth: colWidth,
             head: [['Montante "A" - Mão-de-obra', fmt(montanteA)]],
             body: bodyA,
             theme: 'striped',
-            headStyles: { fillColor: '#064E3B' }, // Dark Green
+            headStyles: { fillColor: '#059669', fontSize: 10 },
+            styles: { fontSize: 9, cellPadding: 1.5 },
             columnStyles: { 1: { halign: 'right' } }
         });
 
         // Group B: Inputs
         const montanteB = d.insumos + (d.custosOperacionais?.total || 0);
         const bodyB = [
-            ['1) Materiais e Equipamentos', fmt(d.insumos)],
-            ['2) Exames Médicos (PCMSO/ASO)', fmt(d.custosOperacionais?.examesMedicos || 0)]
+            ['Materiais / Equip.', fmt(d.insumos)],
+            ['Exames (PCMSO)', fmt(d.custosOperacionais?.examesMedicos || 0)]
         ];
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 5,
-            head: [['Montante "B" - Insumos & Operacionais', fmt(montanteB)]],
+            margin: { left: leftColX },
+            tableWidth: colWidth,
+            head: [['Montante "B" - Insumos', fmt(montanteB)]],
             body: bodyB,
             theme: 'striped',
-            headStyles: { fillColor: '#064E3B' },
+            headStyles: { fillColor: '#059669', fontSize: 10 },
+            styles: { fontSize: 9, cellPadding: 1.5 },
             columnStyles: { 1: { halign: 'right' } }
         });
+
+        // --- RIGHT COLUMN ---
 
         // Group C: Benefits
         const montanteC = d.beneficios.total;
         const bodyC = [
-            ['1) Vale Alimentação / Refeição', fmt(d.beneficios.valeRefeicao)],
-            ['2) Vale Transporte', fmt(d.beneficios.valeTransporte)],
-            ['3) Cesta Básica', fmt(d.beneficios.cestaBasica)],
-            ['4) Uniformes / EPIs (Mensal)', fmt(d.beneficios.uniforme)],
-            ...(d.beneficios.vaSobreFerias ? [['5) Provisão VA nas Férias', fmt(d.beneficios.vaSobreFerias)]] : []),
-            // Discounts
-            ...(d.beneficios.descontoVA < 0 ? [['(-) Desconto VA', fmt(d.beneficios.descontoVA)]] : []),
-            ...(d.beneficios.descontoVT < 0 ? [['(-) Desconto VT', fmt(d.beneficios.descontoVT)]] : [])
+            ['Vale Refeição', fmt(d.beneficios.valeRefeicao)],
+            ['Vale Transporte', fmt(d.beneficios.valeTransporte)],
+            ['Cesta Básica', fmt(d.beneficios.cestaBasica)],
+            ['Uniformes / EPIs', fmt(d.beneficios.uniforme)],
+            ...(d.beneficios.vaSobreFerias ? [['Prov. VA Férias', fmt(d.beneficios.vaSobreFerias)]] : []),
+            ...(d.beneficios.descontoVA < 0 ? [['(-) Desc. VA', fmt(d.beneficios.descontoVA)]] : []),
+            ...(d.beneficios.descontoVT < 0 ? [['(-) Desc. VT', fmt(d.beneficios.descontoVT)]] : [])
         ];
 
         autoTable(doc, {
-            startY: (doc as any).lastAutoTable.finalY + 5,
+            startY: 40,
+            margin: { left: rightColX },
+            tableWidth: colWidth,
             head: [['Montante "C" - Benefícios', fmt(montanteC)]],
             body: bodyC,
             theme: 'striped',
-            headStyles: { fillColor: '#064E3B' },
+            headStyles: { fillColor: '#059669', fontSize: 10 },
+            styles: { fontSize: 9, cellPadding: 2 },
             columnStyles: { 1: { halign: 'right' } }
         });
 
-        // Subtotal (A+B+C)
+        // Subtotal + Margin + Taxes Box (Right Side, Below Group C)
         const subtotal = montanteA + montanteB + montanteC;
-        autoTable(doc, {
-            startY: (doc as any).lastAutoTable.finalY + 2,
-            body: [['TOTAL PARCIAL (A + B + C)', fmt(subtotal)]],
-            theme: 'plain',
-            styles: { fontStyle: 'bold', fillColor: '#E5E7EB' },
-            columnStyles: { 1: { halign: 'right' } }
-        });
+        const currentY = (doc as any).lastAutoTable.finalY + 10;
 
-        // Group D: Margin
-        const montanteD = d.lucro;
-        autoTable(doc, {
-            startY: (doc as any).lastAutoTable.finalY + 5,
-            head: [['Montante "D" - Margem / Lucro', fmt(montanteD)]],
-            body: [['1) Margem de Lucro Estimada', fmt(d.lucro)]],
-            theme: 'striped',
-            headStyles: { fillColor: '#064E3B' },
-            columnStyles: { 1: { halign: 'right' } }
-        });
+        doc.setFillColor('#F3F4F6');
+        doc.rect(rightColX, currentY, colWidth, 60, 'F');
 
-        // Taxes
-        const impostos = d.tributos;
-        autoTable(doc, {
-            startY: (doc as any).lastAutoTable.finalY + 5,
-            head: [['Impostos Indiretos (PIS/COFINS/ISS)', fmt(impostos)]],
-            body: [['Tributos sobre Faturamento', fmt(impostos)]],
-            theme: 'striped',
-            headStyles: { fillColor: '#064E3B' },
-            columnStyles: { 1: { halign: 'right' } }
-        });
+        let y = currentY + 10;
+        doc.setTextColor(secondaryColor);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
 
-        // Final Total
-        // Unitary
-        const unitario = item.custoTotal / item.config.quantidade;
-        autoTable(doc, {
-            startY: (doc as any).lastAutoTable.finalY + 5,
-            body: [
-                ['PREÇO TOTAL UNITÁRIO', fmt(unitario)],
-                [`MENSAL TOTAL (${item.config.quantidade}x)`, fmt(item.custoTotal)]
-            ],
-            theme: 'grid',
-            styles: { fontSize: 12, fontStyle: 'bold' },
-            headStyles: { fillColor: '#000000', textColor: '#FFFFFF' },
-            columnStyles: { 1: { halign: 'right' } }
-        });
+        // Custom Table-like drawing for totals
+        const row = (label: string, val: string, bold = false) => {
+            doc.setFont('helvetica', bold ? 'bold' : 'normal');
+            doc.text(label, rightColX + 5, y);
+            doc.text(val, rightColX + colWidth - 5, y, { align: 'right' });
+            y += 7;
+        };
+
+        row('Custo Operacional:', fmt(subtotal));
+        row('Margem / Lucro:', fmt(d.lucro));
+        row('Impostos (16,25%):', fmt(d.tributos));
+        y += 5;
+        doc.setDrawColor('#E5E7EB');
+        doc.line(rightColX + 5, y - 5, rightColX + colWidth - 5, y - 5);
+
+        doc.setTextColor(primaryColor);
+        doc.setFontSize(14);
+        row('PREÇO UNITÁRIO:', fmt(item.custoTotal / item.config.quantidade), true);
+
+        doc.setFillColor(primaryColor);
+        doc.rect(rightColX, y + 2, colWidth, 15, 'F');
+        doc.setTextColor('#FFFFFF');
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(`TOTAL MENSAL (${item.config.quantidade}x): ${fmt(item.custoTotal)}`, rightColX + colWidth / 2, y + 12, { align: 'center' });
+
     });
-
 
     // Footer
     const totalPages = (doc.internal as any).getNumberOfPages();
@@ -231,12 +283,10 @@ export const generatePropostaPDF = (resultado: ResultadoSimulacao, client: UserD
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor('#9CA3AF');
-        const pageHeight = doc.internal.pageSize.height;
-        doc.text('Grupo JVS Facilities - www.grupojvsserv.com.br', 14, pageHeight - 10);
-        doc.text('Av. Maringá, 1273 - Pinhais/PR - (41) 3505-0020', 14, pageHeight - 6);
-        doc.text(`Página ${i} de ${totalPages}`, 190, pageHeight - 10, { align: 'right' });
+        doc.text('Grupo JVS Facilities - www.grupojvsserv.com.br', 20, pageHeight - 10);
+        doc.text(`Página ${i} de ${totalPages}`, pageWidth - 20, pageHeight - 10, { align: 'right' });
     }
 
-    // Save
-    doc.save(`Proposta_JVS_Facilities_${resultado.id}.pdf`);
+    doc.save(`Proposta_JVS_${client.empresa || 'Cliente'}.pdf`);
 };
+
