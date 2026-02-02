@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V6 (Fixed Arc Error)
+    // Force Deploy Checkpoint: Final Release V7 (Arc Fixed definitively)
 
     // HEADER
     const margin = 20;
@@ -175,7 +175,13 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
         case 'Headset': // Recepção
             doc.setDrawColor(color);
             doc.setLineWidth(1.5);
-            doc.arc(x, y, 9, 9, 180, 0, 'S'); // Headband
+            // Headband using path (Arc approximation) from x-9 to x+9
+            doc.path([
+                { op: 'm', c: [x - 9, y] },
+                { op: 'c', c: [x - 9, y - 12, x + 9, y - 12, x + 9, y] }, // Cubic bezier for arch
+                { op: 's', c: [x + 9, y, x + 9, y] } // stroke
+            ], 'S');
+
             doc.setFillColor(color);
             doc.circle(x - 9, y, 3, 'F'); // Ear cup L
             doc.circle(x + 9, y, 3, 'F'); // Ear cup R
@@ -188,9 +194,12 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
             doc.setDrawColor(color);
             doc.setLineWidth(2);
             doc.line(x - 6, y + 6, x + 6, y - 6); // Handle
-            // C-shape head
+            // C-shape head using path instead of arc
             doc.setLineWidth(3);
-            doc.arc(x + 6, y - 6, 4, 4, 300, 150, 'S');
+            doc.path([
+                { op: 'm', c: [x + 4, y - 8] }, // Top of C
+                { op: 'c', c: [x + 9, y - 3, x + 9, y + 3, x + 4, y + 2] } // Curve around to bottom right
+            ], 'S');
             break;
 
         case 'Leaf': // Jardinagem (Leaf shape)
