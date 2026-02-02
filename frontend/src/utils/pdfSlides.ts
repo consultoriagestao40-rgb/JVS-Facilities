@@ -71,7 +71,7 @@ const drawSectionTitle = (doc: jsPDF, title: string, subtitle: string, x: number
 
 // --- SLIDE RENDERERS ---
 
-// 1. QUEM SOMOS (Dark Theme - Inspired by Hero)
+// 1. QUEM SOMOS (Fixed Content - Facilities Focus)
 export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
 
@@ -79,134 +79,128 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     doc.setFillColor(COLORS.BG_DARK);
     doc.rect(0, 0, width, height, 'F');
 
-    // Decoration (Glow effect simulation - Top Right)
+    // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
-    doc.circle(width, 0, 100, 'F');
+    doc.circle(width, 0, 140, 'F');
 
-    // Content Container (Left)
+    // HEADER
     const margin = 20;
-    drawSectionTitle(doc, 'Quem Somos', 'Excelência em Facilities há mais de 30 anos.', margin, 40, true);
+    drawSectionTitle(doc, 'Quem Somos', 'Excelência em Facilities e Gestão.', margin, 30, true);
 
-    const textY = 70;
-    doc.setTextColor(COLORS.TEXT_GRAY);
-    doc.setFontSize(11);
+    // MAIN TEXT - Left Side
+    const textY = 60;
+    doc.setTextColor(COLORS.TEXT_LIGHT); // Brighter text for contrast
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
 
+    // Using generic Facilities text requested by user
     const paragraphs = [
-        'Especialistas em prestação de serviços de limpeza profissional e facilities.',
-        'Nosso foco é entregar qualidade superior, otimização de custos e tranquilidade operacional.',
+        'Somos especialistas em Facilities, focados em entregar qualidade superior,',
+        'otimização de custos e tranquilidade operacional para seu negócio.',
         '',
-        '• 30+ anos de experiência em terceirização',
-        '• 500.000m² de pisos tratados com excelência',
-        '• Cultura voltada para o desenvolvimento humano',
-        '• Gestão personalizada para cada cliente'
+        '• Mais de 30 anos de experiência em gestão de pessoas;',
+        '• Foco total na eficiência operacional e redução de custos;',
+        '• Cultura voltada para o desenvolvimento humano e bem-estar;',
+        '• Gestão personalizada rigorosa de acordo com cada contrato.'
     ];
     doc.text(paragraphs, margin, textY);
 
-    // Right Side: Staggered "Cards" Visual (Stats)
+    // Right Side: Clean Visuals (Removed specific "Cleaning" stats)
     const cardW = 90;
-    const cardH = 35;
-    const cardX = width - cardW - margin - 20;
+    const cardH = 40;
+    const cardX = width - cardW - margin;
 
     // Card 1
-    let cy = 60;
+    let cy = 70;
     drawCard(doc, cardX, cy, cardW, cardH, COLORS.BG_CARD, COLORS.PRIMARY);
     doc.setTextColor(COLORS.PRIMARY);
-    doc.setFontSize(18);
+    doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
-    doc.text('30 Anos', cardX + 10, cy + 12);
+    doc.text('30 Anos', cardX + 10, cy + 15);
     doc.setTextColor(COLORS.WHITE);
-    doc.setFontSize(10);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text('de experiência no mercado.', cardX + 10, cy + 22);
+    doc.text('de experiência no mercado.', cardX + 10, cy + 28);
 
     // Card 2
-    cy += 45;
-    drawCard(doc, cardX + 10, cy, cardW, cardH, COLORS.BG_CARD, COLORS.SECONDARY); // Offset right
+    cy += 50;
+    drawCard(doc, cardX, cy, cardW, cardH, COLORS.BG_CARD, COLORS.SECONDARY);
     doc.setTextColor(COLORS.SECONDARY);
-    doc.setFontSize(18);
+    doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
-    doc.text('100.000m²', cardX + 20, cy + 12);
+    doc.text('Gestão Total', cardX + 10, cy + 15);
     doc.setTextColor(COLORS.WHITE);
-    doc.setFontSize(10);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-    doc.text('de limpeza em altura executada.', cardX + 20, cy + 22);
-
-    // Card 3
-    cy += 45;
-    drawCard(doc, cardX, cy, cardW, cardH, COLORS.BG_CARD, COLORS.WHITE);
-    doc.setTextColor(COLORS.WHITE);
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text('500.000m²', cardX + 10, cy + 12);
-    doc.setTextColor(COLORS.TEXT_GRAY);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('de tratamento de pisos.', cardX + 10, cy + 22);
+    doc.text('Foco em eficiência e resultados.', cardX + 10, cy + 28);
 };
 
-// 2. VALORES (Light Theme - Clean)
+// 2. VALORES (Restored Full Text - Clean Layout)
 export const renderValores = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
-    doc.setFillColor(COLORS.BG_LIGHT);
-    doc.rect(0, 0, width, height, 'F'); // Background
+    doc.setFillColor(COLORS.WHITE); // White Background for readability
+    doc.rect(0, 0, width, height, 'F');
 
+    // Header
     drawSectionTitle(doc, 'Nossos Valores', 'Pilares que sustentam nossa operação.', 20, 30, false);
 
-    const startY = 60;
-    const cardW = 75;
-    const cardH = 90;
+    // Full Text Block (From User Screenshot)
+    doc.setTextColor(COLORS.TEXT_DARK);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+
+    const fullText =
+        "Nosso compromisso é guiado por princípios sólidos: agimos com ética, mantendo a integridade acima de benefícios momentâneos. " +
+        "Buscamos agilidade, eficiência e excelência através do aprimoramento contínuo de processos e sistemas. " +
+        "Valorizamos nossas pessoas, promovendo um ambiente humanizado e soluções que garantem a satisfação e a permanência dos colaboradores. " +
+        "Somos comprometidos com a entrega dos nossos acordos, mesmo diante de desafios. " +
+        "Além disso, investimos em inovação e tecnologia para otimizar a automação, produtividade e eficiência.";
+
+    const splitText = doc.splitTextToSize(fullText, width - 40);
+    doc.text(splitText, 20, 50);
+
+    // Visual Pillars (Below Text - Smaller)
+    const startY = 110;
+    const cardW = 60;
+    const cardH = 50;
     const gap = 15;
-    let x = (width - ((cardW * 3) + (gap * 2))) / 2; // Center row
+    let x = (width - ((cardW * 3) + (gap * 2))) / 2;
 
-    const drawValueCard = (title: string, desc: string, iconChar: string, accent: string) => {
-        // Shadow/Border (Simulated)
-        doc.setFillColor(COLORS.WHITE);
-        doc.roundedRect(x, startY, cardW, cardH, 3, 3, 'F');
-        doc.setDrawColor(COLORS.BORDER_LIGHT);
-        doc.roundedRect(x, startY, cardW, cardH, 3, 3, 'S');
+    const drawValueCard = (title: string, iconChar: string, accent: string) => {
+        // Card
+        drawCard(doc, x, startY, cardW, cardH, COLORS.BG_LIGHT, COLORS.BORDER_LIGHT);
 
-        // Top Accent Bar
-        doc.setFillColor(accent);
-        doc.rect(x, startY, cardW, 2, 'F');
+        // Icon
+        drawIcon(doc, x + cardW / 2, startY + 20, accent, iconChar);
 
-        // Icon Circle
-        drawIcon(doc, x + cardW / 2, startY + 25, accent, iconChar);
-
-        // Text
+        // Title
         doc.setTextColor(COLORS.TEXT_DARK);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text(title, x + cardW / 2, startY + 50, { align: 'center' });
-
-        doc.setTextColor(COLORS.TEXT_MUTED);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.text(doc.splitTextToSize(desc, cardW - 10), x + cardW / 2, startY + 65, { align: 'center' });
+        doc.text(title, x + cardW / 2, startY + 40, { align: 'center' });
 
         x += cardW + gap;
     };
 
-    drawValueCard('Ética', 'Agimos com integridade e transparência em todas as negociações.', 'E', COLORS.PRIMARY);
-    drawValueCard('Inovação', 'Buscamos constantemente novas tecnologias e processos.', 'I', COLORS.SECONDARY);
-    drawValueCard('Pessoas', 'Valorizamos e desenvolvemos nossos talentos humanos.', 'P', COLORS.BG_DARK);
+    drawValueCard('Ética', 'E', COLORS.PRIMARY);
+    drawValueCard('Eficiência', 'E', COLORS.SECONDARY);
+    drawValueCard('Pessoas', 'P', COLORS.BG_DARK);
 };
 
-// 3. SERVIÇOS (Grid Layout - Matches Website)
+// 3. SERVIÇOS (Improved Spacing)
 export const renderServicos = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
-    doc.setFillColor(COLORS.WHITE);
+    doc.setFillColor(COLORS.BG_LIGHT);
     doc.rect(0, 0, width, height, 'F');
 
     drawSectionTitle(doc, 'Principais Serviços', 'Soluções completas para sua empresa.', 20, 30, false);
 
-    const startY = 55;
-    const cardW = 80;
-    const cardH = 35;
-    const gapX = 15;
+    const startY = 50;
+    const cardW = 85;
+    const cardH = 40; // Taller cards to prevent text cut-off
+    const gapX = 10;
     const gapY = 15;
 
-    // Grid 2x3 (3 Columns, 2 Rows)
     const startX = (width - ((cardW * 3) + (gapX * 2))) / 2;
 
     const servicesList = [
@@ -223,29 +217,29 @@ export const renderServicos = (doc: jsPDF, width: number, height: number) => {
 
     servicesList.forEach((item, i) => {
         // Card Body
-        doc.setFillColor(COLORS.BG_LIGHT);
-        doc.roundedRect(cx, cy, cardW, cardH, 2, 2, 'F');
+        doc.setFillColor(COLORS.WHITE);
+        doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'F');
         doc.setDrawColor(COLORS.BORDER_LIGHT);
-        doc.roundedRect(cx, cy, cardW, cardH, 2, 2, 'S');
+        doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'S');
 
         // Icon Box (Left)
-        doc.setFillColor(COLORS.WHITE);
-        doc.roundedRect(cx + 4, cy + 4, 12, 12, 2, 2, 'F');
+        doc.setFillColor(COLORS.BG_LIGHT);
+        doc.roundedRect(cx + 5, cy + 8, 14, 14, 3, 3, 'F');
         doc.setTextColor(COLORS.PRIMARY);
-        doc.setFontSize(9);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.text(item.icon, cx + 10, cy + 11.5, { align: 'center' });
+        doc.text(item.icon, cx + 12, cy + 17, { align: 'center' });
 
         // Text
         doc.setTextColor(COLORS.TEXT_DARK);
-        doc.setFontSize(11);
+        doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text(item.title, cx + 22, cy + 10);
+        doc.text(item.title, cx + 25, cy + 15);
 
         doc.setTextColor(COLORS.TEXT_MUTED);
-        doc.setFontSize(8);
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(item.desc, cx + 22, cy + 16);
+        doc.text(item.desc, cx + 25, cy + 22);
 
         // Move Grid
         cx += cardW + gapX;
