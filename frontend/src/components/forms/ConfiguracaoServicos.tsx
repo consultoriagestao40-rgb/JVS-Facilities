@@ -17,7 +17,7 @@ const DAYS = [
 ];
 
 export default function ConfiguracaoServicos() {
-    const { state, updateConfiguracao, removeConfiguracao, nextStep, prevStep, updateRegrasCCT } = useSimulador();
+    const { state, updateConfiguracao, removeConfiguracao, nextStep, prevStep } = useSimulador();
     const [localConfigs, setLocalConfigs] = useState<ConfiguracaoServico[]>([]);
     const [availableRules, setAvailableRules] = useState<RegraCCT[]>([]);
     const [loadingRules, setLoadingRules] = useState(true);
@@ -37,11 +37,9 @@ export default function ConfiguracaoServicos() {
                 if (res.ok) {
                     const data = await res.json();
                     setAvailableRules(data);
-                    // Sync initial default API rules to context
-                    // @ts-ignore
-                    if (typeof updateRegrasCCT === 'function') {
-                        updateRegrasCCT(data);
-                    }
+                    // Do NOT sync to context here. Context should only hold User/Admin overrides.
+                    // If context is empty, backend uses its own Mocks.
+                    // If we write here, we risk overwriting valid Session data due to race conditions.
                 }
             } catch (error) {
                 console.error("Failed to fetch CCT rules", error);
