@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V9 (All Icons Premium)
+    // Force Deploy Checkpoint: Final Release V10 (Fixed Curve Error)
 
     // HEADER
     const margin = 20;
@@ -216,9 +216,15 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
         case 'Leaf': // Jardinagem (Sprout)
             doc.setFillColor(color);
             // Stem
+            // Stem
             doc.setDrawColor(color);
             doc.setLineWidth(2);
-            doc.curve(x, y + 8, x - 2, y, x, y - 2);
+            // Replaced curve with path (cubic bezier)
+            doc.path([
+                { op: 'm', c: [x, y + 8] },
+                { op: 'c', c: [x - 2, y + 2, x - 2, y, x, y - 2] },
+                { op: 's', c: [x, y - 2, x, y - 2] }
+            ], 'S');
             // Leaf Left
             doc.path([
                 { op: 'm', c: [x, y - 2] },
