@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V4 (Premium Icons)
+    // Force Deploy Checkpoint: Final Release V5 (Icons Fix Confirmed)
 
     // HEADER
     const margin = 20;
@@ -137,54 +137,153 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
 };
 
 // --- VECTOR ICONS ---
+// --- VECTOR ICONS (PREMIUM) ---
 const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: string) => {
     doc.setFillColor(color);
     doc.setDrawColor(color);
-    doc.setLineWidth(1);
+    doc.setLineWidth(0.7);
 
     switch (type) {
-        case 'Check': // Checkmark inside circle
+        // --- SERVICES ---
+        case 'Sparkle': // Limpeza (Star/Sparkle)
+            doc.setFillColor(color);
+            // Draw a 4-point star
+            const r1 = 8, r2 = 3;
+            // Simplified paths for cleaner code
+            doc.line(x, y - r1, x, y + r1);
+            doc.line(x - r1, y, x + r1, y);
+            doc.line(x - r2, y - r2, x + r2, y + r2);
+            doc.line(x - r2, y + r2, x + r2, y - r2);
+            break;
+
+        case 'Shield': // Portaria/Segurança
+            doc.path([
+                { op: 'm', c: [x - 7, y - 7] },
+                { op: 'l', c: [x + 7, y - 7] },
+                { op: 'l', c: [x + 7, y] }, // straight sides
+                { op: 'c', c: [x + 7, y + 6, x, y + 10, x, y + 10] }, // curve to tip
+                { op: 'c', c: [x, y + 10, x - 7, y + 6, x - 7, y] }, // curve back
+                { op: 'l', c: [x - 7, y - 7] }
+            ], 'F');
+            // Checkmark inside (White)
+            doc.setDrawColor(COLORS.WHITE);
+            doc.setLineWidth(1.5);
+            doc.line(x - 3, y, x, y + 3);
+            doc.line(x, y + 3, x + 4, y - 2);
+            break;
+
+        case 'Headset': // Recepção
+            doc.setDrawColor(color);
+            doc.setLineWidth(1.5);
+            doc.arc(x, y, 9, 9, 180, 0, 'S'); // Headband
+            doc.setFillColor(color);
+            doc.circle(x - 9, y, 3, 'F'); // Ear cup L
+            doc.circle(x + 9, y, 3, 'F'); // Ear cup R
+            doc.setLineWidth(1);
+            doc.line(x + 9, y, x + 6, y + 6); // Mic boom
+            doc.circle(x + 6, y + 6, 1.5, 'F'); // Mic tip
+            break;
+
+        case 'Wrench': // Manutenção
+            doc.setDrawColor(color);
+            doc.setLineWidth(2);
+            doc.line(x - 6, y + 6, x + 6, y - 6); // Handle
+            // C-shape head
+            doc.setLineWidth(3);
+            doc.arc(x + 6, y - 6, 4, 4, 300, 150, 'S');
+            break;
+
+        case 'Leaf': // Jardinagem (Leaf shape)
+            doc.setFillColor(color);
+            // Quadratic curves for leaf
+            doc.lines([[8, -8], [0, 16], [-8, -8]], x, y + 4, [1, 1], 'F', true);
+            // Better approximation: Circle + Triangle cut? No, simple eye shape
+            doc.path([
+                { op: 'm', c: [x, y + 8] },
+                { op: 'c', c: [x + 8, y + 2, x + 8, y - 6, x, y - 10] },
+                { op: 'c', c: [x - 8, y - 6, x - 8, y + 2, x, y + 8] }
+            ], 'F');
+            doc.setDrawColor(COLORS.WHITE);
+            doc.setLineWidth(0.5);
+            doc.line(x, y - 8, x, y + 6); // Vein
+            break;
+
+        case 'Office': // Facilities / Proper Building
+            doc.setFillColor(color);
+            doc.rect(x - 8, y - 8, 6, 16, 'F'); // Tower 1
+            doc.rect(x - 2, y - 12, 10, 20, 'F'); // Tower 2 (Taller)
+            // Windows
+            doc.setFillColor(COLORS.WHITE);
+            doc.rect(x - 6, y - 6, 2, 2, 'F');
+            doc.rect(x - 6, y - 2, 2, 2, 'F');
+            doc.rect(x, y - 10, 6, 2, 'F');
+            doc.rect(x, y - 6, 6, 2, 'F');
+            doc.rect(x, y - 2, 6, 2, 'F');
+            break;
+
+        // --- SECTORS ---
+        case 'Home': // Condomínios
+            doc.setFillColor(color);
+            doc.triangle(x - 8, y - 2, x + 8, y - 2, x, y - 10, 'F'); // Roof
+            doc.rect(x - 6, y - 2, 12, 10, 'F'); // Body
+            doc.setFillColor(COLORS.WHITE);
+            doc.rect(x - 2, y + 2, 4, 6, 'F'); // Door
+            break;
+
+        case 'Graduation': // Escolas
+            doc.setFillColor(color);
+            doc.triangle(x - 10, y - 2, x + 10, y - 2, x, y - 6, 'F'); // Top Triangle Top
+            doc.triangle(x - 10, y - 2, x + 10, y - 2, x, y + 2, 'F'); // Top Triangle Bottom
+            doc.rect(x - 10, y - 2, 20, 1, 'F'); // Line fix
+            doc.line(x + 10, y - 2, x + 10, y + 6); // Tassel start
+            doc.circle(x + 10, y + 6, 1.5, 'F'); // Tassel end
+            break;
+
+        case 'Factory': // Indústria
+            doc.setFillColor(color);
+            doc.path([
+                { op: 'm', c: [x - 10, y + 8] },
+                { op: 'l', c: [x - 10, y - 2] },
+                { op: 'l', c: [x - 4, y - 8] }, // Roof 1 peak
+                { op: 'l', c: [x - 4, y - 2] },
+                { op: 'l', c: [x + 2, y - 8] }, // Roof 2 peak
+                { op: 'l', c: [x + 2, y - 2] },
+                { op: 'l', c: [x + 8, y - 8] }, // Roof 3 peak
+                { op: 'l', c: [x + 8, y + 8] },
+                { op: 'l', c: [x - 10, y + 8] }
+            ], 'F');
+            break;
+
+        case 'Shop': // Varejo/Shopping (Storefront)
+            doc.setFillColor(color);
+            doc.rect(x - 10, y, 20, 8, 'F'); // Base
+            // Awning (Striped)
+            doc.triangle(x - 10, y, x - 6, y, x - 8, y - 6, 'F');
+            doc.triangle(x - 6, y, x - 2, y, x - 4, y - 6, 'F');
+            doc.triangle(x - 2, y, x + 2, y, x, y - 6, 'F');
+            doc.triangle(x + 2, y, x + 6, y, x + 4, y - 6, 'F');
+            doc.triangle(x + 6, y, x + 10, y, x + 8, y - 6, 'F');
+            break;
+
+        case 'Cross': // Hospital
+            doc.setFillColor(color);
+            doc.setLineWidth(4);
+            doc.setDrawColor(color);
+            doc.line(x, y - 8, x, y + 8);
+            doc.line(x - 8, y, x + 8, y);
+            break;
+
+        case 'Check': // Keep legacy check just in case
             doc.circle(x, y, 12, 'F');
             doc.setDrawColor(COLORS.WHITE);
             doc.setLineWidth(2);
             doc.lines([[5, 5], [-10, -5]], x - 2, y - 1, [1, 1], 'S', true);
             break;
 
-        case 'Gear': // Abstract Gear
-            doc.circle(x, y, 12, 'F');
+        default:
+            // Circle fallback
+            doc.circle(x, y, 5, 'F');
             doc.setDrawColor(COLORS.WHITE);
-            doc.circle(x, y, 6, 'S');
-            doc.line(x - 8, y, x + 8, y);
-            doc.line(x, y - 8, x, y + 8);
-            break;
-
-        case 'User': // User Silhouette
-            doc.circle(x, y, 12, 'F');
-            doc.setFillColor(COLORS.WHITE);
-            doc.circle(x, y - 3, 4, 'F'); // Head
-            doc.path([{ op: 'm', c: [x - 6, y + 8] }, { op: 'q', c: [x, y + 2, x + 6, y + 8] }, { op: 'l', c: [x + 6, y + 8] }, { op: 'l', c: [x - 6, y + 8] }], 'F'); // Shoulders
-            break;
-
-        case 'Building': // Simple Building
-            doc.circle(x, y, 12, 'F');
-            doc.setFillColor(COLORS.WHITE);
-            doc.rect(x - 4, y - 4, 8, 10, 'F');
-            doc.triangle(x - 5, y - 4, x + 5, y - 4, x, y - 9, 'F');
-            break;
-
-        case 'Plus':
-            doc.circle(x, y, 12, 'F');
-            doc.setDrawColor(COLORS.WHITE);
-            doc.setLineWidth(3);
-            doc.line(x - 5, y, x + 5, y);
-            doc.line(x, y - 5, x, y + 5);
-            break;
-
-        default: // Fallback Circle
-            doc.circle(x, y, 12, 'F');
-            doc.setTextColor(COLORS.WHITE);
-            doc.setFontSize(14);
-            doc.setFont('helvetica', 'bold');
             doc.text(type.charAt(0), x, y + 2, { align: 'center' });
     }
 };
