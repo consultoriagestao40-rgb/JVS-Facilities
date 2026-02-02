@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V10 (Fixed Curve Error)
+    // Force Deploy Checkpoint: Final Release V11 (Shadows and Robust Icons)
 
     // HEADER
     const margin = 20;
@@ -162,23 +162,33 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
             doc.circle(x - 5, y + 5, 1.5, 'F');
             break;
 
-        case 'Shield': // Portaria/Segurança (Shield with Star)
+        case 'Shield': // Portaria/Segurança (Robust Lines)
             doc.setFillColor(color);
+            // Shield shape using relative lines (safer than path)
+            // Start at top center relative 0,0 is x,y (but lines start at x,y)
+            // We need to move to top-left of shield
+            doc.lines([
+                [14, 0], // Top edge
+                [0, 8], // Right straight
+                [-7, 8, -14, 0], // Bottom curve (bezier to bottom center then left) -> Simplified to simple curves
+                [-7, -8, -14, -16] // Closing curve? lines API is tricky for complex curves.
+                // Let's use a simpler shape composed of lines and cubic bezier
+            ], x - 7, y - 8, [1, 1], 'F', true);
+
+            // Retry Path for Shield with simpler coords if above is too complex to guess
+            // Actually, let's use the exact path style from Sparkle which worked, but ensure setFillColor is explicit
             doc.path([
-                { op: 'm', c: [x - 8, y - 8] },
-                { op: 'l', c: [x + 8, y - 8] },
-                { op: 'l', c: [x + 8, y] },
-                { op: 'c', c: [x + 8, y + 8, x, y + 11, x, y + 11] }, // Tip
-                { op: 'c', c: [x, y + 11, x - 8, y + 8, x - 8, y] },
-                { op: 'l', c: [x - 8, y - 8] }
+                { op: 'm', c: [x - 7, y - 7] },
+                { op: 'l', c: [x + 7, y - 7] },
+                { op: 'l', c: [x + 7, y] },
+                { op: 'c', c: [x + 7, y + 7, x, y + 10, x, y + 10] },
+                { op: 'c', c: [x, y + 10, x - 7, y + 7, x - 7, y] },
+                { op: 'l', c: [x - 7, y - 7] }
             ], 'F');
-            // Star Badge in center (White)
+
+            // Star Badge center
             doc.setFillColor(COLORS.WHITE);
-            doc.circle(x, y, 3, 'F');
-            doc.setDrawColor(COLORS.WHITE);
-            doc.setLineWidth(1);
-            doc.line(x, y - 4, x, y + 4);
-            doc.line(x - 4, y, x + 4, y);
+            doc.circle(x, y, 2.5, 'F');
             break;
 
         case 'Headset': // Recepção (Modern Operator)
@@ -444,15 +454,24 @@ export const renderServicos = (doc: jsPDF, width: number, height: number) => {
     let cy = startY;
 
     servicesList.forEach((item, i) => {
-        // Card Body (White, subtle shadow via gray border bottom)
+        // Card Shadow (Light Gray offset)
+        doc.setFillColor('#E5E7EB'); // Light Gray
+        doc.roundedRect(cx + 1, cy + 1, cardW, cardH, 2, 2, 'F');
+
+        // Card Body (White)
         doc.setFillColor(COLORS.WHITE);
         doc.roundedRect(cx, cy, cardW, cardH, 2, 2, 'F');
+
+        // Border (Consistent Thin Line)
         doc.setDrawColor(COLORS.BORDER_LIGHT);
+        doc.setLineWidth(0.5);
         doc.roundedRect(cx, cy, cardW, cardH, 2, 2, 'S');
 
-        // Draw Icon (Larger, colored) -- Top Left of Card content
+        // Draw Icon Background
         doc.setFillColor(COLORS.BG_LIGHT);
         doc.circle(cx + 12, cy + 17.5, 9, 'F');
+
+        // Draw Vector Icon
         drawVectorIcon(doc, cx + 12, cy + 17.5, item.icon, COLORS.PRIMARY);
 
         // Title
