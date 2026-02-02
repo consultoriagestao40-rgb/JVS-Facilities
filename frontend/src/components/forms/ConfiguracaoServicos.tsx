@@ -22,14 +22,26 @@ export default function ConfiguracaoServicos() {
     const [availableRules, setAvailableRules] = useState<RegraCCT[]>([]);
     const [loadingRules, setLoadingRules] = useState(true);
 
-    // Fetch Rules on Mount
+    // Fetch Rules on Mount ONLY if context is empty (Preserve Admin Changes)
     useEffect(() => {
+        // If we already have rules in context (from Admin or Session), use them!
+        if (state.regrasCCT && state.regrasCCT.length > 0) {
+            setAvailableRules(state.regrasCCT);
+            setLoadingRules(false);
+            return;
+        }
+
         async function fetchRules() {
             try {
                 const res = await fetch('/api/simulador/regras');
                 if (res.ok) {
                     const data = await res.json();
                     setAvailableRules(data);
+                    // Sync initial default API rules to context
+                    // @ts-ignore
+                    if (typeof updateRegrasCCT === 'function') {
+                        updateRegrasCCT(data);
+                    }
                 }
             } catch (error) {
                 console.error("Failed to fetch CCT rules", error);
@@ -38,17 +50,9 @@ export default function ConfiguracaoServicos() {
             }
         }
         fetchRules();
-    }, []);
+    }, [state.regrasCCT]); // Add state.regrasCCT dependence to react to updates
 
-    // Also sync retrieved Rules to Context so Backend receives them!
-    useEffect(() => {
-        if (availableRules.length > 0) {
-            // @ts-ignore
-            if (typeof updateRegrasCCT === 'function') {
-                updateRegrasCCT(availableRules);
-            }
-        }
-    }, [availableRules]);
+
 
     // Initialize Local State (and ensure IDs/Defaults)
     useEffect(() => {
