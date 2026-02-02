@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V7 (Arc Fixed definitively)
+    // Force Deploy Checkpoint: Final Release V8 (Website Match Icons)
 
     // HEADER
     const margin = 20;
@@ -138,18 +138,17 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
 
 // --- VECTOR ICONS ---
 // --- VECTOR ICONS (PREMIUM) ---
+// --- VECTOR ICONS (PREMIUM - WEBSITE MATCH) ---
 const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: string) => {
     doc.setFillColor(color);
     doc.setDrawColor(color);
     doc.setLineWidth(0.7);
 
     switch (type) {
-        // --- SERVICES ---
-        case 'Sparkle': // Limpeza (Star/Sparkle)
+        // --- SERVICES (KEEPING EXISTING NICE ONES) ---
+        case 'Sparkle': // Limpeza
             doc.setFillColor(color);
-            // Draw a 4-point star
             const r1 = 8, r2 = 3;
-            // Simplified paths for cleaner code
             doc.line(x, y - r1, x, y + r1);
             doc.line(x - r1, y, x + r1, y);
             doc.line(x - r2, y - r2, x + r2, y + r2);
@@ -160,12 +159,11 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
             doc.path([
                 { op: 'm', c: [x - 7, y - 7] },
                 { op: 'l', c: [x + 7, y - 7] },
-                { op: 'l', c: [x + 7, y] }, // straight sides
-                { op: 'c', c: [x + 7, y + 6, x, y + 10, x, y + 10] }, // curve to tip
-                { op: 'c', c: [x, y + 10, x - 7, y + 6, x - 7, y] }, // curve back
+                { op: 'l', c: [x + 7, y] },
+                { op: 'c', c: [x + 7, y + 6, x, y + 10, x, y + 10] },
+                { op: 'c', c: [x, y + 10, x - 7, y + 6, x - 7, y] },
                 { op: 'l', c: [x - 7, y - 7] }
             ], 'F');
-            // Checkmark inside (White)
             doc.setDrawColor(COLORS.WHITE);
             doc.setLineWidth(1.5);
             doc.line(x - 3, y, x, y + 3);
@@ -175,38 +173,33 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
         case 'Headset': // Recepção
             doc.setDrawColor(color);
             doc.setLineWidth(1.5);
-            // Headband using path (Arc approximation) from x-9 to x+9
             doc.path([
                 { op: 'm', c: [x - 9, y] },
-                { op: 'c', c: [x - 9, y - 12, x + 9, y - 12, x + 9, y] }, // Cubic bezier for arch
-                { op: 's', c: [x + 9, y, x + 9, y] } // stroke
+                { op: 'c', c: [x - 9, y - 12, x + 9, y - 12, x + 9, y] },
+                { op: 's', c: [x + 9, y, x + 9, y] }
             ], 'S');
-
             doc.setFillColor(color);
-            doc.circle(x - 9, y, 3, 'F'); // Ear cup L
-            doc.circle(x + 9, y, 3, 'F'); // Ear cup R
+            doc.circle(x - 9, y, 3, 'F');
+            doc.circle(x + 9, y, 3, 'F');
             doc.setLineWidth(1);
-            doc.line(x + 9, y, x + 6, y + 6); // Mic boom
-            doc.circle(x + 6, y + 6, 1.5, 'F'); // Mic tip
+            doc.line(x + 9, y, x + 6, y + 6);
+            doc.circle(x + 6, y + 6, 1.5, 'F');
             break;
 
         case 'Wrench': // Manutenção
             doc.setDrawColor(color);
             doc.setLineWidth(2);
-            doc.line(x - 6, y + 6, x + 6, y - 6); // Handle
-            // C-shape head using path instead of arc
+            doc.line(x - 6, y + 6, x + 6, y - 6);
             doc.setLineWidth(3);
             doc.path([
-                { op: 'm', c: [x + 4, y - 8] }, // Top of C
-                { op: 'c', c: [x + 9, y - 3, x + 9, y + 3, x + 4, y + 2] } // Curve around to bottom right
+                { op: 'm', c: [x + 4, y - 8] },
+                { op: 'c', c: [x + 9, y - 3, x + 9, y + 3, x + 4, y + 2] }
             ], 'S');
             break;
 
-        case 'Leaf': // Jardinagem (Leaf shape)
+        case 'Leaf': // Jardinagem
             doc.setFillColor(color);
-            // Quadratic curves for leaf
             doc.lines([[8, -8], [0, 16], [-8, -8]], x, y + 4, [1, 1], 'F', true);
-            // Better approximation: Circle + Triangle cut? No, simple eye shape
             doc.path([
                 { op: 'm', c: [x, y + 8] },
                 { op: 'c', c: [x + 8, y + 2, x + 8, y - 6, x, y - 10] },
@@ -214,14 +207,13 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
             ], 'F');
             doc.setDrawColor(COLORS.WHITE);
             doc.setLineWidth(0.5);
-            doc.line(x, y - 8, x, y + 6); // Vein
+            doc.line(x, y - 8, x, y + 6);
             break;
 
-        case 'Office': // Facilities / Proper Building
+        case 'Office': // Facilities
             doc.setFillColor(color);
-            doc.rect(x - 8, y - 8, 6, 16, 'F'); // Tower 1
-            doc.rect(x - 2, y - 12, 10, 20, 'F'); // Tower 2 (Taller)
-            // Windows
+            doc.rect(x - 8, y - 8, 6, 16, 'F');
+            doc.rect(x - 2, y - 12, 10, 20, 'F');
             doc.setFillColor(COLORS.WHITE);
             doc.rect(x - 6, y - 6, 2, 2, 'F');
             doc.rect(x - 6, y - 2, 2, 2, 'F');
@@ -230,56 +222,104 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
             doc.rect(x, y - 2, 6, 2, 'F');
             break;
 
-        // --- SECTORS ---
-        case 'Home': // Condomínios
+        // --- NEW PREMIUM SECTOR ICONS (MATCHING WEBSITE) ---
+
+        case 'Bag': // Shoppings (Shopping Bag)
             doc.setFillColor(color);
-            doc.triangle(x - 8, y - 2, x + 8, y - 2, x, y - 10, 'F'); // Roof
-            doc.rect(x - 6, y - 2, 12, 10, 'F'); // Body
+            // Handle
+            doc.setDrawColor(color);
+            doc.setLineWidth(1.5);
+            doc.path([
+                { op: 'm', c: [x - 4, y - 6] },
+                { op: 'c', c: [x - 4, y - 10, x + 4, y - 10, x + 4, y - 6] },
+                { op: 's', c: [x + 4, y - 6, x + 4, y - 6] }
+            ], 'S');
+            // Bag Body
+            doc.path([
+                { op: 'm', c: [x - 7, y - 6] },
+                { op: 'l', c: [x + 7, y - 6] },
+                { op: 'l', c: [x + 8, y + 8] }, // slight taper
+                { op: 'l', c: [x - 8, y + 8] },
+                { op: 'l', c: [x - 7, y - 6] }
+            ], 'F');
+            // Lock/Detail
             doc.setFillColor(COLORS.WHITE);
-            doc.rect(x - 2, y + 2, 4, 6, 'F'); // Door
+            doc.circle(x, y - 1, 1.5, 'F');
             break;
 
-        case 'Graduation': // Escolas
+        case 'Cart': // Supermercados/Varejo (Shopping Cart)
             doc.setFillColor(color);
-            doc.triangle(x - 10, y - 2, x + 10, y - 2, x, y - 6, 'F'); // Top Triangle Top
-            doc.triangle(x - 10, y - 2, x + 10, y - 2, x, y + 2, 'F'); // Top Triangle Bottom
-            doc.rect(x - 10, y - 2, 20, 1, 'F'); // Line fix
-            doc.line(x + 10, y - 2, x + 10, y + 6); // Tassel start
-            doc.circle(x + 10, y + 6, 1.5, 'F'); // Tassel end
+            doc.setDrawColor(color);
+            doc.setLineWidth(1.5);
+            doc.line(x - 9, y - 5, x - 7, y - 5); // Handle start
+            doc.line(x - 7, y - 5, x - 5, y + 3); // Back
+            doc.line(x - 5, y + 3, x + 6, y + 3); // Bottom
+            doc.line(x + 6, y + 3, x + 8, y - 5); // Front
+            doc.line(x - 7, y - 5, x + 8, y - 5); // Top
+            // Wheels
+            doc.circle(x - 4, y + 6, 1.5, 'F');
+            doc.circle(x + 5, y + 6, 1.5, 'F');
             break;
 
-        case 'Factory': // Indústria
+        case 'Hospital': // Hospitais (Building with Cross)
+            doc.setFillColor(color);
+            doc.rect(x - 9, y - 8, 18, 16, 'F'); // Main block
+            doc.triangle(x - 10, y - 8, x + 10, y - 8, x, y - 13, 'F'); // Roof
+            // Cross (White)
+            doc.setFillColor(COLORS.WHITE);
+            doc.rect(x - 2.5, y - 4, 5, 1.5, 'F'); // Horz
+            doc.rect(x - 0.75, y - 5.75, 1.5, 5, 'F'); // Vert
+            // Windows
+            doc.rect(x - 6, y + 2, 2, 2, 'F');
+            doc.rect(x - 2, y + 2, 4, 3, 'F'); // Door
+            doc.rect(x + 4, y + 2, 2, 2, 'F');
+            break;
+
+        case 'Gears': // Indústria (3 Gears Cluster)
+            doc.setFillColor(color);
+            // Main Gear
+            doc.circle(x - 4, y, 5, 'F');
+            doc.setDrawColor(COLORS.WHITE);
+            doc.setLineWidth(1.5);
+            doc.circle(x - 4, y, 2, 'S'); // Hole
+            // Small Gear Top Right
+            doc.setFillColor(color);
+            doc.circle(x + 4, y - 5, 3.5, 'F');
+            doc.setDrawColor(COLORS.WHITE);
+            doc.circle(x + 4, y - 5, 1.5, 'S');
+            // Small Gear Bottom Right
+            doc.setFillColor(color);
+            doc.circle(x + 4, y + 4, 3.5, 'F');
+            doc.setDrawColor(COLORS.WHITE);
+            doc.circle(x + 4, y + 4, 1.5, 'S');
+            break;
+
+        case 'Home': // Condomínios (Residential Tower)
+            doc.setFillColor(color);
+            doc.rect(x - 6, y - 10, 12, 18, 'F'); // Tall Building
+            // Windows Grid
+            doc.setFillColor(COLORS.WHITE);
+            doc.rect(x - 3, y - 7, 2, 2, 'F');
+            doc.rect(x + 1, y - 7, 2, 2, 'F');
+            doc.rect(x - 3, y - 3, 2, 2, 'F');
+            doc.rect(x + 1, y - 3, 2, 2, 'F');
+            doc.rect(x - 3, y + 1, 2, 2, 'F');
+            doc.rect(x + 1, y + 1, 2, 2, 'F');
+            break;
+
+        case 'Graduation': // Escolas (Cap)
             doc.setFillColor(color);
             doc.path([
-                { op: 'm', c: [x - 10, y + 8] },
-                { op: 'l', c: [x - 10, y - 2] },
-                { op: 'l', c: [x - 4, y - 8] }, // Roof 1 peak
-                { op: 'l', c: [x - 4, y - 2] },
-                { op: 'l', c: [x + 2, y - 8] }, // Roof 2 peak
-                { op: 'l', c: [x + 2, y - 2] },
-                { op: 'l', c: [x + 8, y - 8] }, // Roof 3 peak
-                { op: 'l', c: [x + 8, y + 8] },
-                { op: 'l', c: [x - 10, y + 8] }
+                { op: 'm', c: [x - 9, y - 2] },
+                { op: 'l', c: [x, y - 6] },
+                { op: 'l', c: [x + 9, y - 2] },
+                { op: 'l', c: [x, y + 2] },
+                { op: 'l', c: [x - 9, y - 2] }
             ], 'F');
-            break;
-
-        case 'Shop': // Varejo/Shopping (Storefront)
-            doc.setFillColor(color);
-            doc.rect(x - 10, y, 20, 8, 'F'); // Base
-            // Awning (Striped)
-            doc.triangle(x - 10, y, x - 6, y, x - 8, y - 6, 'F');
-            doc.triangle(x - 6, y, x - 2, y, x - 4, y - 6, 'F');
-            doc.triangle(x - 2, y, x + 2, y, x, y - 6, 'F');
-            doc.triangle(x + 2, y, x + 6, y, x + 4, y - 6, 'F');
-            doc.triangle(x + 6, y, x + 10, y, x + 8, y - 6, 'F');
-            break;
-
-        case 'Cross': // Hospital
-            doc.setFillColor(color);
-            doc.setLineWidth(4);
+            doc.rect(x - 9, y - 2, 20, 1, 'F'); // Line fix
             doc.setDrawColor(color);
-            doc.line(x, y - 8, x, y + 8);
-            doc.line(x - 8, y, x + 8, y);
+            doc.line(x + 9, y - 2, x + 9, y + 5); // Tassel line
+            doc.circle(x + 9, y + 5, 1, 'F');
             break;
 
         case 'Check': // Keep legacy check just in case
@@ -290,7 +330,6 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
             break;
 
         default:
-            // Circle fallback
             doc.circle(x, y, 5, 'F');
             doc.setDrawColor(COLORS.WHITE);
             doc.text(type.charAt(0), x, y + 2, { align: 'center' });
@@ -424,10 +463,10 @@ export const renderSetores = (doc: jsPDF, width: number, height: number) => {
     const sectors = [
         { name: 'Condomínios', icon: 'Home' },
         { name: 'Escolas', icon: 'Graduation' },
-        { name: 'Hospitais', icon: 'Cross' },
-        { name: 'Indústrias', icon: 'Factory' },
-        { name: 'Shoppings', icon: 'Shop' },
-        { name: 'Varejo', icon: 'Shop' }
+        { name: 'Hospitais', icon: 'Hospital' },
+        { name: 'Indústrias', icon: 'Gears' },
+        { name: 'Shoppings', icon: 'Bag' },
+        { name: 'Varejo', icon: 'Cart' }
     ];
 
     // Grid 3x2
