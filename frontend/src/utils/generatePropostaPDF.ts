@@ -43,9 +43,11 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     const pageHeight = doc.internal.pageSize.height; // ~210mm
 
     // --- SLIDE 1: COVER (Dynamic) ---
+    // --- SLIDE 1: COVER (Dynamic) ---
     // Header Logo (Top Left)
+    let logoData: string | null = null;
     try {
-        const logoData = await loadImage('/logo-jvs.png');
+        logoData = await loadImage('/logo-jvs.png');
         // Aspect ratio for "logo-branco-200px.png" (approx 200x50 usually, but let's assume a safe width)
         // Drawing logo...
         doc.addImage(logoData, 'PNG', 20, 20, 50, 15); // x, y, w, h
