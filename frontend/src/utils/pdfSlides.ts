@@ -379,7 +379,7 @@ export const renderResponsabilidades = (doc: jsPDF, width: number, height: numbe
             doc.roundedRect(x, y, w, h, 3, 3, 'S');
         } else {
             // Shadow for center card
-            doc.setFillColor('rgba(16, 185, 129, 0.2)');
+            doc.setFillColor('#D1FAE5');
             doc.rect(x + 2, y + 2, w, h, 'F');
             doc.setFillColor(bg);
             doc.roundedRect(x, y, w, h, 3, 3, 'F');
