@@ -51,7 +51,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     doc.text(text, 20, 50);
 
     // Right Content (Visual Placeholder)
-    doc.setCheckOutLine(WHITE);
+    doc.setDrawColor(WHITE);
     doc.setLineWidth(1);
     doc.circle(splitX + (width - splitX) / 2, height / 2, 40, 'S'); // Abstract Graphic
     doc.text('Excelência em', splitX + (width - splitX) / 2, height / 2 - 5, { align: 'center' });
