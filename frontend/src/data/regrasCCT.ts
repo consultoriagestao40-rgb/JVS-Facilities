@@ -19,12 +19,12 @@ export const MOCK_REGRAS: RegraCCT[] = [
         dataVigencia: '2025-01-01',
         salarioPiso: 1900.00, // Servente 44h reference
         beneficios: {
-            valeRefeicao: 900.00, // FIXED: User Contract Value
-            tipoValeRefeicao: 'MENSAL', // FIXED: Monthly
+            valeRefeicao: 900.00, // User Contract Value
+            tipoValeRefeicao: 'MENSAL', // Monthly
             valeTransporte: 12,
-            cestaBasica: 6.00, // FIXED: User Value
+            cestaBasica: 6.00, // User Value
             uniforme: 40,
-            adicionalCopa: 136.00 // FIXED: User Contract Value
+            adicionalCopa: 136.00 // User Contract Value
         },
         cargos: [
             { nome: 'Servente 44h', piso: 1900.00, gratificacao: 0, adicionalCopa: 0 },
@@ -50,7 +50,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
         funcao: 'PORTARIA',
         dataVigencia: '2025-01-01',
         salarioPiso: 2415.00, // Porteiro 44h ref
-        beneficios: { valeRefeicao: 28, valeTransporte: 12, cestaBasica: 150, uniforme: 0 },
+        beneficios: { valeRefeicao: 28, valeTransporte: 12, cestaBasica: 6.00, uniforme: 0 },
         cargos: [
             { nome: 'Porteiro 44h / 12x36', piso: 2415.00, gratificacao: 86.00, adicionalCopa: 0 },
             { nome: 'Porteiro SDF', piso: 1869.00, gratificacao: 0, adicionalCopa: 0 },
@@ -67,7 +67,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
         funcao: 'JARDINAGEM',
         dataVigencia: '2025-01-01',
         salarioPiso: 2029.00,
-        beneficios: { valeRefeicao: 25, valeTransporte: 12, cestaBasica: 150, uniforme: 30 },
+        beneficios: { valeRefeicao: 25, valeTransporte: 12, cestaBasica: 6.00, uniforme: 30 },
         cargos: [
             { nome: 'Jardineiro 44h', piso: 2029.00, gratificacao: 0, adicionalCopa: 0 },
             { nome: 'Operador de Máquina Costal/Roçadeira', piso: 2404.00, gratificacao: 0, adicionalCopa: 0 },
@@ -82,7 +82,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
         funcao: 'RECEPCAO',
         dataVigencia: '2025-01-01',
         salarioPiso: 2141.00,
-        beneficios: { valeRefeicao: 25, valeTransporte: 12, cestaBasica: 150, uniforme: 50 },
+        beneficios: { valeRefeicao: 25, valeTransporte: 12, cestaBasica: 6.00, uniforme: 50 },
         cargos: [
             { nome: 'Recepcionista 44h / 12x36', piso: 2141.00, gratificacao: 43.00, adicionalCopa: 0 },
             { nome: 'Ascensorista / Telefonista 36h', piso: 1998.00, gratificacao: 0, adicionalCopa: 0 }
@@ -96,7 +96,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
         funcao: 'MANUTENCAO',
         dataVigencia: '2025-01-01',
         salarioPiso: 2141.00,
-        beneficios: { valeRefeicao: 25, valeTransporte: 12, cestaBasica: 150, uniforme: 40 },
+        beneficios: { valeRefeicao: 25, valeTransporte: 12, cestaBasica: 6.00, uniforme: 40 },
         cargos: [
             { nome: 'Bombeiro Hidráulico 44h', piso: 2141.00, gratificacao: 43.00, adicionalCopa: 0 },
             { nome: 'Auxiliar de Manutenção Predial', piso: 1900.00, gratificacao: 0, adicionalCopa: 0 }
@@ -112,7 +112,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
         funcao: 'LIMPEZA',
         dataVigencia: '2025-01-01',
         salarioPiso: 1850.00,
-        beneficios: { valeRefeicao: 35, valeTransporte: 18, cestaBasica: 200, uniforme: 30 },
+        beneficios: { valeRefeicao: 35, valeTransporte: 18, cestaBasica: 6.00, uniforme: 30 },
         cargos: [
             { nome: 'Auxiliar de Limpeza', piso: 1850.00, gratificacao: 0, adicionalCopa: 0 },
             { nome: 'Encarregado de Limpeza', piso: 2400.00, gratificacao: 350, adicionalCopa: 100 }
@@ -126,7 +126,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
         funcao: 'LIMPEZA',
         dataVigencia: '2025-01-01',
         salarioPiso: 1700.00,
-        beneficios: { valeRefeicao: 28, valeTransporte: 15, cestaBasica: 180, uniforme: 28 },
+        beneficios: { valeRefeicao: 28, valeTransporte: 15, cestaBasica: 6.00, uniforme: 28 },
         cargos: [
             { nome: 'Auxiliar de Limpeza', piso: 1700.00, gratificacao: 0, adicionalCopa: 50 },
             { nome: 'Zelador', piso: 2100.00, gratificacao: 150, adicionalCopa: 0 }
@@ -140,7 +140,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
         funcao: 'PORTARIA',
         dataVigencia: '2025-01-01',
         salarioPiso: 2100.00,
-        beneficios: { valeRefeicao: 35, valeTransporte: 18, cestaBasica: 200, uniforme: 0 },
+        beneficios: { valeRefeicao: 35, valeTransporte: 18, cestaBasica: 6.00, uniforme: 0 },
         cargos: [
             { nome: 'Porteiro Controlador', piso: 2100.00, gratificacao: 100, adicionalCopa: 0 },
             { nome: 'Vigia', piso: 2000.00, gratificacao: 0, adicionalCopa: 0 }

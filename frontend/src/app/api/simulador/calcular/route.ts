@@ -204,7 +204,7 @@ function getValores(params?: ParametrosCustos) {
             SALARIO_MINIMO: params?.salarioMinimo ?? 1412.00,
             VALE_REFEICAO_DIA: params?.beneficios.valeRefeicao ?? 25.00,
             VALE_TRANSPORTE_DIA: params?.beneficios.valeTransporte ?? 12.00,
-            CESTA_BASICA: params?.beneficios.cestaBasica ?? 150.00,
+            CESTA_BASICA: params?.beneficios.cestaBasica ?? 6.00,
             UNIFORME_MENSAL: params?.beneficios.uniforme ?? 25.00,
             GRATIFICACOES: 0 // Default
         },
