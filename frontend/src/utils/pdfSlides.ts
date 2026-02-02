@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V12 (Fixed Crash)
+    // Force Deploy Checkpoint: Final Release V13 (Primitives for Safety)
 
     // HEADER
     const margin = 20;
@@ -162,39 +162,32 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
             doc.circle(x - 5, y + 5, 1.5, 'F');
             break;
 
-        case 'Shield': // Portaria/Segurança (Fixed Path)
+        case 'Shield': // Portaria/Segurança (Primitives)
             doc.setFillColor(color);
-            doc.path([
-                { op: 'm', c: [x - 8, y - 8] },
-                { op: 'l', c: [x + 8, y - 8] },
-                { op: 'l', c: [x + 8, y] }, // Straight side right
-                { op: 'c', c: [x + 8, y + 8, x, y + 11, x, y + 11] }, // Curve to tip
-                { op: 'c', c: [x, y + 11, x - 8, y + 8, x - 8, y] }, // Curve to left side
-                { op: 'l', c: [x - 8, y - 8] },
-                { op: 'h' } // Close
-            ], 'F');
+            // Top block
+            doc.rect(x - 7, y - 7, 14, 7, 'F');
+            // Bottom point (Triangle)
+            doc.triangle(x - 7, y, x + 7, y, x, y + 9, 'F');
 
             // Star Badge center
             doc.setFillColor(COLORS.WHITE);
             doc.circle(x, y, 2.5, 'F');
             break;
 
-        case 'Headset': // Recepção (Modern Operator)
+        case 'Leaf': // Jardinagem (Primitives)
+            doc.setFillColor(color);
+
+            // Stem
             doc.setDrawColor(color);
             doc.setLineWidth(2);
-            doc.path([
-                { op: 'm', c: [x - 9, y + 2] },
-                { op: 'c', c: [x - 9, y - 12, x + 9, y - 12, x + 9, y + 2] }, // Headband
-                { op: 's', c: [x + 9, y + 2, x + 9, y + 2] }
-            ], 'S');
-            doc.setFillColor(color);
-            doc.roundedRect(x - 11, y - 1, 4, 8, 1, 1, 'F'); // Ear L
-            doc.roundedRect(x + 7, y - 1, 4, 8, 1, 1, 'F'); // Ear R
-            doc.setLineWidth(1.5);
-            doc.line(x + 9, y + 7, x + 4, y + 8); // Mic Boom
-            doc.circle(x + 4, y + 8, 2, 'F'); // Mic
-            break;
+            doc.line(x, y + 6, x, y - 2);
 
+            // Leaf (Diamond Shape composed of two triangles)
+            // Left Triangle
+            doc.triangle(x, y - 10, x - 6, y - 4, x, y + 2, 'F');
+            // Right Triangle
+            doc.triangle(x, y - 10, x + 6, y - 4, x, y + 2, 'F');
+            break;
         case 'Wrench': // Manutenção (Crossed Tools)
             doc.setFillColor(color);
             doc.setDrawColor(color);
