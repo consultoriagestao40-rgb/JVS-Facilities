@@ -412,8 +412,11 @@ function calcularBeneficios(
     // Total = (Costs) - (Discounts) + (Provisions)
     // Note: Discounts are subtracted from the company cost because the employee pays them.
     // ADD COPA TO TOTAL
+    // Total = (Costs) - (Discounts) + (Provisions)
+    // Note: Discounts are subtracted from the company cost because the employee pays them.
+    // COPA REMOVED FROM BENEFIT CALC HERE (Moved to Salary/Labor Group)
     const total =
-        (custoVR + custoVT + cesta + uniforme + copa + vaSobreFerias) -
+        (custoVR + custoVT + cesta + uniforme + vaSobreFerias) -
         (descontoVAReal + descontoVTReal);
 
     return {
@@ -421,13 +424,15 @@ function calcularBeneficios(
         valeTransporte: custoVT,
         cestaBasica: cesta,
         uniforme: uniforme,
-        adicionalCopa: copa, // Return field
+        // adicionalCopa: copa, // REMOVED from Benefits
         vaSobreFerias: vaSobreFerias,
         descontoVA: -descontoVAReal, // Return as negative for display consistency
         descontoVT: -descontoVTReal, // Return as negative for display consistency
         total: total
     };
 }
+// ... (skip to detailed return) ...
+
 
 function calcularEncargosSociais(remuneracao: number, valores: ReturnType<typeof getValores>): number {
     const { INSS, FGTS, RAT } = valores.ALIQUOTAS;

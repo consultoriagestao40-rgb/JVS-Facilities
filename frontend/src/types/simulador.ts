@@ -123,6 +123,7 @@ export interface BreakdownCustos {
         noturno: number; // New
         intrajornada: number; // New
         dsr: number; // New
+        copa: number; // Moved from beneficios
         total: number;
     };
     beneficios: {
@@ -130,7 +131,7 @@ export interface BreakdownCustos {
         valeTransporte: number;
         cestaBasica: number;
         uniforme: number;
-        adicionalCopa: number; // Moved from adicionais
+        // adicionalCopa removed
         vaSobreFerias: number; // New cost
         descontoVA: number; // Negative value
         descontoVT: number; // Negative value
