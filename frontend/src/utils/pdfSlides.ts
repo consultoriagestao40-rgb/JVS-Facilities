@@ -137,7 +137,6 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
 
 // --- VECTOR ICONS ---
 const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: string) => {
-    doc.setIsInputVisual(false); // Optimize
     doc.setFillColor(color);
     doc.setDrawColor(color);
     doc.setLineWidth(1);
@@ -187,7 +186,6 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
             doc.setFont('helvetica', 'bold');
             doc.text(type.charAt(0), x, y + 2, { align: 'center' });
     }
-    doc.setIsInputVisual(true);
 };
 
 // 2. VALORES (Restored Full Text - Clean Layout)
