@@ -22,7 +22,7 @@ export const MOCK_REGRAS: RegraCCT[] = [
             valeRefeicao: 900.00, // FIXED: User Contract Value
             tipoValeRefeicao: 'MENSAL', // FIXED: Monthly
             valeTransporte: 12,
-            cestaBasica: 150,
+            cestaBasica: 6.00, // FIXED: User Value
             uniforme: 40,
             adicionalCopa: 136.00 // FIXED: User Contract Value
         },
