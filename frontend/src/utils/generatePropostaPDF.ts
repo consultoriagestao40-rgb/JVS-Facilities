@@ -50,11 +50,8 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.addImage(logoData, 'PNG', 20, 20, 50, 15); // x, y, w, h
     } catch (e) {
         console.error('Error loading logo:', e);
-        // Fallback if logo fails
-        doc.setTextColor(secondaryColor);
-        doc.setFontSize(28);
-        doc.setFont('helvetica', 'bold');
-        doc.text('JVS Facilities', 20, 30);
+        // Fallback: Do NOTHING (to avoid "Loose S" bug).
+        // If logo fails, we prefer a clean sidebar over broken text.
     }
     // doc.text('Proposta Comercial Personalizada', 20, 40);
     // doc.text(`PROPOSTA #${resultado.id}`, 20, 50);
