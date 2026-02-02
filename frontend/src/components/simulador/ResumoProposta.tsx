@@ -111,7 +111,9 @@ export default function ResumoProposta() {
                         {resultado.servicos.map((item, idx) => (
                             <div key={idx} className="flex justify-between items-center pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                                 <div>
-                                    <p className="font-bold text-gray-900 capitalize">{item.config.funcao}</p>
+                                    <p className="font-bold text-gray-900 capitalize">
+                                        {item.config.cargo ? `${item.config.funcao} - ${item.config.cargo}` : item.config.funcao}
+                                    </p>
                                     <p className="text-xs text-gray-500">{item.config.quantidade}x profissional(is)</p>
                                 </div>
                                 <div className="text-right">

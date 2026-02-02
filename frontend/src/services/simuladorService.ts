@@ -39,6 +39,7 @@ export const simuladorService = {
             materiais: config.materiais || 0,
             adicionalCopa: (config as any).adicionalCopa || 0,
             intrajornada: config.intrajornada || false,
+            copa: (config as any).copa || false, // Pass the checkbox flag
             adicionais: {
                 insalubridade: (config as any).insalubridade || false,
                 periculosidade: (config as any).periculosidade || false

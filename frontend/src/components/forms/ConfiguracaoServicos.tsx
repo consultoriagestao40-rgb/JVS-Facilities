@@ -17,7 +17,7 @@ const DAYS = [
 ];
 
 export default function ConfiguracaoServicos() {
-    const { state, updateConfiguracao, removeConfiguracao, nextStep, prevStep } = useSimulador();
+    const { state, updateConfiguracao, removeConfiguracao, nextStep, prevStep, updateRegrasCCT } = useSimulador();
     const [localConfigs, setLocalConfigs] = useState<ConfiguracaoServico[]>([]);
     const [availableRules, setAvailableRules] = useState<RegraCCT[]>([]);
     const [loadingRules, setLoadingRules] = useState(true);
@@ -39,6 +39,16 @@ export default function ConfiguracaoServicos() {
         }
         fetchRules();
     }, []);
+
+    // Also sync retrieved Rules to Context so Backend receives them!
+    useEffect(() => {
+        if (availableRules.length > 0) {
+            // @ts-ignore
+            if (typeof updateRegrasCCT === 'function') {
+                updateRegrasCCT(availableRules);
+            }
+        }
+    }, [availableRules]);
 
     // Initialize Local State (and ensure IDs/Defaults)
     useEffect(() => {

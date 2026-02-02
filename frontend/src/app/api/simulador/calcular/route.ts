@@ -98,16 +98,24 @@ function getMatchingRule(
                 const specificRole = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
                 const specificPiso = specificRole?.piso || r.salarioPiso;
                 const specificGratificacao = specificRole?.gratificacao ?? r.gratificacoes;
-                // Store copa temporarily in a new property (need to extend RegraCCT locally or handle via extra variable)
-                // For simplicity, we will merge it into 'adicionais' config or return it as part of the match info.
-                // Best approach: Add 'adicionalCopa' to the match object (cast as any if needed or update type globally)
+                // COPA LOGIC: Inherit from General Rule if Specific Role is 0/Undefined
+                // This ensures if User configures 136 in General, it applies to all roles that don't explicitly zero it out (or we treat 0 as inherit)
+                const roleCopa = specificRole?.adicionalCopa;
+                const generalCopa = r.beneficios.adicionalCopa || 0;
+
+                // If role has explicitly 0, we might strictly mean 0.
+                // But generally in this system 0 means "Default".
+                // We use || to prioritize General if specific is 0.
+                const finalCopa = roleCopa || generalCopa;
+
                 bestMatch = {
                     ...r,
                     salarioPiso: specificPiso,
                     gratificacoes: specificGratificacao,
                     cargo: configCargo,
-                    // @ts-ignore: Prop 'copa' doesn't exist on RegraCCT yet but we need to pass it
-                    adicionalCopa: specificRole?.adicionalCopa || 0
+                    // Pass the final decided Copa value
+                    // @ts-ignore
+                    adicionalCopa: finalCopa
                 };
             } else {
                 bestMatch = r;
@@ -456,12 +464,19 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 
     // Merge Manual + Rule Copa + Config Flag
     const adicionalCopaRule = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
-    let adicionalCopa = adicionalCopaRule + AdicionalCopaManual;
 
-    // Fix for User: If 'copa' flag is checked but total is 0, apply fallback (20% of Base)
-    if (config.copa && adicionalCopa === 0) {
-        adicionalCopa = salarioBase * 0.20;
+    // STRICT FIX: Only apply if Checkbox is Checked
+    let adicionalCopa = 0;
+
+    if (config.copa) {
+        adicionalCopa = adicionalCopaRule + AdicionalCopaManual;
+
+        // Fallback: If checked but still 0, apply 20%
+        if (adicionalCopa === 0) {
+            adicionalCopa = salarioBase * 0.20;
+        }
     }
+    // If NOT checked, result is 0 (or manual only? Assuming 0 for safety based on user request "sempre que estiver marcado")
 
     // 2. Adicionais
     const adicionaisObj = calcularAdicionais(salarioBase, valores, config);

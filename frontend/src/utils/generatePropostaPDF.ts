@@ -58,7 +58,7 @@ export const generatePropostaPDF = (resultado: ResultadoSimulacao, client: UserD
     doc.text('Detalhamento dos Serviços', 14, 90);
 
     const tableData = resultado.servicos.map(item => [
-        item.config.funcao.toUpperCase(),
+        item.config.cargo ? `${item.config.funcao.toUpperCase()} - ${item.config.cargo.toUpperCase()}` : item.config.funcao.toUpperCase(),
         `${item.config.quantidade} profissional(is)`,
         `${item.config.dias.join(', ')} - ${item.config.horarioEntrada} às ${item.config.horarioSaida}`,
         new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.custoTotal)
