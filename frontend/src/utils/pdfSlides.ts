@@ -249,19 +249,19 @@ export const renderServicos = (doc: jsPDF, width: number, height: number) => {
 
     const startY = 50;
     const cardW = 85;
-    const cardH = 40; // Taller cards to prevent text cut-off
+    const cardH = 40;
     const gapX = 10;
     const gapY = 15;
 
     const startX = (width - ((cardW * 3) + (gapX * 2))) / 2;
 
     const servicesList = [
-        { title: 'Limpeza', desc: 'Técnica, hospitalar e comercial.', icon: 'L' },
-        { title: 'Portaria', desc: 'Controle de acesso qualificado.', icon: 'P' },
-        { title: 'Recepção', desc: 'Atendimento de excelência.', icon: 'R' },
-        { title: 'Manutenção', desc: 'Elétrica e hidráulica preventiva.', icon: 'M' },
-        { title: 'Jardinagem', desc: 'Paisagismo e conservação verde.', icon: 'J' },
-        { title: 'Facilities', desc: 'Gestão integrada completa.', icon: 'F' }
+        { title: 'Limpeza', desc: 'Técnica, hospitalar e comercial.', icon: 'Check' },
+        { title: 'Portaria', desc: 'Controle de acesso qualificado.', icon: 'User' },
+        { title: 'Recepção', desc: 'Atendimento de excelência.', icon: 'User' },
+        { title: 'Manutenção', desc: 'Elétrica e hidráulica preventiva.', icon: 'Gear' },
+        { title: 'Jardinagem', desc: 'Paisagismo e conservação verde.', icon: 'Plus' },
+        { title: 'Facilities', desc: 'Gestão integrada completa.', icon: 'Building' }
     ];
 
     let cx = startX;
@@ -274,13 +274,8 @@ export const renderServicos = (doc: jsPDF, width: number, height: number) => {
         doc.setDrawColor(COLORS.BORDER_LIGHT);
         doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'S');
 
-        // Icon Box (Left)
-        doc.setFillColor(COLORS.BG_LIGHT);
-        doc.roundedRect(cx + 5, cy + 8, 14, 14, 3, 3, 'F');
-        doc.setTextColor(COLORS.PRIMARY);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text(item.icon, cx + 12, cy + 17, { align: 'center' });
+        // Draw Icon
+        drawVectorIcon(doc, cx + 12, cy + 15, item.icon, COLORS.PRIMARY);
 
         // Text
         doc.setTextColor(COLORS.TEXT_DARK);
@@ -307,7 +302,7 @@ export const renderServicos = (doc: jsPDF, width: number, height: number) => {
     doc.text('* Consulte nosso catálogo completo para mais detalhes técnicos.', width / 2, height - 10, { align: 'center' });
 };
 
-// 4. SETORES (Clean Grid - No more "Timeline")
+// 4. SETORES (Grid with Icons)
 export const renderSetores = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
     doc.setFillColor(COLORS.BG_DARK);
@@ -316,21 +311,20 @@ export const renderSetores = (doc: jsPDF, width: number, height: number) => {
     drawSectionTitle(doc, 'Setores Atendidos', 'Expertise adaptada ao seu negócio.', 20, 30, true);
 
     const sectors = [
-        { name: 'Condomínios', icon: 'C' },
-        { name: 'Escolas', icon: 'E' },
-        { name: 'Hospitais', icon: 'H' },
-        { name: 'Indústrias', icon: 'I' },
-        { name: 'Shoppings', icon: 'S' },
-        { name: 'Varejo', icon: 'V' }
+        { name: 'Condomínios', icon: 'Building' },
+        { name: 'Escolas', icon: 'Building' },
+        { name: 'Hospitais', icon: 'Plus' },
+        { name: 'Indústrias', icon: 'Gear' },
+        { name: 'Shoppings', icon: 'Building' },
+        { name: 'Varejo', icon: 'Building' }
     ];
 
-    // Grid 3x2 (3 Columns, 2 Rows) for maximum impact
+    // Grid 3x2
     const cardW = 80;
-    const cardH = 50; // Large comfortable touch targets
+    const cardH = 50;
     const gapX = 15;
     const gapY = 15;
 
-    // Calculate centered start position
     const totalW = (cardW * 3) + (gapX * 2);
     const startX = (width - totalW) / 2;
     const startY = 60;
@@ -339,27 +333,19 @@ export const renderSetores = (doc: jsPDF, width: number, height: number) => {
     let cy = startY;
 
     sectors.forEach((sector, i) => {
-        // Card Background (Dark Card on Darker BG)
         doc.setFillColor(COLORS.BG_CARD);
         doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'F');
         doc.setDrawColor(COLORS.PRIMARY);
         doc.setLineWidth(0.5);
         doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'S');
 
-        // Large Icon Circle
-        doc.setFillColor(COLORS.PRIMARY);
-        doc.circle(cx + cardW / 2, cy + 20, 10, 'F');
-        doc.setTextColor(COLORS.WHITE);
-        doc.setFontSize(14);
-        doc.setFont('helvetica', 'bold');
-        doc.text(sector.icon, cx + cardW / 2, cy + 22, { align: 'center' });
+        // Use Vector Icon
+        drawVectorIcon(doc, cx + cardW / 2, cy + 20, sector.icon, COLORS.PRIMARY);
 
-        // Label
         doc.setTextColor(COLORS.WHITE);
         doc.setFontSize(14);
         doc.text(sector.name, cx + cardW / 2, cy + 40, { align: 'center' });
 
-        // Grid Logic
         cx += cardW + gapX;
         if ((i + 1) % 3 === 0) {
             cx = startX;
@@ -495,4 +481,58 @@ export const renderFerramentas = (doc: jsPDF, width: number, height: number) => 
 
         y += cardH + 10;
     });
+};
+
+// 8. OBRIGADO (Final Slide)
+export const renderObrigado = (doc: jsPDF, width: number, height: number, logoData: string | null) => {
+    doc.addPage();
+    doc.setFillColor(COLORS.BG_DARK);
+    doc.rect(0, 0, width, height, 'F');
+
+    // Centered Content Container
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    // Logo (Centered)
+    if (logoData) {
+        // 200px equivalent width ~ 50mm
+        doc.addImage(logoData, 'PNG', centerX - 25, centerY - 50, 50, 15);
+    } else {
+        doc.setTextColor(COLORS.WHITE);
+        doc.setFontSize(28);
+        doc.setFont('helvetica', 'bold');
+        doc.text('JVS Facilities', centerX, centerY - 40, { align: 'center' });
+    }
+
+    // "Obrigado"
+    doc.setTextColor(COLORS.PRIMARY);
+    doc.setFontSize(40);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Obrigado!', centerX, centerY - 10, { align: 'center' });
+
+    // Subtext
+    doc.setTextColor(COLORS.TEXT_GRAY);
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Estamos prontos para atender sua empresa.', centerX, centerY + 5, { align: 'center' });
+
+    // Contacts Box
+    const boxY = centerY + 25;
+    doc.setDrawColor(COLORS.BG_CARD);
+    doc.setLineWidth(0.5);
+    doc.line(centerX - 60, boxY, centerX + 60, boxY); // Divider
+
+    doc.setTextColor(COLORS.WHITE);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+
+    // Address
+    doc.text('Av. Maringá, 1273 - Pinhais - PR', centerX, boxY + 10, { align: 'center' });
+
+    // Phone / Email / Site
+    doc.setTextColor(COLORS.TEXT_LIGHT);
+    doc.text('(41) 3505-0020  |  comercial@grupojvsserv.com.br', centerX, boxY + 20, { align: 'center' });
+
+    doc.setTextColor(COLORS.PRIMARY);
+    doc.text('www.grupojvsserv.com.br', centerX, boxY + 30, { align: 'center' });
 };
