@@ -260,6 +260,7 @@ export const renderSetores = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
     doc.setFillColor(COLORS.BG_DARK);
     doc.rect(0, 0, width, height, 'F');
+    // Force Deploy Checkpoint
 
     drawSectionTitle(doc, 'Setores Atendidos', 'Expertise adaptada ao seu negócio.', 20, 30, true);
 
