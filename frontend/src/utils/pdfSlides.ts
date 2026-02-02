@@ -4,6 +4,7 @@ const BLUE_DARK = '#2C3E50'; // Approximate Navy Blue
 const BLUE_LIGHT = '#34495E';
 const WHITE = '#FFFFFF';
 const GRAY_LIGHT = '#F3F4F6';
+// Trigger Deploy: 2026-02-02
 
 // Helper to draw a circle with text
 const drawCircleItem = (doc: jsPDF, x: number, y: number, r: number, title: string, iconChar: string) => {
