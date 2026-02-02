@@ -19,6 +19,7 @@ interface BackendConfigPayload {
         periculosidade?: boolean;
     };
     intrajornada?: boolean; // New
+    copa?: boolean; // Checkbox from Step 4
 }
 
 // Detailed Breakdown used internally for calculations
@@ -452,12 +453,18 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     // 1. Base e Gratificações
     const salarioBase = getPisoSalarial(config.funcao, valores);
     const gratificacoes = valores.VALORES_BASE.GRATIFICACOES || 0;
-    // Merge Manual + Rule Copa
+
+    // Merge Manual + Rule Copa + Config Flag
     const adicionalCopaRule = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
-    const adicionalCopa = adicionalCopaRule + AdicionalCopaManual; // Additive
+    let adicionalCopa = adicionalCopaRule + AdicionalCopaManual;
+
+    // Fix for User: If 'copa' flag is checked but total is 0, apply fallback (20% of Base)
+    if (config.copa && adicionalCopa === 0) {
+        adicionalCopa = salarioBase * 0.20;
+    }
 
     // 2. Adicionais
-    const adicionaisObj = calcularAdicionais(salarioBase, valores, config); // Adicionais calculados sobre Salário Base geralmente
+    const adicionaisObj = calcularAdicionais(salarioBase, valores, config);
 
     // Remuneração Total para fins de Encargos e Provisões
     const remuneracaoTotal = salarioBase + gratificacoes + adicionalCopa + adicionaisObj.total;
