@@ -8,7 +8,8 @@ import {
     renderSetores,
     renderDiferenciais,
     renderResponsabilidades,
-    renderFerramentas
+    renderFerramentas,
+    renderObrigado
 } from './pdfSlides';
 
 // Helper to load image as Base64
@@ -287,6 +288,9 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.text(`TOTAL MENSAL (${item.config.quantidade}x): ${fmt(item.custoTotal)}`, rightColX + colWidth / 2, y + 12, { align: 'center' });
 
     });
+
+    // --- SLIDE FINAL: OBRIGADO ---
+    renderObrigado(doc, pageWidth, pageHeight, logoData);
 
     // Footer
     const totalPages = (doc.internal as any).getNumberOfPages();

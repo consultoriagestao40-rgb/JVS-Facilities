@@ -135,13 +135,67 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     doc.text('Foco em eficiência e resultados.', cardX + 10, cy + 28);
 };
 
+// --- VECTOR ICONS ---
+const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: string) => {
+    doc.setIsInputVisual(false); // Optimize
+    doc.setFillColor(color);
+    doc.setDrawColor(color);
+    doc.setLineWidth(1);
+
+    switch (type) {
+        case 'Check': // Checkmark inside circle
+            doc.circle(x, y, 12, 'F');
+            doc.setDrawColor(COLORS.WHITE);
+            doc.setLineWidth(2);
+            doc.lines([[5, 5], [-10, -5]], x - 2, y - 1, [1, 1], 'S', true);
+            break;
+
+        case 'Gear': // Abstract Gear
+            doc.circle(x, y, 12, 'F');
+            doc.setDrawColor(COLORS.WHITE);
+            doc.circle(x, y, 6, 'S');
+            doc.line(x - 8, y, x + 8, y);
+            doc.line(x, y - 8, x, y + 8);
+            break;
+
+        case 'User': // User Silhouette
+            doc.circle(x, y, 12, 'F');
+            doc.setFillColor(COLORS.WHITE);
+            doc.circle(x, y - 3, 4, 'F'); // Head
+            doc.path([{ op: 'm', c: [x - 6, y + 8] }, { op: 'q', c: [x, y + 2, x + 6, y + 8] }, { op: 'l', c: [x + 6, y + 8] }, { op: 'l', c: [x - 6, y + 8] }], 'F'); // Shoulders
+            break;
+
+        case 'Building': // Simple Building
+            doc.circle(x, y, 12, 'F');
+            doc.setFillColor(COLORS.WHITE);
+            doc.rect(x - 4, y - 4, 8, 10, 'F');
+            doc.triangle(x - 5, y - 4, x + 5, y - 4, x, y - 9, 'F');
+            break;
+
+        case 'Plus':
+            doc.circle(x, y, 12, 'F');
+            doc.setDrawColor(COLORS.WHITE);
+            doc.setLineWidth(3);
+            doc.line(x - 5, y, x + 5, y);
+            doc.line(x, y - 5, x, y + 5);
+            break;
+
+        default: // Fallback Circle
+            doc.circle(x, y, 12, 'F');
+            doc.setTextColor(COLORS.WHITE);
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text(type.charAt(0), x, y + 2, { align: 'center' });
+    }
+    doc.setIsInputVisual(true);
+};
+
 // 2. VALORES (Restored Full Text - Clean Layout)
 export const renderValores = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
     doc.setFillColor(COLORS.WHITE); // White Background for readability
     doc.rect(0, 0, width, height, 'F');
 
-    // Header
     drawSectionTitle(doc, 'Nossos Valores', 'Pilares que sustentam nossa operação.', 20, 30, false);
 
     // Full Text Block (From User Screenshot)
@@ -166,14 +220,12 @@ export const renderValores = (doc: jsPDF, width: number, height: number) => {
     const gap = 15;
     let x = (width - ((cardW * 3) + (gap * 2))) / 2;
 
-    const drawValueCard = (title: string, iconChar: string, accent: string) => {
-        // Card
+    const drawValueCard = (title: string, iconType: string, accent: string) => {
         drawCard(doc, x, startY, cardW, cardH, COLORS.BG_LIGHT, COLORS.BORDER_LIGHT);
 
-        // Icon
-        drawIcon(doc, x + cardW / 2, startY + 20, accent, iconChar);
+        // Use Vector Icon
+        drawVectorIcon(doc, x + cardW / 2, startY + 20, iconType, accent);
 
-        // Title
         doc.setTextColor(COLORS.TEXT_DARK);
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
@@ -182,9 +234,9 @@ export const renderValores = (doc: jsPDF, width: number, height: number) => {
         x += cardW + gap;
     };
 
-    drawValueCard('Ética', 'E', COLORS.PRIMARY);
-    drawValueCard('Eficiência', 'E', COLORS.SECONDARY);
-    drawValueCard('Pessoas', 'P', COLORS.BG_DARK);
+    drawValueCard('Ética', 'Check', COLORS.PRIMARY);
+    drawValueCard('Eficiência', 'Gear', COLORS.SECONDARY);
+    drawValueCard('Pessoas', 'User', COLORS.BG_DARK);
 };
 
 // 3. SERVIÇOS (Improved Spacing)
@@ -260,7 +312,6 @@ export const renderSetores = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
     doc.setFillColor(COLORS.BG_DARK);
     doc.rect(0, 0, width, height, 'F');
-    // Force Deploy Checkpoint: Final Release V2
 
     drawSectionTitle(doc, 'Setores Atendidos', 'Expertise adaptada ao seu negócio.', 20, 30, true);
 
