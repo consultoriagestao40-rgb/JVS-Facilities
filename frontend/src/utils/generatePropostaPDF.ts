@@ -11,6 +11,28 @@ import {
     renderFerramentas
 } from './pdfSlides';
 
+// Helper to load image as Base64
+const loadImage = (url: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.src = url;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL('image/png'));
+            } else {
+                reject(new Error('Canvas context failed'));
+            }
+        };
+        img.onerror = reject;
+    });
+};
+
 export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client: UserData) => {
     // 1. Initialize Landscape PDF (A4 Landscape: 297mm x 210mm)
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
@@ -20,14 +42,20 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     const pageHeight = doc.internal.pageSize.height; // ~210mm
 
     // --- SLIDE 1: COVER (Dynamic) ---
-    // Header Logo/Text
-    doc.setTextColor(secondaryColor);
-    doc.setFontSize(28);
-    doc.setFont('helvetica', 'bold');
-    doc.text('JVS Facilities', 20, 30);
-
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'normal');
+    // Header Logo (Top Left)
+    try {
+        const logoData = await loadImage('/logo-jvs.png');
+        // Aspect ratio for "logo-branco-200px.png" (approx 200x50 usually, but let's assume a safe width)
+        // Drawing logo...
+        doc.addImage(logoData, 'PNG', 20, 20, 50, 15); // x, y, w, h
+    } catch (e) {
+        console.error('Error loading logo:', e);
+        // Fallback if logo fails
+        doc.setTextColor(secondaryColor);
+        doc.setFontSize(28);
+        doc.setFont('helvetica', 'bold');
+        doc.text('JVS Facilities', 20, 30);
+    }
     // doc.text('Proposta Comercial Personalizada', 20, 40);
     // doc.text(`PROPOSTA #${resultado.id}`, 20, 50);
 

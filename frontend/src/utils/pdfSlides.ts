@@ -255,7 +255,7 @@ export const renderServicos = (doc: jsPDF, width: number, height: number) => {
     doc.text('* Consulte nosso catálogo completo para mais detalhes técnicos.', width / 2, height - 10, { align: 'center' });
 };
 
-// 4. SETORES (Horizontal "Pills" Layout)
+// 4. SETORES (Clean Grid - No more "Timeline")
 export const renderSetores = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
     doc.setFillColor(COLORS.BG_DARK);
@@ -263,39 +263,60 @@ export const renderSetores = (doc: jsPDF, width: number, height: number) => {
 
     drawSectionTitle(doc, 'Setores Atendidos', 'Expertise adaptada ao seu negócio.', 20, 30, true);
 
-    const sectors = ['Condomínios', 'Escolas', 'Hospitais', 'Indústrias', 'Shoppings', 'Varejo'];
+    const sectors = [
+        { name: 'Condomínios', icon: 'C' },
+        { name: 'Escolas', icon: 'E' },
+        { name: 'Hospitais', icon: 'H' },
+        { name: 'Indústrias', icon: 'I' },
+        { name: 'Shoppings', icon: 'S' },
+        { name: 'Varejo', icon: 'V' }
+    ];
 
-    // Central Flow Line
-    const lineY = height / 2;
-    doc.setDrawColor(COLORS.PRIMARY);
-    doc.setLineWidth(0.5);
-    doc.line(20, lineY, width - 20, lineY);
+    // Grid 3x2 (3 Columns, 2 Rows) for maximum impact
+    const cardW = 80;
+    const cardH = 50; // Large comfortable touch targets
+    const gapX = 15;
+    const gapY = 15;
 
-    const gap = (width - 40) / sectors.length;
-    let x = 40; // Start offset
+    // Calculate centered start position
+    const totalW = (cardW * 3) + (gapX * 2);
+    const startX = (width - totalW) / 2;
+    const startY = 60;
 
-    sectors.forEach((sector) => {
-        // Circle Node
+    let cx = startX;
+    let cy = startY;
+
+    sectors.forEach((sector, i) => {
+        // Card Background (Dark Card on Darker BG)
         doc.setFillColor(COLORS.BG_CARD);
+        doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'F');
         doc.setDrawColor(COLORS.PRIMARY);
-        doc.setLineWidth(1);
-        doc.circle(x, lineY, 12, 'FD');
+        doc.setLineWidth(0.5);
+        doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'S');
 
-        // Inner Dot
+        // Large Icon Circle
         doc.setFillColor(COLORS.PRIMARY);
-        doc.circle(x, lineY, 3, 'F');
+        doc.circle(cx + cardW / 2, cy + 20, 10, 'F');
+        doc.setTextColor(COLORS.WHITE);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(sector.icon, cx + cardW / 2, cy + 22, { align: 'center' });
 
         // Label
         doc.setTextColor(COLORS.WHITE);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'bold');
-        doc.text(sector, x, lineY + 25, { align: 'center' });
+        doc.setFontSize(14);
+        doc.text(sector.name, cx + cardW / 2, cy + 40, { align: 'center' });
 
-        x += gap;
+        // Grid Logic
+        cx += cardW + gapX;
+        if ((i + 1) % 3 === 0) {
+            cx = startX;
+            cy += cardH + gapY;
+        }
     });
 };
 
-// 5. DIFERENCIAIS (Timeline Vertical Clean)
+// 5. DIFERENCIAIS (Clean Vertical List - No "Timeline" lines)
 export const renderDiferenciais = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
     doc.setFillColor(COLORS.WHITE);
@@ -310,39 +331,32 @@ export const renderDiferenciais = (doc: jsPDF, width: number, height: number) =>
     ];
 
     let y = 60;
-    const x = 50;
+    const x = 30; // Left aligned for better reading
 
     items.forEach((item, i) => {
-        // Number Badge
+        // Number Badge (Large and Clear)
         doc.setFillColor(COLORS.PRIMARY);
-        doc.circle(x, y, 10, 'F');
+        doc.circle(x, y + 5, 12, 'F');
         doc.setTextColor(COLORS.WHITE);
-        doc.setFontSize(12);
+        doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text((i + 1).toString(), x, y + 3, { align: 'center' });
+        doc.text((i + 1).toString(), x, y + 9, { align: 'center' });
 
         // Content
         doc.setTextColor(COLORS.TEXT_DARK);
-        doc.setFontSize(14);
-        doc.text(item.title, x + 20, y - 2);
+        doc.setFontSize(16); // Larger Title
+        doc.text(item.title, x + 25, y + 5);
 
         doc.setTextColor(COLORS.TEXT_MUTED);
-        doc.setFontSize(10);
+        doc.setFontSize(12); // Larger Body
         doc.setFont('helvetica', 'normal');
-        doc.text(item.desc, x + 20, y + 5);
+        doc.text(item.desc, x + 25, y + 15);
 
-        // Vertical Connector
-        if (i < items.length - 1) {
-            doc.setDrawColor(COLORS.BORDER_LIGHT);
-            doc.setLineWidth(2);
-            doc.line(x, y + 15, x, y + 35);
-        }
-
-        y += 40;
+        y += 45; // More spacing
     });
 };
 
-// 6. RESPONSABILIDADES ("Cards" Split)
+// 6. RESPONSABILIDADES (Clean 3-Column Layout)
 export const renderResponsabilidades = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
     doc.setFillColor(COLORS.BG_LIGHT);
@@ -358,42 +372,38 @@ export const renderResponsabilidades = (doc: jsPDF, width: number, height: numbe
 
     let x = 20;
     const y = 60;
-    const w = (width - 60) / 3;
-    const h = 50;
+    const w = (width - 50) / 3;
+    const h = 80; // Taller for vertical centering
 
     items.forEach((item, i) => {
-        const bg = i === 1 ? COLORS.PRIMARY : COLORS.WHITE;
-        const txt = i === 1 ? COLORS.WHITE : COLORS.TEXT_DARK;
-        const muted = i === 1 ? '#ECFDF5' : COLORS.TEXT_MUTED; // Light Green for center card text
+        const bg = COLORS.WHITE;
+        const txt = COLORS.TEXT_DARK;
+        const border = COLORS.PRIMARY;
 
+        // Card
         doc.setFillColor(bg);
         doc.roundedRect(x, y, w, h, 3, 3, 'F');
-        if (i !== 1) {
-            doc.setDrawColor(COLORS.BORDER_LIGHT);
-            doc.roundedRect(x, y, w, h, 3, 3, 'S');
-        } else {
-            // Shadow for center card
-            doc.setFillColor('#D1FAE5');
-            doc.rect(x + 2, y + 2, w, h, 'F');
-            doc.setFillColor(bg);
-            doc.roundedRect(x, y, w, h, 3, 3, 'F');
-        }
+        // Top Border Accent
+        doc.setFillColor(border);
+        doc.rect(x, y, w, 4, 'F'); // Top Bar
 
+        // Title
         doc.setTextColor(txt);
-        doc.setFontSize(14);
+        doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text(item.label, x + w / 2, y + 20, { align: 'center' });
+        doc.text(item.label, x + w / 2, y + 30, { align: 'center' });
 
-        doc.setTextColor(muted);
-        doc.setFontSize(9);
+        // Desc
+        doc.setTextColor(COLORS.TEXT_MUTED);
+        doc.setFontSize(11); // Readable size
         doc.setFont('helvetica', 'normal');
-        doc.text(doc.splitTextToSize(item.desc, w - 10), x + w / 2, y + 35, { align: 'center' });
+        doc.text(doc.splitTextToSize(item.desc, w - 10), x + w / 2, y + 50, { align: 'center' });
 
         x += w + 10;
     });
 };
 
-// 7. FERRAMENTAS (Technical/Techy Look)
+// 7. FERRAMENTAS (Clean 2-Column List)
 export const renderFerramentas = (doc: jsPDF, width: number, height: number) => {
     doc.addPage();
     doc.setFillColor(COLORS.BG_DARK);
@@ -408,47 +418,29 @@ export const renderFerramentas = (doc: jsPDF, width: number, height: number) => 
         { name: 'CHECK-LIST FÁCIL', type: 'Auditoria Digital' }
     ];
 
-    // Grid 2x2
+    // Simple Vertical List with Cards
+    let y = 60;
+    const cardH = 25;
+    const cardW = 120;
     const centerX = width / 2;
-    const centerY = (height / 2) + 10;
-    const boxW = 100;
-    const boxH = 25;
-    const gap = 10;
 
-    // Top Left
-    drawCard(doc, centerX - boxW - gap, centerY - boxH - gap, boxW, boxH, COLORS.BG_CARD, COLORS.PRIMARY);
-    doc.setTextColor(COLORS.WHITE);
-    doc.setFontSize(12);
-    doc.text(tools[0].name, centerX - boxW - gap + 10, centerY - boxH - gap + 15);
-    doc.setFontSize(9);
-    doc.setTextColor(COLORS.TEXT_GRAY);
-    doc.text(tools[0].type, centerX - gap - 10, centerY - boxH - gap + 15, { align: 'right' });
+    tools.forEach((tool) => {
+        // Card Container
+        doc.setFillColor(COLORS.BG_CARD);
+        doc.roundedRect(centerX - (cardW / 2), y, cardW, cardH, 3, 3, 'F');
 
-    // Top Right
-    drawCard(doc, centerX + gap, centerY - boxH - gap, boxW, boxH, COLORS.BG_CARD, COLORS.SECONDARY);
-    doc.setTextColor(COLORS.WHITE);
-    doc.setFontSize(12);
-    doc.text(tools[1].name, centerX + gap + 10, centerY - boxH - gap + 15);
-    doc.setFontSize(9);
-    doc.setTextColor(COLORS.TEXT_GRAY);
-    doc.text(tools[1].type, centerX + gap + boxW - 10, centerY - boxH - gap + 15, { align: 'right' });
+        // Name (Left)
+        doc.setTextColor(COLORS.WHITE);
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(tool.name, centerX - (cardW / 2) + 10, y + 16);
 
-    // Bottom Left
-    drawCard(doc, centerX - boxW - gap, centerY + gap, boxW, boxH, COLORS.BG_CARD, COLORS.WHITE);
-    doc.setTextColor(COLORS.WHITE);
-    doc.setFontSize(12);
-    doc.text(tools[2].name, centerX - boxW - gap + 10, centerY + gap + 15);
-    doc.setFontSize(9);
-    doc.setTextColor(COLORS.TEXT_GRAY);
-    doc.text(tools[2].type, centerX - gap - 10, centerY + gap + 15, { align: 'right' });
+        // Type (Right)
+        doc.setTextColor(COLORS.PRIMARY);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(tool.type, centerX + (cardW / 2) - 10, y + 16, { align: 'right' });
 
-    // Bottom Right
-    drawCard(doc, centerX + gap, centerY + gap, boxW, boxH, COLORS.BG_CARD, COLORS.WHITE);
-    doc.setTextColor(COLORS.WHITE);
-    doc.setFontSize(12);
-    doc.text(tools[3].name, centerX + gap + 10, centerY + gap + 15);
-    doc.setFontSize(9);
-    doc.setTextColor(COLORS.TEXT_GRAY);
-    doc.text(tools[3].type, centerX + gap + boxW - 10, centerY + gap + 15, { align: 'right' });
+        y += cardH + 10;
+    });
 };
-
