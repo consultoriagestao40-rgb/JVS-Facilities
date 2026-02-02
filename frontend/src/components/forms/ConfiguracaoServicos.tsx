@@ -221,7 +221,7 @@ export default function ConfiguracaoServicos() {
                                                             handleUpdate(config.id, 'estado', e.target.value);
                                                             handleUpdate(config.id, 'cargo', ''); // Reset cargo
                                                         }}
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
                                                     >
                                                         <option value="">Selecione...</option>
                                                         {uniqueUfs.map(uf => (
@@ -240,7 +240,7 @@ export default function ConfiguracaoServicos() {
                                                         value={config.cidade || ''}
                                                         onChange={(e) => handleUpdate(config.id, 'cidade', e.target.value)}
                                                         placeholder="Ex: Curitiba"
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
                                                     />
                                                 </div>
 
@@ -253,7 +253,7 @@ export default function ConfiguracaoServicos() {
                                                         value={selectedCargo}
                                                         onChange={(e) => handleUpdate(config.id, 'cargo', e.target.value)}
                                                         disabled={!selectedUF}
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none disabled:bg-gray-100 disabled:text-gray-400 text-gray-900 bg-white"
                                                     >
                                                         <option value="">{selectedUF ? 'Selecione o Cargo...' : 'Selecione o Estado primeiro'}</option>
                                                         {availableRoles.map(role => (
@@ -299,7 +299,7 @@ export default function ConfiguracaoServicos() {
                                                         type="time"
                                                         value={config.horarioEntrada}
                                                         onChange={(e) => handleUpdate(config.id, 'horarioEntrada', e.target.value)}
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
                                                     />
                                                 </div>
                                                 <div>
@@ -310,7 +310,7 @@ export default function ConfiguracaoServicos() {
                                                         type="time"
                                                         value={config.horarioSaida}
                                                         onChange={(e) => handleUpdate(config.id, 'horarioSaida', e.target.value)}
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
                                                     />
                                                 </div>
                                             </div>
@@ -325,7 +325,7 @@ export default function ConfiguracaoServicos() {
                                                     min="1"
                                                     value={config.quantidade}
                                                     onChange={(e) => handleUpdate(config.id, 'quantidade', parseInt(e.target.value) || 1)}
-                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
                                                 />
                                             </div>
 
@@ -341,7 +341,7 @@ export default function ConfiguracaoServicos() {
                                                     placeholder="0,00"
                                                     value={config.materiais || ''}
                                                     onChange={(e) => handleUpdate(config.id, 'materiais', parseFloat(e.target.value) || 0)}
-                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
                                                 />
                                             </div>
 
@@ -357,7 +357,7 @@ export default function ConfiguracaoServicos() {
                                                     placeholder="0,00"
                                                     value={config.adicionalCopa || ''}
                                                     onChange={(e) => handleUpdate(config.id, 'adicionalCopa', parseFloat(e.target.value) || 0)}
-                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none"
+                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
                                                 />
                                             </div>
 
