@@ -1,6 +1,15 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ResultadoSimulacao, UserData } from '@/types/simulador';
+import {
+    renderQuemSomos,
+    renderValores,
+    renderServicos,
+    renderSetores,
+    renderDiferenciais,
+    renderResponsabilidades,
+    renderFerramentas
+} from './pdfSlides';
 
 export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client: UserData) => {
     // 1. Initialize Landscape PDF (A4 Landscape: 297mm x 210mm)
@@ -70,37 +79,14 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     doc.text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.resumo.custoAnualTotal), 220, 172);
 
 
-    // --- SLIDES 2-8: INSTITUTIONAL ---
-    const slideImages = [
-        'slide-01-quem-somos.png',
-        'slide-02-valores.png',
-        'slide-03-servicos.png',
-        'slide-04-setores.png',
-        'slide-05-diferenciais.png',
-        'slide-06-responsabilidades.png',
-        'slide-07-ferramentas.png'
-    ];
-
-    for (const imgName of slideImages) {
-        doc.addPage();
-        try {
-            // In a real app, you might need to fetch the blob if it's external, 
-            // but for public folder assets in client-side jsPDF, we often need to load them first or use an <img> tag trick.
-            // Since this is a browser run, we can try to use a Helper to load the image.
-            // For simplicity in this environment, assuming standardized assets are accessible.
-            const imgPath = window.location.origin + `/assets/slides/${imgName}`;
-
-            // We need to wait for image loading? jsPDF addImage supports HTMLImageElement
-            const img = new Image();
-            img.src = imgPath;
-            await new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
-
-            // Full Page Image (Fit)
-            doc.addImage(img, 'PNG', 0, 0, pageWidth, pageHeight, undefined, 'FAST');
-        } catch (e) {
-            doc.text(`[Slide Institucional: ${imgName} não carregado]`, 20, 20);
-        }
-    }
+    // --- SLIDES 2-8: INSTITUTIONAL (NATIVE VECTORS) ---
+    renderQuemSomos(doc, pageWidth, pageHeight);
+    renderValores(doc, pageWidth, pageHeight);
+    renderServicos(doc, pageWidth, pageHeight);
+    renderSetores(doc, pageWidth, pageHeight);
+    renderDiferenciais(doc, pageWidth, pageHeight);
+    renderResponsabilidades(doc, pageWidth, pageHeight);
+    renderFerramentas(doc, pageWidth, pageHeight);
 
 
     // --- SLIDE 9+: COST TABLES ---
@@ -289,4 +275,3 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     doc.save(`Proposta_JVS_${client.empresa || 'Cliente'}.pdf`);
 };
-

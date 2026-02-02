@@ -5,7 +5,7 @@ echo "Iniciando deploy das alterações..."
 git add .
 
 # Realiza o commit
-git commit -m "feat: adiciona Adicional de Copa e corrige formatação de percentuais"
+git commit -m "feat: implementa slides nativos no PDF e corrige layout"
 
 # Envia para o repositório remoto
 git push
