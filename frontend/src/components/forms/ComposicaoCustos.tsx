@@ -38,7 +38,8 @@ export default function ComposicaoCustos() {
         state.configuracoes.forEach(config => {
             const updatedConfig = {
                 ...config,
-                materiais: materiaisValue,
+                // Fix: Only overwrite if 'necessitaMateriais'. Otherwise preserve Step 3 value.
+                materiais: data.necessitaMateriais ? data.valorMateriais : config.materiais,
                 // adicionalCopa preserved from ...config
                 insalubridade: data.insalubridade,
                 periculosidade: data.periculosidade,
