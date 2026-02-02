@@ -82,6 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
+    // Force Deploy Checkpoint: Final Release V4 (Premium Icons)
 
     // HEADER
     const margin = 20;
@@ -232,9 +233,10 @@ export const renderValores = (doc: jsPDF, width: number, height: number) => {
         x += cardW + gap;
     };
 
+    // Updated icons for Values too
     drawValueCard('Ética', 'Check', COLORS.PRIMARY);
-    drawValueCard('Eficiência', 'Gear', COLORS.SECONDARY);
-    drawValueCard('Pessoas', 'User', COLORS.BG_DARK);
+    drawValueCard('Eficiência', 'Sparkle', COLORS.SECONDARY);
+    drawValueCard('Pessoas', 'Headset', COLORS.BG_DARK);
 };
 
 // 3. SERVIÇOS (Improved Spacing)
@@ -254,37 +256,40 @@ export const renderServicos = (doc: jsPDF, width: number, height: number) => {
     const startX = (width - ((cardW * 3) + (gapX * 2))) / 2;
 
     const servicesList = [
-        { title: 'Limpeza', desc: 'Técnica, hospitalar e comercial.', icon: 'Check' },
-        { title: 'Portaria', desc: 'Controle de acesso qualificado.', icon: 'User' },
-        { title: 'Recepção', desc: 'Atendimento de excelência.', icon: 'User' },
-        { title: 'Manutenção', desc: 'Elétrica e hidráulica preventiva.', icon: 'Gear' },
-        { title: 'Jardinagem', desc: 'Paisagismo e conservação verde.', icon: 'Plus' },
-        { title: 'Facilities', desc: 'Gestão integrada completa.', icon: 'Building' }
+        { title: 'Limpeza', desc: 'Técnica, hospitalar e comercial.', icon: 'Sparkle' },
+        { title: 'Portaria', desc: 'Controle de acesso qualificado.', icon: 'Shield' },
+        { title: 'Recepção', desc: 'Atendimento de excelência.', icon: 'Headset' },
+        { title: 'Manutenção', desc: 'Elétrica e hidráulica.', icon: 'Wrench' },
+        { title: 'Jardinagem', desc: 'Paisagismo e conservação.', icon: 'Leaf' },
+        { title: 'Facilities', desc: 'Gestão integrada completa.', icon: 'Office' }
     ];
 
     let cx = startX;
     let cy = startY;
 
     servicesList.forEach((item, i) => {
-        // Card Body
+        // Card Body (White, subtle shadow via gray border bottom)
         doc.setFillColor(COLORS.WHITE);
-        doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'F');
+        doc.roundedRect(cx, cy, cardW, cardH, 2, 2, 'F');
         doc.setDrawColor(COLORS.BORDER_LIGHT);
-        doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'S');
+        doc.roundedRect(cx, cy, cardW, cardH, 2, 2, 'S');
 
-        // Draw Icon
-        drawVectorIcon(doc, cx + 12, cy + 15, item.icon, COLORS.PRIMARY);
+        // Draw Icon (Larger, colored) -- Top Left of Card content
+        doc.setFillColor(COLORS.BG_LIGHT);
+        doc.circle(cx + 12, cy + 17.5, 9, 'F');
+        drawVectorIcon(doc, cx + 12, cy + 17.5, item.icon, COLORS.PRIMARY);
 
-        // Text
+        // Title
         doc.setTextColor(COLORS.TEXT_DARK);
-        doc.setFontSize(12);
+        doc.setFontSize(13);
         doc.setFont('helvetica', 'bold');
-        doc.text(item.title, cx + 25, cy + 15);
+        doc.text(item.title, cx + 26, cy + 13);
 
+        // Description
         doc.setTextColor(COLORS.TEXT_MUTED);
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text(item.desc, cx + 25, cy + 22);
+        doc.text(item.desc, cx + 26, cy + 20);
 
         // Move Grid
         cx += cardW + gapX;
@@ -309,12 +314,12 @@ export const renderSetores = (doc: jsPDF, width: number, height: number) => {
     drawSectionTitle(doc, 'Setores Atendidos', 'Expertise adaptada ao seu negócio.', 20, 30, true);
 
     const sectors = [
-        { name: 'Condomínios', icon: 'Building' },
-        { name: 'Escolas', icon: 'Building' },
-        { name: 'Hospitais', icon: 'Plus' },
-        { name: 'Indústrias', icon: 'Gear' },
-        { name: 'Shoppings', icon: 'Building' },
-        { name: 'Varejo', icon: 'Building' }
+        { name: 'Condomínios', icon: 'Home' },
+        { name: 'Escolas', icon: 'Graduation' },
+        { name: 'Hospitais', icon: 'Cross' },
+        { name: 'Indústrias', icon: 'Factory' },
+        { name: 'Shoppings', icon: 'Shop' },
+        { name: 'Varejo', icon: 'Shop' }
     ];
 
     // Grid 3x2
@@ -337,12 +342,17 @@ export const renderSetores = (doc: jsPDF, width: number, height: number) => {
         doc.setLineWidth(0.5);
         doc.roundedRect(cx, cy, cardW, cardH, 3, 3, 'S');
 
-        // Use Vector Icon
+        // Central Icon Container
+        doc.setFillColor(COLORS.BG_DARK); // Darker circle background for contrast
+        doc.circle(cx + cardW / 2, cy + 20, 14, 'F');
+
+        // Vector Icon
         drawVectorIcon(doc, cx + cardW / 2, cy + 20, sector.icon, COLORS.PRIMARY);
 
         doc.setTextColor(COLORS.WHITE);
         doc.setFontSize(14);
-        doc.text(sector.name, cx + cardW / 2, cy + 40, { align: 'center' });
+        doc.setFont('helvetica', 'bold'); // Bold text
+        doc.text(sector.name, cx + cardW / 2, cy + 42, { align: 'center' });
 
         cx += cardW + gapX;
         if ((i + 1) % 3 === 0) {
