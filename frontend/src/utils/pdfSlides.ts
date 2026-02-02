@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V8 (Website Match Icons)
+    // Force Deploy Checkpoint: Final Release V9 (All Icons Premium)
 
     // HEADER
     const margin = 20;
@@ -145,81 +145,104 @@ const drawVectorIcon = (doc: jsPDF, x: number, y: number, type: string, color: s
     doc.setLineWidth(0.7);
 
     switch (type) {
-        // --- SERVICES (KEEPING EXISTING NICE ONES) ---
-        case 'Sparkle': // Limpeza
+        // --- SERVICES (UPGRADED TO PREMIUM) ---
+        case 'Sparkle': // Limpeza (Shinier Sparkles)
             doc.setFillColor(color);
-            const r1 = 8, r2 = 3;
-            doc.line(x, y - r1, x, y + r1);
-            doc.line(x - r1, y, x + r1, y);
-            doc.line(x - r2, y - r2, x + r2, y + r2);
-            doc.line(x - r2, y + r2, x + r2, y - r2);
-            break;
-
-        case 'Shield': // Portaria/Segurança
+            // Main star
             doc.path([
-                { op: 'm', c: [x - 7, y - 7] },
-                { op: 'l', c: [x + 7, y - 7] },
-                { op: 'l', c: [x + 7, y] },
-                { op: 'c', c: [x + 7, y + 6, x, y + 10, x, y + 10] },
-                { op: 'c', c: [x, y + 10, x - 7, y + 6, x - 7, y] },
-                { op: 'l', c: [x - 7, y - 7] }
+                { op: 'm', c: [x, y - 9] }, // Top
+                { op: 'c', c: [x + 1, y - 1, x + 9, y, x + 9, y] }, // Right
+                { op: 'c', c: [x + 1, y + 1, x, y + 9, x, y + 9] }, // Bottom
+                { op: 'c', c: [x - 1, y + 1, x - 9, y, x - 9, y] }, // Left
+                { op: 'c', c: [x - 1, y - 1, x, y - 9, x, y - 9] } // Back to Top
             ], 'F');
-            doc.setDrawColor(COLORS.WHITE);
-            doc.setLineWidth(1.5);
-            doc.line(x - 3, y, x, y + 3);
-            doc.line(x, y + 3, x + 4, y - 2);
+            // Small star top-right
+            doc.circle(x + 6, y - 6, 2, 'F');
+            // Small star bottom-left
+            doc.circle(x - 5, y + 5, 1.5, 'F');
             break;
 
-        case 'Headset': // Recepção
-            doc.setDrawColor(color);
-            doc.setLineWidth(1.5);
-            doc.path([
-                { op: 'm', c: [x - 9, y] },
-                { op: 'c', c: [x - 9, y - 12, x + 9, y - 12, x + 9, y] },
-                { op: 's', c: [x + 9, y, x + 9, y] }
-            ], 'S');
+        case 'Shield': // Portaria/Segurança (Shield with Star)
             doc.setFillColor(color);
-            doc.circle(x - 9, y, 3, 'F');
-            doc.circle(x + 9, y, 3, 'F');
+            doc.path([
+                { op: 'm', c: [x - 8, y - 8] },
+                { op: 'l', c: [x + 8, y - 8] },
+                { op: 'l', c: [x + 8, y] },
+                { op: 'c', c: [x + 8, y + 8, x, y + 11, x, y + 11] }, // Tip
+                { op: 'c', c: [x, y + 11, x - 8, y + 8, x - 8, y] },
+                { op: 'l', c: [x - 8, y - 8] }
+            ], 'F');
+            // Star Badge in center (White)
+            doc.setFillColor(COLORS.WHITE);
+            doc.circle(x, y, 3, 'F');
+            doc.setDrawColor(COLORS.WHITE);
             doc.setLineWidth(1);
-            doc.line(x + 9, y, x + 6, y + 6);
-            doc.circle(x + 6, y + 6, 1.5, 'F');
+            doc.line(x, y - 4, x, y + 4);
+            doc.line(x - 4, y, x + 4, y);
             break;
 
-        case 'Wrench': // Manutenção
+        case 'Headset': // Recepção (Modern Operator)
             doc.setDrawColor(color);
             doc.setLineWidth(2);
-            doc.line(x - 6, y + 6, x + 6, y - 6);
-            doc.setLineWidth(3);
             doc.path([
-                { op: 'm', c: [x + 4, y - 8] },
-                { op: 'c', c: [x + 9, y - 3, x + 9, y + 3, x + 4, y + 2] }
+                { op: 'm', c: [x - 9, y + 2] },
+                { op: 'c', c: [x - 9, y - 12, x + 9, y - 12, x + 9, y + 2] }, // Headband
+                { op: 's', c: [x + 9, y + 2, x + 9, y + 2] }
             ], 'S');
+            doc.setFillColor(color);
+            doc.roundedRect(x - 11, y - 1, 4, 8, 1, 1, 'F'); // Ear L
+            doc.roundedRect(x + 7, y - 1, 4, 8, 1, 1, 'F'); // Ear R
+            doc.setLineWidth(1.5);
+            doc.line(x + 9, y + 7, x + 4, y + 8); // Mic Boom
+            doc.circle(x + 4, y + 8, 2, 'F'); // Mic
             break;
 
-        case 'Leaf': // Jardinagem
+        case 'Wrench': // Manutenção (Crossed Tools)
             doc.setFillColor(color);
-            doc.lines([[8, -8], [0, 16], [-8, -8]], x, y + 4, [1, 1], 'F', true);
+            doc.setDrawColor(color);
+            doc.setLineWidth(2);
+            // Wrench (Diagonal \ )
+            doc.saveGraphicsState();
+            doc.line(x - 5, y - 5, x + 5, y + 5); // Handle
+            doc.circle(x - 6, y - 6, 3, 'F'); // Head
+            doc.restoreGraphicsState();
+
+            // Screwdriver (Diagonal / ) - Simplified appearance
+            doc.setLineWidth(2.5);
+            doc.line(x + 5, y - 5, x - 5, y + 5);
+            doc.rect(x + 4, y - 6, 2, 2, 'F'); // Handle Tip
+            break;
+
+        case 'Leaf': // Jardinagem (Sprout)
+            doc.setFillColor(color);
+            // Stem
+            doc.setDrawColor(color);
+            doc.setLineWidth(2);
+            doc.curve(x, y + 8, x - 2, y, x, y - 2);
+            // Leaf Left
             doc.path([
-                { op: 'm', c: [x, y + 8] },
-                { op: 'c', c: [x + 8, y + 2, x + 8, y - 6, x, y - 10] },
-                { op: 'c', c: [x - 8, y - 6, x - 8, y + 2, x, y + 8] }
+                { op: 'm', c: [x, y - 2] },
+                { op: 'c', c: [x - 6, y - 4, x - 8, y - 8, x - 10, y - 2] }, // Top curve
+                { op: 'c', c: [x - 10, y - 2, x - 6, y + 2, x, y - 2] } // Bottom curve
             ], 'F');
+            // Leaf Right (Higher)
+            doc.path([
+                { op: 'm', c: [x, y - 4] },
+                { op: 'c', c: [x + 6, y - 6, x + 8, y - 10, x + 10, y - 4] },
+                { op: 'c', c: [x + 10, y - 4, x + 6, y, x, y - 4] }
+            ], 'F');
+            break;
+
+        case 'Office': // Facilities (Modern Building)
+            doc.setFillColor(color);
+            doc.rect(x - 5, y - 10, 10, 20, 'F'); // Main Tower
+            doc.triangle(x - 5, y - 10, x + 5, y - 10, x, y - 14, 'F'); // Spire
+            // Glass Reflection Lines (White)
             doc.setDrawColor(COLORS.WHITE);
             doc.setLineWidth(0.5);
-            doc.line(x, y - 8, x, y + 6);
-            break;
-
-        case 'Office': // Facilities
-            doc.setFillColor(color);
-            doc.rect(x - 8, y - 8, 6, 16, 'F');
-            doc.rect(x - 2, y - 12, 10, 20, 'F');
-            doc.setFillColor(COLORS.WHITE);
-            doc.rect(x - 6, y - 6, 2, 2, 'F');
-            doc.rect(x - 6, y - 2, 2, 2, 'F');
-            doc.rect(x, y - 10, 6, 2, 'F');
-            doc.rect(x, y - 6, 6, 2, 'F');
-            doc.rect(x, y - 2, 6, 2, 'F');
+            doc.line(x - 3, y - 6, x + 3, y - 2);
+            doc.line(x - 3, y, x + 3, y + 4);
+            doc.line(x - 3, y + 6, x + 3, y + 10);
             break;
 
         // --- NEW PREMIUM SECTOR ICONS (MATCHING WEBSITE) ---
