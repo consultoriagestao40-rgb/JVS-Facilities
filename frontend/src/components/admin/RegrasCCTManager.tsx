@@ -92,7 +92,7 @@ export default function RegrasCCTManager() {
         const vaFerias = configBen.vaSobreFerias ? (custoVR / 12) : 0;
 
         const copa = Number(ben.adicionalCopa || 0);
-        const totalBen = (custoVR + custoVT + cesta + uniforme + copa + vaFerias) - (descontoVT + descontoVA);
+        const totalBen = (custoVR + custoVT + cesta + uniforme + vaFerias) - (descontoVT + descontoVA);
 
         const detailBen = {
             valeRefeicao: custoVR,
@@ -100,7 +100,7 @@ export default function RegrasCCTManager() {
             cestaBasica: cesta,
             uniforme: uniforme,
             vaSobreFerias: vaFerias,
-            adicionalCopa: copa,
+            // adicionalCopa: copa, // Removed from Benefits
             descontoVT: -descontoVT,
             descontoVA: -descontoVA,
             total: totalBen
@@ -123,7 +123,7 @@ export default function RegrasCCTManager() {
             total: totalProv
         };
 
-        const totalOperacional = piso + gratificacoes + totalBen + totalEnc + totalProv;
+        const totalOperacional = piso + gratificacoes + totalBen + totalEnc + totalProv + copa;
 
         // Lucro
         const lucro = totalOperacional * currentRegra.aliquotas.margemLucro;
@@ -158,8 +158,8 @@ export default function RegrasCCTManager() {
                     noturno: 0,
                     intrajornada: 0,
                     dsr: 0,
-                    // copa moved to benefits
-                    total: 0
+                    copa: copa, // Added here
+                    total: copa // Copa is the only add-on in generic preview
                 },
                 beneficios: detailBen,
                 encargos: totalEnc,
