@@ -15,7 +15,7 @@ model Lead {
   nome      String
   empresa   String
   cnpj      String
-  email     String   @unique
+  email     String
   whatsapp  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

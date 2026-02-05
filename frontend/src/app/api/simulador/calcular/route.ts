@@ -606,23 +606,32 @@ export async function POST(request: Request) {
         if (body.userData && body.userData.email) {
             const userData = body.userData;
             try {
-                // 1. Upsert Lead
-                const lead = await prisma.lead.upsert({
-                    where: { email: userData.email },
-                    update: {
-                        nome: userData.nome,
-                        empresa: userData.empresa,
-                        whatsapp: userData.whatsapp,
-                        cnpj: userData.cnpj
-                    },
-                    create: {
-                        nome: userData.nome || 'Anônimo',
-                        email: userData.email,
-                        empresa: userData.empresa || 'Não informada',
-                        whatsapp: userData.whatsapp || '',
-                        cnpj: userData.cnpj || ''
-                    }
+                // 1. Manual Upsert (since email might not be unique in DB schema)
+                let lead = await prisma.lead.findFirst({
+                    where: { email: userData.email }
                 });
+
+                if (lead) {
+                    lead = await prisma.lead.update({
+                        where: { id: lead.id },
+                        data: {
+                            nome: userData.nome,
+                            empresa: userData.empresa,
+                            whatsapp: userData.whatsapp,
+                            cnpj: userData.cnpj
+                        }
+                    });
+                } else {
+                    lead = await prisma.lead.create({
+                        data: {
+                            nome: userData.nome || 'Anônimo',
+                            email: userData.email,
+                            empresa: userData.empresa || 'Não informada',
+                            whatsapp: userData.whatsapp || '',
+                            cnpj: userData.cnpj || ''
+                        }
+                    });
+                }
 
                 // 2. Create Proposal
                 await prisma.proposta.create({
