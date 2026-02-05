@@ -68,28 +68,28 @@ export default function LeadsPage() {
         window.open(`https://api.whatsapp.com/send?phone=55${number}&text=${text}`, '_blank');
     };
 
-    const filtersLeads = leads.filter(l => {
+    const filteredProposals = proposals.filter(p => {
         const matchesSearch =
-            l.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            l.empresa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            l.email.toLowerCase().includes(searchTerm.toLowerCase());
+            p.lead.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.lead.empresa.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.lead.email.toLowerCase().includes(searchTerm.toLowerCase());
 
         let matchesDate = true;
         if (startDate) {
-            matchesDate = matchesDate && new Date(l.createdAt) >= new Date(startDate);
+            matchesDate = matchesDate && new Date(p.createdAt) >= new Date(startDate);
         }
         if (endDate) {
             // Add 1 day to include the end date fully
             const end = new Date(endDate);
             end.setDate(end.getDate() + 1);
-            matchesDate = matchesDate && new Date(l.createdAt) < end;
+            matchesDate = matchesDate && new Date(p.createdAt) < end;
         }
 
         return matchesSearch && matchesDate;
     });
 
-    const totalValue = filtersLeads.reduce((acc, lead) => {
-        return acc + (lead.propostas[0]?.custoMensal || 0);
+    const totalValue = filteredProposals.reduce((acc, p) => {
+        return acc + (p.custoMensal || 0);
     }, 0);
 
     // Helper to parse services
