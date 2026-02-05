@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ParametrosCustos, RegraCCT, BackendConfigPayload } from '@/types/simulador';
+import { ParametrosCustos, RegraCCT } from '@/types/simulador';
 import { MOCK_REGRAS } from '@/data/regrasCCT';
 import prisma from '@/lib/prisma'; // Import Singleton
 

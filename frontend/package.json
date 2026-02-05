@@ -7,6 +7,7 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
+        "postinstall": "npx prisma generate",
         "postinstall": "prisma generate"
     },
     "dependencies": {
@@ -24,7 +25,9 @@
         "axios": "^1.6.8",
         "date-fns": "^3.6.0",
         "jspdf": "^2.5.1",
-        "jspdf-autotable": "^3.8.2"
+        "net": "1.0.2",
+        "jspdf-autotable": "^3.8.2",
+        "@prisma/client": "^5.13.0"
     },
     "devDependencies": {
         "typescript": "^5",
@@ -36,6 +39,7 @@
         "tailwindcss": "^3.4.1",
         "eslint": "^8",
         "@types/jspdf": "^2.0.0",
-        "eslint-config-next": "14.2.1"
+        "eslint-config-next": "14.2.1",
+        "prisma": "^5.13.0"
     }
 }
