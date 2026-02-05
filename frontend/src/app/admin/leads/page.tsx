@@ -28,10 +28,8 @@ export default function LeadsPage() {
 
     const fetchLeads = async () => {
         try {
-            // Fetch directly from backend port since frontend doesn't have local API proxy for it yet
-            // Assuming backend is on 3001 as seen in server.ts
-            // In production, this URL should be env var
-            const response = await fetch('http://localhost:3001/api/simulador/leads');
+            // Fetch from local Next.js API
+            const response = await fetch('/api/leads');
             if (response.ok) {
                 const data = await response.json();
                 setLeads(data);
