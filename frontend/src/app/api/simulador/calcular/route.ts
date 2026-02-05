@@ -601,6 +601,26 @@ export async function POST(request: Request) {
             resumo
         };
 
+        // --- ASYNC SAVE TO BACKEND (FIRE AND FORGET) ---
+        // We sends user data and result to backend if user provided contacts
+        try {
+            if (body.userData && body.userData.email) {
+                // Hardcoded localhost:3001 for now as per server.ts
+                // In production, use process.env.BACKEND_URL
+                fetch('http://localhost:3001/api/simulador/salvar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userData: body.userData,
+                        configs: configs, // original configs
+                        resultado: responseData
+                    })
+                }).catch(err => console.error("Simulador: Background Save Error:", err));
+            }
+        } catch (e) {
+            console.error("Simulador: Background Logic Error", e);
+        }
+
         return NextResponse.json(responseData);
 
     } catch (error) {

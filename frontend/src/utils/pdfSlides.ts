@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V20 (Admin Leads Dashboard)
+    // Force Deploy Checkpoint: Final Release V21 (Fix Experience Years & Lead Save)
 
     // HEADER
     const margin = 20;
@@ -99,7 +99,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
         'Somos especialistas em Facilities, focados em entregar qualidade superior,',
         'otimização de custos e tranquilidade operacional para seu negócio.',
         '',
-        '• Mais de 30 anos de experiência em gestão de pessoas;',
+        '• Mais de 15 anos de experiência em gestão de pessoas;',
         '• Foco total na eficiência operacional e redução de custos;',
         '• Cultura voltada para o desenvolvimento humano e bem-estar;',
         '• Gestão personalizada rigorosa de acordo com cada contrato.'
