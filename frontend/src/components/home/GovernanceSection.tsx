@@ -1,7 +1,20 @@
+"use client";
+
 import { CheckCircle2, Shield, Gem, Star, Zap, Clock, UserCheck, FileCheck } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
+import WhatsAppModal from './WhatsAppModal';
 
 const GovernanceSection = () => {
+    const [modalState, setModalState] = useState<{ isOpen: boolean, tier: "BRONZE" | "PRATA" | "OURO" | "DIAMANTE" | null }>({
+        isOpen: false,
+        tier: null
+    });
+
+    const handleOpenModal = (tier: string) => {
+        setModalState({ isOpen: true, tier: tier as any });
+    };
+
     const plans = [
         {
             tier: "BRONZE",
@@ -14,9 +27,10 @@ const GovernanceSection = () => {
                 "Relatório mensal: versão enxuta + plano de ação",
                 "Compliance e padrão: uniforme, EPI e documentação"
             ],
-            cta: "Simular meu cenário",
+            cta: "Simular meu cenário", // Keeps anchor for Simulator
             href: "/simulador",
-            highlight: false
+            highlight: false,
+            isSimulator: true
         },
         {
             tier: "PRATA",
@@ -30,8 +44,8 @@ const GovernanceSection = () => {
                 "Auditoria de conformidade e correções rápidas"
             ],
             cta: "Falar com especialista",
-            href: "https://wa.me/5541999999999",
-            highlight: false
+            highlight: false,
+            isSimulator: false
         },
         {
             tier: "OURO",
@@ -46,10 +60,10 @@ const GovernanceSection = () => {
                 "Acompanhamento antes da reclamação do cliente"
             ],
             cta: "Agendar diagnóstico",
-            href: "https://wa.me/5541999999999",
             highlight: true,
             highlightText: "Mais escolhido",
-            borderColor: "border-yellow-400 ring-1 ring-yellow-400"
+            borderColor: "border-yellow-400 ring-1 ring-yellow-400",
+            isSimulator: false
         },
         {
             tier: "DIAMANTE",
@@ -64,10 +78,10 @@ const GovernanceSection = () => {
                 "Evidência e rastreabilidade máxima (programado x realizado)"
             ],
             cta: "Atendimento prioritário",
-            href: "https://wa.me/5541999999999",
             highlight: true,
             highlightText: "Máxima criticidade",
-            borderColor: "border-blue-500 ring-1 ring-blue-500"
+            borderColor: "border-blue-500 ring-1 ring-blue-500",
+            isSimulator: false
         }
     ];
 
@@ -80,7 +94,7 @@ const GovernanceSection = () => {
     ];
 
     return (
-        <section className="py-24 bg-white">
+        <section className="py-24 bg-white" id="governanca">
             <div className="container mx-auto px-4">
 
                 {/* Section 1: Header */}
@@ -136,9 +150,9 @@ const GovernanceSection = () => {
                             </ul>
 
                             <div className="mt-auto">
-                                {plan.href.startsWith('/') ? (
+                                {plan.isSimulator ? (
                                     <Link
-                                        href={plan.href}
+                                        href={plan.href || "/simulador"}
                                         className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-colors
                                             ${plan.highlight
                                                 ? 'bg-primary hover:bg-green-600 text-white shadow-lg shadow-green-100'
@@ -149,19 +163,17 @@ const GovernanceSection = () => {
                                         {plan.cta}
                                     </Link>
                                 ) : (
-                                    <a
-                                        href={plan.href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        onClick={() => handleOpenModal(plan.tier)}
                                         className={`block w-full text-center py-3 rounded-xl font-bold text-sm transition-colors
                                             ${plan.highlight
                                                 ? 'bg-primary hover:bg-green-600 text-white shadow-lg shadow-green-100'
-                                                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                                                : 'bg-green-50 hover:bg-green-100 text-green-700 border border-green-200'
                                             }
                                         `}
                                     >
                                         {plan.cta}
-                                    </a>
+                                    </button>
                                 )}
                             </div>
                         </div>
@@ -200,20 +212,24 @@ const GovernanceSection = () => {
                             >
                                 Simular minha operação agora
                             </Link>
-                            <a
-                                href="https://wa.me/5541992252968"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <button
+                                onClick={() => handleOpenModal("GERAL")} // Assuming "GERAL" for the main CTA
                                 className="bg-white hover:bg-gray-100 text-gray-700 font-bold text-lg px-8 py-4 rounded-xl border border-gray-200 transition-colors w-full md:w-auto text-center flex items-center justify-center gap-2"
                             >
                                 <span>Chamar no WhatsApp</span>
-                            </a>
+                            </button>
                         </div>
                         <p className="text-center text-sm text-gray-500 mt-4">
                             Diagnóstico rápido e proposta com governança por criticidade.
                         </p>
                     </div>
                 </div>
+
+                <WhatsAppModal
+                    isOpen={modalState.isOpen}
+                    onClose={() => setModalState({ ...modalState, isOpen: false })}
+                    tier={modalState.tier}
+                />
 
             </div>
         </section>
