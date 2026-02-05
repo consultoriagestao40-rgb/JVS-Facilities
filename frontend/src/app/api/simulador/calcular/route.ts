@@ -603,7 +603,11 @@ export async function POST(request: Request) {
         };
 
         // --- ASYNC SAVE TO DATABASE (DIRECT) ---
-        if (body.userData && body.userData.email) {
+        if (!process.env.DATABASE_URL) {
+            console.error("CRITICAL: DATABASE_URL is missing in environment variables!");
+            // @ts-ignore
+            responseData.debug = { saved: false, error: 'DATABASE_URL_MISSING' };
+        } else if (body.userData && body.userData.email) {
             const userData = body.userData;
             try {
                 // 1. Manual Upsert (since email might not be unique in DB schema)
@@ -647,7 +651,7 @@ export async function POST(request: Request) {
                 });
                 console.log("Simulação salva com sucesso:", responseData.id);
                 // @ts-ignore
-                responseData.debug = { saved: true };
+                responseData.debug = { saved: true, leadId: lead.id };
             } catch (dbError) {
                 console.error("Erro ao salvar simulação no banco:", dbError);
                 // @ts-ignore
@@ -655,7 +659,7 @@ export async function POST(request: Request) {
             }
         } else {
             // @ts-ignore
-            responseData.debug = { saved: false, error: 'No UserData provided' };
+            responseData.debug = { saved: false, error: 'No UserData provided', receivedData: body.userData };
         }
 
         return NextResponse.json(responseData);
