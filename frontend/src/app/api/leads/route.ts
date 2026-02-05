@@ -9,15 +9,13 @@ export async function GET() {
             orderBy: { createdAt: 'desc' },
             include: {
                 propostas: {
-                    propostas: {
-                        orderBy: { createdAt: 'desc' },
-                        select: {
-                            id: true,
-                            custoMensal: true,
-                            status: true,
-                            servicos: true, // Include JSON string
-                            createdAt: true
-                        }
+                    orderBy: { createdAt: 'desc' },
+                    select: {
+                        id: true,
+                        custoMensal: true,
+                        status: true,
+                        servicos: true, // Include JSON string
+                        createdAt: true
                     }
                 }
             }
