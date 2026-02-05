@@ -637,10 +637,16 @@ export async function POST(request: Request) {
                     }
                 });
                 console.log("Simulação salva com sucesso:", responseData.id);
+                // @ts-ignore
+                responseData.debug = { saved: true };
             } catch (dbError) {
                 console.error("Erro ao salvar simulação no banco:", dbError);
-                // Non-blocking, continue
+                // @ts-ignore
+                responseData.debug = { saved: false, error: String(dbError) };
             }
+        } else {
+            // @ts-ignore
+            responseData.debug = { saved: false, error: 'No UserData provided' };
         }
 
         return NextResponse.json(responseData);
