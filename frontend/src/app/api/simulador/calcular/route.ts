@@ -602,24 +602,45 @@ export async function POST(request: Request) {
             resumo
         };
 
-        // --- ASYNC SAVE TO BACKEND (FIRE AND FORGET) ---
-        // We sends user data and result to backend if user provided contacts
-        try {
-            if (body.userData && body.userData.email) {
-                // Hardcoded localhost:3001 for now as per server.ts
-                // In production, use process.env.BACKEND_URL
-                fetch('http://localhost:3001/api/simulador/salvar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userData: body.userData,
-                        configs: configs, // original configs
-                        resultado: responseData
-                    })
-                }).catch(err => console.error("Simulador: Background Save Error:", err));
+        // --- ASYNC SAVE TO DATABASE (DIRECT) ---
+        if (body.userData && body.userData.email) {
+            const userData = body.userData;
+            try {
+                // 1. Upsert Lead
+                const lead = await prisma.lead.upsert({
+                    where: { email: userData.email },
+                    update: {
+                        nome: userData.nome,
+                        empresa: userData.empresa,
+                        whatsapp: userData.whatsapp,
+                        cnpj: userData.cnpj
+                    },
+                    create: {
+                        nome: userData.nome || 'Anônimo',
+                        email: userData.email,
+                        empresa: userData.empresa || 'Não informada',
+                        whatsapp: userData.whatsapp || '',
+                        cnpj: userData.cnpj || ''
+                    }
+                });
+
+                // 2. Create Proposal
+                await prisma.proposta.create({
+                    data: {
+                        numeroSequencial: responseData.id,
+                        leadId: lead.id,
+                        servicos: JSON.stringify(responseData.servicos),
+                        custoMensal: responseData.resumo.custoMensalTotal,
+                        custoAnual: responseData.resumo.custoAnualTotal,
+                        breakdown: JSON.stringify(responseData.resumo),
+                        status: 'DRAFT'
+                    }
+                });
+                console.log("Simulação salva com sucesso:", responseData.id);
+            } catch (dbError) {
+                console.error("Erro ao salvar simulação no banco:", dbError);
+                // Non-blocking, continue
             }
-        } catch (e) {
-            console.error("Simulador: Background Logic Error", e);
         }
 
         return NextResponse.json(responseData);
