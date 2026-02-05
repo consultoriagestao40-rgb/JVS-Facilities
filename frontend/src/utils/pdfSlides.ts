@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V19 (Fixed WhatsApp Message)
+    // Force Deploy Checkpoint: Final Release V20 (Admin Leads Dashboard)
 
     // HEADER
     const margin = 20;

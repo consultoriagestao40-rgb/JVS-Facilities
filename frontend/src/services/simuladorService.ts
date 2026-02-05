@@ -54,6 +54,7 @@ export const simuladorService = {
             },
             body: JSON.stringify({
                 configs,
+                userData: state.userData, // Pass User Data for Lead generation
                 parametros: state.parametros,
                 regrasCCT: state.regrasCCT // Pass rules to backend for lookup
             }),

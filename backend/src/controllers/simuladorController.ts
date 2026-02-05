@@ -22,6 +22,11 @@ export class SimuladorController {
 
             const resultado = await this.calculoService.calcularProposta(configs);
 
+            // AUTO-SAVE if userData is present
+            if (req.body.userData) {
+                await this.calculoService.salvarSimulacao(req.body.userData, configs, resultado);
+            }
+
             return res.status(200).json(resultado);
         } catch (error) {
             console.error('Erro ao calcular proposta:', error);
@@ -29,6 +34,25 @@ export class SimuladorController {
                 error: 'Internal Server Error',
                 message: 'Ocorreu um erro ao processar o cálculo da proposta.'
             });
+        }
+    }
+
+    public salvar = async (req: Request, res: Response) => {
+        try {
+            const { userData, configs, resultado } = req.body;
+            const saved = await this.calculoService.salvarSimulacao(userData, configs, resultado);
+            return res.status(200).json(saved);
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to save' });
+        }
+    }
+
+    public listarLeads = async (req: Request, res: Response) => {
+        try {
+            const leads = await this.calculoService.getLeads();
+            return res.status(200).json(leads);
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to fetch leads' });
         }
     }
 }

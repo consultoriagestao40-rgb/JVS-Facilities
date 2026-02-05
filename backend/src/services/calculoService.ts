@@ -39,6 +39,72 @@ export class CalculoService {
         };
     }
 
+    public async salvarSimulacao(userData: any, configs: any, resultado: ResultadoSimulacao) {
+        if (!userData || !userData.email) {
+            console.log("Ignorando salvamento: UserData incompleto");
+            return null;
+        }
+
+        try {
+            // 1. Create or Update Lead
+            let lead = await prisma.lead.findFirst({
+                where: { email: userData.email }
+            });
+
+            if (lead) {
+                lead = await prisma.lead.update({
+                    where: { id: lead.id },
+                    data: {
+                        nome: userData.nome,
+                        empresa: userData.empresa,
+                        whatsapp: userData.whatsapp,
+                        cnpj: userData.cnpj
+                    }
+                });
+            } else {
+                lead = await prisma.lead.create({
+                    data: {
+                        nome: userData.nome || 'Anônimo',
+                        email: userData.email,
+                        empresa: userData.empresa || 'Não informada',
+                        whatsapp: userData.whatsapp || '',
+                        cnpj: userData.cnpj || ''
+                    }
+                });
+            }
+
+            // 2. Create Proposta
+            const proposta = await prisma.proposta.create({
+                data: {
+                    numeroSequencial: `PROP-${Date.now()}`,
+                    leadId: lead.id,
+                    servicos: JSON.stringify(resultado.servicos),
+                    custoMensal: resultado.resumo.custoMensalTotal,
+                    custoAnual: resultado.resumo.custoAnualTotal,
+                    breakdown: JSON.stringify(resultado.resumo),
+                    status: 'DRAFT'
+                }
+            });
+
+            return { lead, proposta };
+        } catch (error) {
+            console.error("Erro ao salvar simulação:", error);
+            return null; // Don't crash
+        }
+    }
+
+    public async getLeads() {
+        return await prisma.lead.findMany({
+            orderBy: { createdAt: 'desc' },
+            include: {
+                propostas: {
+                    take: 1,
+                    orderBy: { createdAt: 'desc' }
+                }
+            }
+        });
+    }
+
     /**
      * Calculates costs for a single service item
      */

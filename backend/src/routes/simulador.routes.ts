@@ -5,5 +5,7 @@ const router = Router();
 const simuladorController = new SimuladorController();
 
 router.post('/calcular', simuladorController.calcular);
+router.post('/salvar', simuladorController.salvar);
+router.get('/leads', simuladorController.listarLeads);
 
 export default router;
