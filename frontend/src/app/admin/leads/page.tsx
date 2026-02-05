@@ -178,9 +178,10 @@ export default function LeadsPage() {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {filteredProposals.map(prop => {
-                                const details = lead.propostas[0] ? getServiceDetails(lead.propostas[0]) : { types: [], details: [] };
+                                const details = getServiceDetails(prop);
+                                const lead = prop.lead;
                                 return (
-                                    <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={prop.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
