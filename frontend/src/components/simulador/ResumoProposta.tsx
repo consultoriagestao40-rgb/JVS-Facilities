@@ -12,7 +12,7 @@ import { motion } from 'framer-motion';
 import { ItemResultado } from '@/types/simulador';
 
 export default function ResumoProposta() {
-    const { state } = useSimulador();
+    const { state, novoCalculo } = useSimulador();
     const [resultado, setResultado] = useState<ResultadoSimulacao | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -162,6 +162,12 @@ export default function ResumoProposta() {
 
             {/* Actions */}
             <div className="flex flex-col md:flex-row gap-4 justify-center pt-8">
+                <button
+                    onClick={novoCalculo}
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                >
+                    Nova Simulação
+                </button>
                 <button
                     onClick={() => resultado && generatePropostaPDF(resultado, state.userData)}
                     className="flex items-center justify-center gap-2 px-8 py-4 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors"

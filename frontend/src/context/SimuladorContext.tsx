@@ -13,6 +13,7 @@ type SimuladorContextType = {
     removeConfiguracao: (id: string) => void; // New
     updateParametros: (params: ParametrosCustos) => void;
     updateRegrasCCT: (regras: RegraCCT[]) => void;
+    novoCalculo: () => void; // New
 };
 
 const defaultState: SimuladorState = {
