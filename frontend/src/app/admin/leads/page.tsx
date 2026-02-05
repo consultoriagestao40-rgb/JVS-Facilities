@@ -17,7 +17,6 @@ interface Lead {
         servicos: string; // JSON String
     }[];
 }
-}
 
 export default function LeadsPage() {
     const [startDate, setStartDate] = useState('');
