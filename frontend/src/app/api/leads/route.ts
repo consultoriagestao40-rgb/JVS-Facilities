@@ -10,7 +10,13 @@ export async function GET() {
             include: {
                 propostas: {
                     take: 1,
-                    orderBy: { createdAt: 'desc' }
+                    orderBy: { createdAt: 'desc' },
+                    select: {
+                        id: true,
+                        custoMensal: true,
+                        status: true,
+                        servicos: true // Include JSON string
+                    }
                 }
             }
         });
