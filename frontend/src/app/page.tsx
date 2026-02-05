@@ -2,11 +2,13 @@ import Hero from '@/components/home/Hero';
 import Benefits from '@/components/home/Benefits';
 import Services from '@/components/home/Services';
 import SocialProof from '@/components/home/SocialProof';
+import PlaybookSection from '@/components/home/PlaybookSection';
 
 export default function Home() {
     return (
         <main className="flex min-h-screen flex-col">
             <Hero />
+            <PlaybookSection />
             <Benefits />
             <Services />
             <SocialProof />
