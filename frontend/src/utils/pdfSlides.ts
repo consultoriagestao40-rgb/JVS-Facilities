@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V14 (Landing Page Logos)
+    // Force Deploy Checkpoint: Final Release V15 (Fixed Hero Link)
 
     // HEADER
     const margin = 20;

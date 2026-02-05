@@ -59,7 +59,7 @@ const PlaybookSection = () => {
     ];
 
     return (
-        <section className="py-24 bg-gray-50">
+        <section id="playbook" className="py-24 bg-gray-50">
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="text-center max-w-3xl mx-auto mb-16">

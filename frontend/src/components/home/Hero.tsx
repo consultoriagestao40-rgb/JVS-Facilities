@@ -56,7 +56,7 @@ export default function Hero() {
                         </Link>
 
                         <Link
-                            href="#como-funciona"
+                            href="#playbook"
                             className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl border border-slate-700 transition-all flex items-center justify-center"
                         >
                             Como Funciona
