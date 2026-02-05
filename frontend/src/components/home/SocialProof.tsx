@@ -47,11 +47,22 @@ export default function SocialProof() {
                         viewport={{ once: true }}
                     >
                         <h3 className="text-xl font-bold mb-6 text-center text-gray-300">Empresas que confiam na JVS Facilities</h3>
-                        {/* Placeholder Grid for Logos */}
-                        <div className="grid grid-cols-3 gap-6 opacity-60">
-                            {[1, 2, 3, 4, 5, 6].map((i) => (
-                                <div key={i} className="h-16 bg-slate-700 rounded-lg flex items-center justify-center border border-slate-600 hover:border-primary/50 hover:bg-slate-600 transition-all cursor-default">
-                                    <span className="text-xs font-mono text-gray-500">LOGO {i}</span>
+/* Actual Client Logos */
+                        <div className="grid grid-cols-3 gap-6">
+                            {[
+                                "http://jvsfacilities.com.br/wp-content/uploads/2025/11/7.png",
+                                "http://jvsfacilities.com.br/wp-content/uploads/2025/11/2.png",
+                                "http://jvsfacilities.com.br/wp-content/uploads/2025/11/Design-sem-nome-50.png",
+                                "http://jvsfacilities.com.br/wp-content/uploads/2025/11/9.png",
+                                "http://jvsfacilities.com.br/wp-content/uploads/2025/11/6.png",
+                                "http://jvsfacilities.com.br/wp-content/uploads/2025/11/10.png"
+                            ].map((logoUrl, i) => (
+                                <div key={i} className="h-16 bg-white/5 rounded-lg flex items-center justify-center border border-white/10 hover:border-primary/50 hover:bg-white/10 transition-all p-2 group">
+                                    <img
+                                        src={logoUrl}
+                                        alt={`Cliente ${i + 1}`}
+                                        className="max-h-full max-w-full object-contain filter grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                                    />
                                 </div>
                             ))}
                         </div>
