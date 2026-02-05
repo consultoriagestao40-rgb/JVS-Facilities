@@ -227,11 +227,32 @@ export default function LeadsPage() {
                                                 {lead.whatsapp && (
                                                     <button
                                                         onClick={() => handleWhatsApp(lead)}
-                                                        className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors title='Chamar no WhatsApp'"
+                                                        className="p-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors"
+                                                        title='Chamar no WhatsApp'
                                                     >
                                                         <MessageCircle size={18} />
                                                     </button>
                                                 )}
+                                                <button
+                                                    onClick={async () => {
+                                                        if (confirm('Tem certeza que deseja excluir esta simulação?')) {
+                                                            try {
+                                                                const res = await fetch(`/api/propostas?id=${prop.id}`, { method: 'DELETE' });
+                                                                if (res.ok) {
+                                                                    fetchLeads(); // Reload list
+                                                                } else {
+                                                                    alert('Erro ao excluir');
+                                                                }
+                                                            } catch (e) {
+                                                                alert('Erro ao excluir');
+                                                            }
+                                                        }
+                                                    }}
+                                                    className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
+                                                    title="Excluir Simulação"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
