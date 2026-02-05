@@ -113,10 +113,19 @@ Postos/turnos: ${postos}
 Preciso de uma proposta com governança executiva, rastreabilidade máxima e cobertura de faltas (reposição até 2 horas).
 Quem é o responsável técnico para agendarmos o kickoff de diagnóstico?`;
                 break;
+
+            default: // Caso "GERAL" ou qualquer outro não mapeado
+                message = `Olá! Gostaria de falar com um especialista sobre Facilities.
+Segmento: ${segmento}
+Serviços: ${servicos}
+Postos/turnos: ${postos}
+Gostaria de um diagnóstico personalizado para minha operação.`;
+                break;
         }
 
         const encodedMessage = encodeURIComponent(message);
-        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+        // Use api.whatsapp.com/send which is often more reliable for text pre-filling on web
+        const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
 
         // Track event (mock)
         console.log("whatsapp_click", { tier, ...formData });
