@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Loader2, MessageCircle, FileText, Search, User, Filter } from 'lucide-react';
+import { Loader2, MessageCircle, FileText, Search, User, Filter, Trash2 } from 'lucide-react';
 
 interface Lead {
     id: string;
@@ -215,16 +215,12 @@ export default function LeadsPage() {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            {lead.propostas[0] ? (
-                                                <div>
-                                                    <div className="font-mono font-bold text-green-700">
-                                                        {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(lead.propostas[0].custoMensal)}
-                                                    </div>
-                                                    <div className="text-xs text-gray-400 lowercase">{lead.propostas[0].status}</div>
+                                            <div>
+                                                <div className="font-mono font-bold text-green-700">
+                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(prop.custoMensal)}
                                                 </div>
-                                            ) : (
-                                                <span className="text-gray-400 text-sm">Sem propostas</span>
-                                            )}
+                                                <div className="text-xs text-gray-400 lowercase">{prop.status}</div>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
