@@ -109,7 +109,7 @@ const PlaybookSection = () => {
                         Simular minha operação agora
                     </a>
                     <a
-                        href="https://wa.me/5541999999999" // Replace with actual number if known, otherwise placeholder
+                        href="https://wa.me/5541992252968" // Number updated
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full md:w-auto bg-white hover:bg-gray-50 text-gray-700 font-bold text-lg px-8 py-4 rounded-xl border border-gray-200 transition-colors flex items-center justify-center gap-2"

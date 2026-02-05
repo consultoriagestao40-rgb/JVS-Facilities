@@ -201,7 +201,7 @@ const GovernanceSection = () => {
                                 Simular minha operação agora
                             </Link>
                             <a
-                                href="https://wa.me/5541999999999"
+                                href="https://wa.me/5541992252968"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="bg-white hover:bg-gray-100 text-gray-700 font-bold text-lg px-8 py-4 rounded-xl border border-gray-200 transition-colors w-full md:w-auto text-center flex items-center justify-center gap-2"
