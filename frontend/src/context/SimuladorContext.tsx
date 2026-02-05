@@ -115,6 +115,17 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
         }));
     };
 
+    const novoCalculo = () => {
+        setState(prev => ({
+            ...defaultState,
+            // Keep user data and current params/rules
+            userData: prev.userData,
+            parametros: prev.parametros || defaultState.parametros,
+            regrasCCT: prev.regrasCCT || [],
+            step: 2 // Skip registration (step 1) and go to services (step 2)
+        }));
+    };
+
     return (
         <SimuladorContext.Provider value={{
             state,
@@ -125,7 +136,8 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
             updateConfiguracao,
             removeConfiguracao, // New
             updateParametros,
-            updateRegrasCCT
+            updateRegrasCCT,
+            novoCalculo // Fixed: Add to provider value
         }}>
             {children}
         </SimuladorContext.Provider>
