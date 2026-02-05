@@ -156,7 +156,7 @@ export default function LeadsPage() {
                     {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalValue)}
                 </div>
                 <div className="text-sm text-slate-400 mt-2">
-                    {filtersLeads.length} simulações encontradas
+                    {filteredProposals.length} simulações encontradas
                 </div>
             </div>
 
@@ -177,7 +177,7 @@ export default function LeadsPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filtersLeads.map(lead => {
+                            {filteredProposals.map(prop => {
                                 const details = lead.propostas[0] ? getServiceDetails(lead.propostas[0]) : { types: [], details: [] };
                                 return (
                                     <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
@@ -242,7 +242,7 @@ export default function LeadsPage() {
                             })}
                         </tbody>
                     </table>
-                    {filtersLeads.length === 0 && (
+                    {filteredProposals.length === 0 && (
                         <div className="p-12 text-center text-gray-400">
                             Nenhum lead encontrado neste período.
                         </div>
