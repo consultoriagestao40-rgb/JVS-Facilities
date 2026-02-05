@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V37 (Fix API Nesting Error)
+    // Force Deploy Checkpoint: Final Release V38 (Flatten Proposals for History Validation)
 
     // HEADER
     const margin = 20;

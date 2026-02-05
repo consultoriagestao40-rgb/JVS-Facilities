@@ -19,7 +19,7 @@ interface Lead {
 }
 
 export default function LeadsPage() {
-    const [leads, setLeads] = useState<Lead[]>([]);
+    const [proposals, setProposals] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [startDate, setStartDate] = useState('');
@@ -31,11 +31,29 @@ export default function LeadsPage() {
 
     const fetchLeads = async () => {
         try {
-            // Fetch from local Next.js API
             const response = await fetch('/api/leads');
             if (response.ok) {
-                const data = await response.json();
-                setLeads(data);
+                const leads = await response.json();
+
+                // FLATTEN: One row per Proposal
+                const flattenedProposals = leads.flatMap((lead: any) => {
+                    if (!lead.propostas || lead.propostas.length === 0) {
+                        // Option: Show leads without proposals? For now, let's include them with null proposal
+                        // But user specifically wants multiple simulations "remaining", so focus on existing proposals.
+                        return [];
+                    }
+                    return lead.propostas.map((prop: any) => ({
+                        id: prop.id,
+                        lead: lead,
+                        ...prop
+                        // prop has id, servicos, custoMensal, status
+                    }));
+                });
+
+                // Sort by CreatedAt (newest first)
+                flattenedProposals.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+                setProposals(flattenedProposals);
             }
         } catch (error) {
             console.error("Failed to fetch leads", error);
