@@ -1,7 +1,6 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, Shield, Clock, FileCheck, Phone, Mail, MapPin } from 'lucide-react';
 import Link from 'next/link';
-import Footer from '@/components/common/Footer';
 
 export default function AlturaPage() {
     return (
@@ -148,7 +147,7 @@ export default function AlturaPage() {
                                 </div>
                                 <div className="flex items-center gap-3 text-slate-300">
                                     <Mail className="w-5 h-5 text-emerald-400" />
-                                    <span>contato@grupojvsserv.com.br</span>
+                                    <span>comercial@grupojvsserv.com.br</span>
                                 </div>
                                 <div className="flex items-center gap-3 text-slate-300">
                                     <MapPin className="w-5 h-5 text-emerald-400" />
@@ -184,7 +183,7 @@ export default function AlturaPage() {
                 </div>
             </section>
 
-            <Footer />
+
         </main>
     );
 }
