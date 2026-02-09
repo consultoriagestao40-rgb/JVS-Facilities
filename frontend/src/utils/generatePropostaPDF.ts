@@ -277,14 +277,16 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
             ['Insumos / Equipamentos', formatCurrency(det.insumos)],
             ['Custos Operacionais / EPIs', formatCurrency(det.custosOperacionais.total)],
             ['Tributos e Margem', formatCurrency(det.tributos + det.lucro)],
-            [{ content: 'TOTAL UNITÁRIO', styles: { fontStyle: 'bold', fillColor: '#F0FDF4' } },
-            { content: formatCurrency(item.custoUnitario), styles: { fontStyle: 'bold', fillColor: '#F0FDF4' } }]
+            [
+                { content: 'TOTAL UNITÁRIO', styles: { fontStyle: 'bold' as 'bold', fillColor: '#F0FDF4' } },
+                { content: formatCurrency(item.custoUnitario), styles: { fontStyle: 'bold' as 'bold', fillColor: '#F0FDF4' } }
+            ]
         ];
 
         autoTable(doc, {
             startY: currentY,
             head: [['Item de Custo', 'Valor']],
-            body: breakdownData,
+            body: breakdownData as any, // Cast body to any to avoid complex RowInput union mismatches
             theme: 'grid',
             headStyles: { fillColor: COLORS.DARK_BLUE, fontSize: 9 },
             styles: { fontSize: 9, cellPadding: 2 },
@@ -293,8 +295,6 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
                 1: { cellWidth: 40, halign: 'right' }
             },
             margin: { left: margin, right: pageWidth - margin - 80 } // Keep table narrow (80mm width)
-            // Or just use full width? Let's use 60% width to look "tech".
-            // Actually, full width is cleaner for "Corporate". Let's use standard.
         });
 
         // @ts-ignore

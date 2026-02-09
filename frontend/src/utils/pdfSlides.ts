@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V60 (Fix PDF AutoTable Types)
+    // Force Deploy Checkpoint: Final Release V61 (Manual Push)
 
     // HEADER
     const margin = 20;
