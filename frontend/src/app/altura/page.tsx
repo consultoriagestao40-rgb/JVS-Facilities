@@ -166,6 +166,67 @@ export default function AlturaPage() {
                 </div>
             </section>
 
+            {/* Galeria de Trabalhos */}
+            <section className="py-20 bg-white">
+                <div className="container mx-auto px-4">
+                    <div className="text-center mb-12">
+                        <span className="text-emerald-500 font-bold tracking-wider uppercase text-sm mb-2 block">Portfólio</span>
+                        <h2 className="text-3xl font-bold text-slate-900">Nossos Trabalhos</h2>
+                        <div className="w-20 h-1 bg-emerald-500 mx-auto mt-4 rounded-full"></div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/1-2.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/2-1.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/3-1.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/4-1.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/6-1.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/8-1.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/7-1.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/9-1.png"
+                        ].map((img, i) => (
+                            <div key={i} className="aspect-square overflow-hidden rounded-xl border border-slate-100 hover:shadow-lg transition-all group">
+                                <img
+                                    src={img}
+                                    alt={`Trabalho Realizado ${i + 1}`}
+                                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Clientes */}
+            <section className="py-16 bg-slate-50 border-y border-slate-200">
+                <div className="container mx-auto px-4 text-center">
+                    <h2 className="text-2xl font-bold text-slate-800 mb-10">Nossos Clientes Confiam em Nós</h2>
+                    <div className="flex flex-wrap justify-center gap-8 md:gap-12 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+                        {[
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/11.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/10.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/9.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/8.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/7.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/6.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/5.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/4.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/3.png",
+                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/2.png",
+                        ].map((logo, i) => (
+                            <div key={i} className="w-24 md:w-32 h-20 flex items-center justify-center p-2 bg-white rounded-lg shadow-sm">
+                                <img
+                                    src={logo}
+                                    alt={`Cliente ${i + 1}`}
+                                    className="max-w-full max-h-full object-contain"
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* CTA Final */}
             <section className="py-20 bg-emerald-600 text-white text-center">
                 <div className="container mx-auto px-4">
