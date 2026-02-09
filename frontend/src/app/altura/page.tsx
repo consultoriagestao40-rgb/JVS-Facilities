@@ -39,6 +39,25 @@ export default function AlturaPage() {
                 </div>
             </section>
 
+            {/* Stats Section */}
+            <section className="py-12 bg-white relative z-20 -mt-10">
+                <div className="container mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        {[
+                            { value: "20+", label: "Anos de Experiência" },
+                            { value: "5.000+", label: "Projetos Realizados" },
+                            { value: "98%", label: "Taxa de Satisfação" },
+                            { value: "0", label: "Acidentes Relatados" }
+                        ].map((stat, i) => (
+                            <div key={i} className="bg-white p-8 rounded-xl shadow-xl border-l-4 border-emerald-500 flex flex-col items-center justify-center text-center transform hover:-translate-y-1 transition-transform duration-300">
+                                <span className="text-4xl md:text-5xl font-bold text-slate-700 mb-2">{stat.value}</span>
+                                <span className="text-sm font-bold text-slate-500 uppercase tracking-wide">{stat.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* Soluções Section */}
             <section className="py-20 bg-white">
                 <div className="container mx-auto px-4">
