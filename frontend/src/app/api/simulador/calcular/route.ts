@@ -207,8 +207,10 @@ function getValores(params?: ParametrosCustos) {
             CESTA_BASICA: params?.beneficios.cestaBasica ?? 6.00,
             UNIFORME_MENSAL: params?.beneficios.uniforme ?? 25.00,
             GRATIFICACOES: 0,
-
+            ADICIONAL_COPA: 0,
+            TIPO_VR: 'DIARIO'
         },
+        BENEFICIOS_CONFIG: { descontoVT: 0.06, descontoVA: 0.20, vaSobreFerias: true },
         PISOS: params?.pisosSalariais ?? {
             limpeza: 1900.00,
             seguranca: 2100.00,
