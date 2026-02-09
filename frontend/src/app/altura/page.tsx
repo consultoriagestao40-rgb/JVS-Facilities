@@ -5,13 +5,8 @@ import Link from 'next/link';
 export default function AlturaPage() {
     return (
         <main className="min-h-screen bg-slate-50 font-sans">
-            {/* Header Simples (apenas para esta página se necessário, ou usar o padrão) */}
-            <header className="bg-slate-900 text-white py-4">
-                <div className="container mx-auto px-4 flex justify-between items-center">
-                    <Link href="/" className="text-2xl font-bold text-emerald-400">JVS Facilities</Link>
-                    <Link href="/" className="text-sm text-slate-400 hover:text-white transition-colors">Voltar ao Início</Link>
-                </div>
-            </header>
+            {/* Header removido conforme solicitacao */}
+
 
             {/* Hero Section */}
             <section className="relative bg-slate-900 text-white py-24 overflow-hidden">
