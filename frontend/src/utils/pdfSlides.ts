@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V44 (Add Missing Delete Button)
+    // Force Deploy Checkpoint: Final Release V45 (Add Altura Page)
 
     // HEADER
     const margin = 20;
