@@ -15,7 +15,8 @@ const COLORS = {
     TEXT: '#333333',         // Dark Gray
     RED: '#DC2626',          // Red for discounts
     BG_GRAY: '#E5E7EB',      // Light Gray for subtotals
-    BG_LIGHT: '#F9FAFB'      // Very Light Gray
+    BG_LIGHT: '#F9FAFB',     // Very Light Gray
+    NAVY_BG: '#111827'       // Dark Blue/Slate for End Page
 };
 
 // --- HELPERS ---
@@ -54,7 +55,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     let currentY = 20;
 
-    // --- COVER PAGE (Clean "Proposta Comercial" Layout - V62) ---
+    // --- COVER PAGE (Clean "Proposta Comercial" Layout - V62/V63) ---
 
     // Logo (Top Left or just Text)
     doc.setFont(FONTS.TITLE, 'bold');
@@ -158,12 +159,12 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     };
 
 
-    // 1. RESUMO EXECUTIVO (Restored)
+    // 1. RESUMO EXECUTIVO
     addSectionTitle('Resumo Executivo');
     addParagraph('Somos uma empresa com mais de 30 anos de atuação em Facilities, especializada em terceirização e execução de serviços de limpeza profissional e similares. Atendemos operações que exigem padronização, confiabilidade e continuidade, com foco em eficiência e segurança no dia a dia.');
     addParagraph('Nossa entrega combina equipe dimensionada conforme a necessidade, gestão próxima e processos em evolução contínua, garantindo qualidade percebida e previsibilidade para o cliente.');
 
-    // 2. QUEM SOMOS (Restored)
+    // 2. QUEM SOMOS
     addSectionTitle('Quem Somos');
     addParagraph('Há mais de 30 anos no mercado de Facilities, atuamos com excelência na terceirização e na execução de serviços de limpeza profissional e soluções correlatas. Nosso foco é garantir continuidade operacional, padronização e tranquilidade na gestão, para que o cliente concentre energia no seu core business.');
     addBullets([
@@ -174,7 +175,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         'Dimensionamento personalizado conforme a necessidade de cada operação.'
     ]);
 
-    // 3. PRINCIPAIS SERVIÇOS PRESTADOS (Restored)
+    // 3. PRINCIPAIS SERVIÇOS PRESTADOS
     addSectionTitle('Principais Serviços Prestados');
 
     doc.setFont(FONTS.TITLE, 'bold');
@@ -230,32 +231,26 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     currentY += 15;
 
 
-    // 5. DETALHAMENTO DE CUSTOS (The Specific Table - V62 High Fidelity)
-    // Loop through each service and create a FULL PAGE table
+    // 5. DETALHAMENTO DE CUSTOS (High Fidelity Tables)
     resultado.servicos.forEach((item, index) => {
-        doc.addPage(); // Start each detailed table on a new page for clarity
+        doc.addPage(); // Start each detailed table on a new page
         currentY = 20;
 
         const config = item.config;
         const cargo = config.cargo || config.funcao || `Item ${index + 1}`;
 
-        // Header for the Table Page
         doc.setFont(FONTS.TITLE, 'bold');
         doc.setFontSize(14);
         doc.setTextColor(COLORS.DARK);
         doc.text('Extrato de Custos Detalhado', margin, currentY);
 
-        // Tag for Cargo
         doc.setFillColor(COLORS.BG_GRAY);
         doc.roundedRect(margin + 70, currentY - 5, 50, 7, 1, 1, 'F');
         doc.setFontSize(9);
         doc.text(cargo.toUpperCase(), margin + 72, currentY - 1);
-
         currentY += 10;
 
         const det = item.detalhamento;
-
-        // --- CONSTRUCT THE TABLE ROWS ---
         const body: RowInput[] = [];
 
         // Montante A
@@ -301,20 +296,17 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         body.push([{ content: "IMPOSTOS INDIRETOS (PIS/COFINS/ISS)", colSpan: 2, styles: { fillColor: COLORS.DARK_GREEN, textColor: '#FFFFFF', fontStyle: 'bold' } }, { content: formatCurrency(det.tributos), styles: { fillColor: COLORS.DARK_GREEN, textColor: '#FFFFFF', fontStyle: 'bold', halign: 'right' } }]);
         body.push(['Tributos sobre Faturamento', '', { content: formatCurrency(det.tributos), styles: { halign: 'right' } }]);
 
-        // FINAL TOTAL (Black)
+        // FINAL TOTAL
         body.push([
             { content: "PREÇO TOTAL UNITÁRIO", colSpan: 2, styles: { fillColor: COLORS.DARK, textColor: '#FFFFFF', fontStyle: 'bold', fontSize: 11, minCellHeight: 12, valign: 'middle' } },
             { content: formatCurrency(item.custoUnitario), styles: { fillColor: COLORS.DARK, textColor: '#FFFFFF', fontStyle: 'bold', fontSize: 11, halign: 'right', valign: 'middle' } }
         ]);
 
-        // Monthly Total (Gray)
         body.push([
             { content: "MENSAL TOTAL (1X)", colSpan: 2, styles: { fillColor: COLORS.BG_GRAY, fontStyle: 'bold', halign: 'right' } },
             { content: formatCurrency(item.custoTotal), styles: { fillColor: COLORS.BG_GRAY, fontStyle: 'bold', halign: 'right' } }
         ]);
 
-
-        // Generate Table
         autoTable(doc, {
             startY: currentY,
             head: [['DISCRIMINAÇÃO', '% REF.', 'VALOR (R$)']],
@@ -328,12 +320,11 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
                 2: { cellWidth: 35, halign: 'right' }
             }
         });
-
     });
 
 
-    // 6. NOSSOS DIFERENCIAIS And ENCERRAMENTO (Restored)
-    if (doc.getNumberOfPages() % 2 !== 0) doc.addPage(); // Ensure start on new page if needed
+    // 6. NOSSOS DIFERENCIAIS
+    if (doc.getNumberOfPages() % 2 !== 0) doc.addPage();
     doc.addPage();
     currentY = 25;
 
@@ -358,7 +349,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     addParagraph('Aprimoramos continuamente nossos processos internos e evoluímos junto à tecnologia para aumentar controle, gestão e desempenho.');
 
 
-    // 7. CONDIÇÕES COMERCIAIS (Restored)
+    // 7. CONDIÇÕES COMERCIAIS
     if (currentY > 220) { doc.addPage(); currentY = 25; }
     addSectionTitle('Condições Comerciais');
     addBullets([
@@ -368,22 +359,64 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     ]);
 
 
-    // OBRIGADO + CONTATOS
-    currentY += 20;
-    doc.setFillColor(COLORS.BG_LIGHT);
-    doc.rect(margin, currentY, contentWidth, 40, 'F');
+    // FINAL PAGE: "Obrigado" (DARK BLUE HIGH FIDELITY)
+    doc.addPage();
 
+    // Background
+    doc.setFillColor(COLORS.NAVY_BG);
+    doc.rect(0, 0, pageWidth, pageHeight, 'F');
+
+    // Centering calculations
+    const centerX = pageWidth / 2;
+    let centerY = pageHeight / 3;
+
+    // Title: JVS Facilities (White)
     doc.setFont(FONTS.TITLE, 'bold');
-    doc.setFontSize(14);
-    doc.setTextColor(COLORS.PRIMARY);
-    doc.text('Obrigado pela oportunidade!', margin + 10, currentY + 15);
+    doc.setFontSize(24);
+    doc.setTextColor('#FFFFFF');
+    doc.text('JVS Facilities', centerX, centerY, { align: 'center' });
 
-    doc.setFontSize(10);
+    centerY += 25;
+
+    // Main: Obrigado! (Green)
+    doc.setFontSize(48);
+    doc.setTextColor(COLORS.PRIMARY);
+    doc.text('Obrigado!', centerX, centerY, { align: 'center' });
+
+    centerY += 20;
+
+    // Subtitle: Estamos prontos... (Gray/Blue)
     doc.setFont(FONTS.BODY, 'normal');
-    doc.setTextColor(COLORS.TEXT);
-    doc.text('Ficamos à disposição para esclarecimentos e ajustes nesta proposta.', margin + 10, currentY + 22);
-    doc.text(`Contato: ${client.email}`, margin + 10, currentY + 30);
+    doc.setFontSize(14);
+    doc.setTextColor('#94A3B8'); // Slate 400
+    doc.text('Estamos prontos para atender sua empresa.', centerX, centerY, { align: 'center' });
+
+    centerY += 40;
+
+    // Line Divider
+    doc.setDrawColor('#334155'); // Slate 700
+    doc.setLineWidth(0.5);
+    doc.line(centerX - 40, centerY, centerX + 40, centerY);
+
+    centerY += 25;
+
+    // Address
+    doc.setFontSize(11);
+    doc.setTextColor('#E2E8F0'); // Slate 200
+    doc.text('Av. Maringá, 1273 - Pinhais - PR', centerX, centerY, { align: 'center' });
+
+    centerY += 10;
+
+    // Phone | Email (Using correct number from WhatsAppModal: (41) 99225-2968)
+    doc.text('(41) 99225-2968  |  comercial@grupojvsserv.com.br', centerX, centerY, { align: 'center' });
+
+    centerY += 12;
+
+    // Website (Green)
+    doc.setTextColor(COLORS.PRIMARY);
+    doc.text('www.grupojvsserv.com.br', centerX, centerY, { align: 'center' });
+
 
     // Save
-    doc.save(`Proposta_JVS_V63_${client.empresa || 'Comercial'}.pdf`);
+    doc.save(`Proposta_JVS_V64_${client.empresa || 'Comercial'}.pdf`);
 };
