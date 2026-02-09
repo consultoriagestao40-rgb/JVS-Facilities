@@ -207,12 +207,22 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     // 4. ESCOPO E INVESTIMENTO (Inserted dynamically based on simulation)
     addSectionTitle('Escopo Proposto e Investimento');
 
-    const tableData = resultado.programacao.map(item => [
-        item.cargo,
-        item.quantidade,
-        item.escala,
-        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.custoMensal)
-    ]);
+    const tableData = resultado.servicos.map(item => {
+        // Extract details from config using explicit casting if needed or loose access
+        const config = item.config;
+        const cargo = config.cargo || config.funcao || 'Serviço';
+        const quantidade = config.quantidade || 1;
+
+        // Format scale (e.g. ['seg', 'ter'] -> "seg, ter" or "Diário")
+        const escala = Array.isArray(config.dias) ? config.dias.join(', ') : (config.dias || 'Diário');
+
+        return [
+            cargo,
+            quantidade,
+            escala,
+            new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.custoTotal)
+        ];
+    });
 
     autoTable(doc, {
         startY: currentY,
@@ -224,7 +234,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         columnStyles: {
             0: { cellWidth: 'auto' },
             1: { cellWidth: 20, halign: 'center' },
-            2: { cellWidth: 30, halign: 'center' },
+            2: { cellWidth: 40, halign: 'center' },
             3: { cellWidth: 40, halign: 'right' }
         }
     });
@@ -240,9 +250,10 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     doc.setFontSize(16);
     doc.setTextColor(COLORS.PRIMARY);
-    const totalSemAdicionais = resultado.custoMensalTotal; // Assuming simple sum for now
+    // Use correct 'resumo' field
+    const totalMensal = resultado.resumo.custoMensalTotal;
     doc.text(
-        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalSemAdicionais),
+        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalMensal),
         pageWidth - margin,
         currentY,
         { align: 'right' }
