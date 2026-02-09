@@ -13,6 +13,8 @@ export const metadata: Metadata = {
 import { SimuladorProvider } from '@/context/SimuladorContext';
 import Footer from "@/components/common/Footer";
 
+import { GoogleTag } from '@next/third-parties/google';
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -29,6 +31,7 @@ export default function RootLayout({
                         <Footer />
                     </div>
                 </SimuladorProvider>
+                <GoogleTag gaId="AW-10778063853" />
             </body>
         </html>
     );
