@@ -84,9 +84,10 @@ async function fetchActiveRules(): Promise<RegraCCT[]> {
                 gratificacoes: 0
             } as unknown as RegraCCT;
         });
+        return mappedRules;
     } catch (e) {
-        console.error("Failed to fetch rules from DB:", e);
-        return [];
+        console.error("Failed to fetch rules from DB, returning safety net rules:", e);
+        return SAFETY_NET_RULES;
     }
 }
 
