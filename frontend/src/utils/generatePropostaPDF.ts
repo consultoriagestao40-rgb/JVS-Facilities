@@ -117,7 +117,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
             ['Custos Operacionais (Exames, EPIs)', formatCurrency(det.custosOperacionais.total)],
             ['Tributos Indiretos', formatCurrency(det.tributos)],
             ['Margem / Lucro', formatCurrency(det.lucro)],
-            [{ content: 'PREÇO FINAL UNITÁRIO', styles: { fontStyle: 'bold', fillColor: '#E5E7EB' } }, { content: formatCurrency(item.custoUnitario), styles: { fontStyle: 'bold', fillColor: '#E5E7EB' } }]
+            [{ content: 'PREÇO FINAL UNITÁRIO', styles: { fontStyle: 'bold', fillColor: '#E5E7EB' } as any }, { content: formatCurrency(item.custoUnitario), styles: { fontStyle: 'bold', fillColor: '#E5E7EB' } as any }]
         ];
 
         autoTable(doc, {
