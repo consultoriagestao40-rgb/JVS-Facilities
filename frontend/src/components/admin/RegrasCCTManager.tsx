@@ -204,27 +204,50 @@ export default function RegrasCCTManager() {
         loadRegras();
     }, [state.regrasCCT]); // Add dependency for safety
 
-    const handleSave = () => {
-        const newRegras = [...regras];
-        if (currentRegra.id) {
-            // Edit
-            const index = newRegras.findIndex(r => r.id === currentRegra.id);
-            if (index >= 0) newRegras[index] = currentRegra;
-        } else {
-            // New
-            newRegras.push({ ...currentRegra, id: `CCT-${Date.now()}` });
+    const handleSave = async () => {
+        try {
+            const method = currentRegra.id ? 'PUT' : 'POST';
+            const res = await fetch('/api/simulador/regras', {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(currentRegra)
+            });
+
+            if (!res.ok) throw new Error('Failed to save rule');
+
+            // Reload all rules to ensure sync with DB
+            const updatedRulesRes = await fetch('/api/simulador/regras', { cache: 'no-store' });
+            const updatedRules = await updatedRulesRes.json();
+
+            setRegras(updatedRules);
+            updateRegrasCCT(updatedRules);
+            setIsEditing(false);
+            setCurrentRegra(emptyRegra);
+            alert('Regra salva com sucesso!');
+        } catch (error) {
+            console.error("Save Error:", error);
+            alert('Erro ao salvar regra. Tente novamente.');
         }
-        setRegras(newRegras);
-        updateRegrasCCT(newRegras);
-        setIsEditing(false);
-        setCurrentRegra(emptyRegra);
     };
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         if (confirm('Tem certeza que deseja excluir esta regra?')) {
-            const newRegras = regras.filter(r => r.id !== id);
-            setRegras(newRegras);
-            updateRegrasCCT(newRegras);
+            try {
+                const res = await fetch('/api/simulador/regras', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id })
+                });
+
+                if (!res.ok) throw new Error('Failed to delete');
+
+                const newRegras = regras.filter(r => r.id !== id);
+                setRegras(newRegras);
+                updateRegrasCCT(newRegras);
+            } catch (error) {
+                console.error("Delete Error:", error);
+                alert('Erro ao excluir regra.');
+            }
         }
     };
 
