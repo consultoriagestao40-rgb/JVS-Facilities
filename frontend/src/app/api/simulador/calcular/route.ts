@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server';
 import { ParametrosCustos, RegraCCT } from '@/types/simulador';
-import { MOCK_REGRAS } from '@/data/regrasCCT';
+// removed MOCK_REGRAS
 import prisma from '@/lib/prisma';
 
-// --- Types ---
+// ... (existing code)
+
+            } as unknown as RegraCCT;
+        });
+    } catch (e) {
+    console.error("Failed to fetch rules from DB:", e);
+    return []; // Return empty instead of MOCK
+}
+}
 interface BackendConfigPayload {
     funcao: string; // Service ID (e.g., 'LIMPEZA', 'PORTARIA')
     estado: string;
@@ -417,7 +425,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Invalid Input' }, { status: 400 });
         }
 
-        const regrasDB = await fetchActiveRules();
+        let regrasDB: RegraCCT[] = [];
+        try {
+            regrasDB = await fetchActiveRules();
+        } catch (e) {
+            console.error("Error fetching active rules, proceeding with empty rules:", e);
+            // regrasDB is already initialized to []
+        }
         const globalVals = getValores(parametros);
 
         const servicosCalculados = configs.map(config => {
