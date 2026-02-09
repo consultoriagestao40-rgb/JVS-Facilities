@@ -1,18 +1,21 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ResultadoSimulacao, UserData } from '@/types/simulador';
-import {
-    renderQuemSomos,
-    renderValores,
-    renderServicos,
-    renderSetores,
-    renderDiferenciais,
-    renderResponsabilidades,
-    renderFerramentas,
-    renderObrigado
-} from './pdfSlides';
 
-// Helper to load image as Base64
+// --- CONFIGURATION ---
+const FONTS = {
+    TITLE: 'helvetica',
+    BODY: 'helvetica'
+};
+
+const COLORS = {
+    PRIMARY: '#10B981',    // Emerald 500
+    DARK: '#111827',       // Gray 900
+    TEXT: '#374151',       // Gray 700
+    LIGHT_BG: '#F3F4F6'    // Gray 100
+};
+
+// --- HELPERS ---
 const loadImage = (url: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -35,274 +38,250 @@ const loadImage = (url: string): Promise<string> => {
 };
 
 export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client: UserData) => {
-    // 1. Initialize Landscape PDF (A4 Landscape: 297mm x 210mm)
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-    const primaryColor = '#10B981'; // Green
-    const secondaryColor = '#1F2937'; // Slate 800
-    const pageWidth = doc.internal.pageSize.width; // ~297mm
-    const pageHeight = doc.internal.pageSize.height; // ~210mm
+    // 1. Initialize Portrait PDF (A4)
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageWidth = doc.internal.pageSize.width; // 210mm
+    const pageHeight = doc.internal.pageSize.height; // 297mm
+    const margin = 20;
+    const contentWidth = pageWidth - (margin * 2);
 
-    // --- SLIDE 1: COVER (Dynamic) ---
-    // --- SLIDE 1: COVER (Dynamic) ---
-    // Header Logo (Top Left)
-    let logoData: string | null = null;
+    let currentY = 20;
+
+    // --- COVER PAGE ---
+
+    // Logo
     try {
-        logoData = await loadImage('/logo-jvs.png');
-        // Aspect ratio for "logo-branco-200px.png" (approx 200x50 usually, but let's assume a safe width)
-        // Drawing logo...
-        doc.addImage(logoData, 'PNG', 20, 20, 50, 15); // x, y, w, h
+        // Use a generic placeholder if logo fails, or try to load real logo
+        const logoData = await loadImage('/logo-jvs.png');
+        doc.addImage(logoData, 'PNG', margin, 20, 50, 15); // Adjust size as needed
     } catch (e) {
-        console.error('Error loading logo:', e);
-        // Fallback: Do NOTHING (to avoid "Loose S" bug).
-        // If logo fails, we prefer a clean sidebar over broken text.
+        // Fallback text if logo fails
+        doc.setFontSize(20);
+        doc.setTextColor(COLORS.PRIMARY);
+        doc.text('JVS Facilities', margin, 32);
     }
-    // doc.text('Proposta Comercial Personalizada', 20, 40);
-    // doc.text(`PROPOSTA #${resultado.id}`, 20, 50);
 
-    // Main Cover Box
-    doc.setFillColor(secondaryColor);
-    doc.rect(0, 0, 80, pageHeight, 'F'); // Left sidebar
+    // Title
+    currentY = 80;
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(36);
+    doc.setTextColor(COLORS.DARK);
+    doc.text('Proposta', margin, currentY);
+    doc.text('Comercial', margin, currentY + 12);
 
-    // Sidebar Content
-    doc.setTextColor('#FFFFFF');
-    doc.setFontSize(32);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Proposta', 10, 80);
-    doc.text('Comercial', 10, 92);
+    // Decorative Line
+    currentY += 25;
+    doc.setDrawColor(COLORS.PRIMARY);
+    doc.setLineWidth(2);
+    doc.line(margin, currentY, margin + 20, currentY);
 
+    // Client Info
+    currentY += 30;
+    doc.setFont(FONTS.BODY, 'normal');
     doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`ID: ${resultado.id}`, 10, 110);
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, 10, 116);
+    doc.setTextColor(COLORS.TEXT);
+    doc.text('PREPARADO PARA:', margin, currentY);
 
-    // Client Info (Right Side)
-    doc.setTextColor(secondaryColor);
+    currentY += 8;
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(18);
+    doc.setTextColor(COLORS.DARK);
+    doc.text(client.empresa || client.nome, margin, currentY);
+
+    currentY += 8;
+    doc.setFont(FONTS.BODY, 'normal');
     doc.setFontSize(12);
-    doc.text('PREPARADO PARA:', 100, 80);
-    doc.setFontSize(24);
-    doc.setFont('helvetica', 'bold');
-    doc.text(client.empresa || client.nome, 100, 92);
+    doc.setTextColor(COLORS.TEXT);
+    doc.text(client.email, margin, currentY);
+    if (client.whatsapp) {
+        currentY += 6;
+        doc.text(client.whatsapp, margin, currentY);
+    }
 
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'normal');
-    doc.text(client.nome, 100, 102);
-    doc.text(client.email, 100, 110);
-    if (client.whatsapp) doc.text(client.whatsapp, 100, 118);
+    // Date/ID
+    currentY += 20;
+    doc.setFontSize(10);
+    doc.setTextColor('#9CA3AF'); // Gray 400
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, margin, currentY);
+    doc.text(`Proposta #: ${resultado.id}`, margin, currentY + 5);
 
-    // Totals Box (Bottom Right)
-    doc.setFillColor('#F3F4F6');
-    doc.rect(100, 140, 180, 50, 'F');
-
-    doc.setTextColor(primaryColor);
-    doc.setFontSize(12);
-    doc.text('INVESTIMENTO MENSAL', 110, 155);
-    doc.setFontSize(32);
-    doc.setFont('helvetica', 'bold');
-    const valorMensal = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.resumo.custoMensalTotal);
-    doc.text(valorMensal, 110, 172);
-
-    doc.setFontSize(12);
-    doc.setTextColor(secondaryColor);
-    doc.text('Anual:', 220, 155);
-    doc.text(new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(resultado.resumo.custoAnualTotal), 220, 172);
+    // Footer
+    doc.setFontSize(9);
+    doc.text('JVS Facilities • Soluções em Governança e Limpeza', margin, pageHeight - 15);
 
 
-    // --- SLIDES 2-8: INSTITUTIONAL (NATIVE VECTORS) ---
-    renderQuemSomos(doc, pageWidth, pageHeight);
-    renderValores(doc, pageWidth, pageHeight);
-    renderServicos(doc, pageWidth, pageHeight);
-    renderSetores(doc, pageWidth, pageHeight);
-    renderDiferenciais(doc, pageWidth, pageHeight);
-    renderResponsabilidades(doc, pageWidth, pageHeight);
-    renderFerramentas(doc, pageWidth, pageHeight);
-
-
-    // --- SLIDE 9+: COST TABLES ---
-    // Services Summary Table
+    // --- CONTENT PAGES ---
     doc.addPage();
-    doc.setTextColor(secondaryColor);
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Detalhamento dos Serviços Contratados', 20, 20);
+    currentY = 25;
 
-    const tableData = resultado.servicos.map(item => [
-        item.config.cargo ? `${item.config.funcao.toUpperCase()} - ${item.config.cargo.toUpperCase()}` : item.config.funcao.toUpperCase(),
-        `${item.config.quantidade}`,
-        `${item.config.dias.join(', ')} - ${item.config.horarioEntrada} às ${item.config.horarioSaida}`,
-        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.custoTotal)
+    // Helper to add Section Title
+    const addSectionTitle = (title: string) => {
+        if (currentY > 250) { doc.addPage(); currentY = 25; }
+
+        doc.setFont(FONTS.TITLE, 'bold');
+        doc.setFontSize(16);
+        doc.setTextColor(COLORS.PRIMARY);
+        doc.text(title.toUpperCase(), margin, currentY);
+
+        // Line under title
+        doc.setDrawColor(COLORS.PRIMARY);
+        doc.setLineWidth(0.5);
+        doc.line(margin, currentY + 3, pageWidth - margin, currentY + 3);
+
+        currentY += 15;
+    };
+
+    // Helper to add Body Text
+    const addParagraph = (text: string) => {
+        doc.setFont(FONTS.BODY, 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(COLORS.TEXT);
+
+        const lines = doc.splitTextToSize(text, contentWidth);
+
+        if (currentY + (lines.length * 5) > 270) { doc.addPage(); currentY = 25; }
+
+        doc.text(lines, margin, currentY);
+        currentY += (lines.length * 5) + 6; // Line height + paragraph spacing
+    };
+
+    // Helper to add Bullet Points
+    const addBullets = (items: string[]) => {
+        doc.setFont(FONTS.BODY, 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(COLORS.TEXT);
+
+        items.forEach(item => {
+            const prefix = '•  ';
+            const lines = doc.splitTextToSize(prefix + item, contentWidth);
+
+            if (currentY + (lines.length * 5) > 270) { doc.addPage(); currentY = 25; }
+
+            doc.text(lines, margin, currentY);
+            currentY += (lines.length * 5) + 2;
+        });
+        currentY += 4; // Spacing after list
+    };
+
+
+    // 1. RESUMO EXECUTIVO
+    addSectionTitle('Resumo Executivo');
+    addParagraph('Somos uma empresa com mais de 30 anos de atuação em Facilities, especializada em terceirização e execução de serviços de limpeza profissional e similares. Atendemos operações que exigem padronização, confiabilidade e continuidade, com foco em eficiência e segurança no dia a dia.');
+    addParagraph('Nossa entrega combina equipe dimensionada conforme a necessidade, gestão próxima e processos em evolução contínua, garantindo qualidade percebida e previsibilidade para o cliente.');
+
+    // 2. QUEM SOMOS
+    addSectionTitle('Quem Somos');
+    addParagraph('Há mais de 30 anos no mercado de Facilities, atuamos com excelência na terceirização e na execução de serviços de limpeza profissional e soluções correlatas. Nosso foco é garantir continuidade operacional, padronização e tranquilidade na gestão, para que o cliente concentre energia no seu core business.');
+    addBullets([
+        '30 anos de experiência em terceirização de equipes;',
+        'Execução de tratamento de pisos em mais de 500.000m²;',
+        'Mais de 100.000m² de limpeza em altura efetuada;',
+        'Cultura de desenvolvimento voltada às pessoas e à qualidade;',
+        'Dimensionamento personalizado conforme a necessidade de cada operação.'
+    ]);
+
+    // 3. PRINCIPAIS SERVIÇOS PRESTADOS
+    addSectionTitle('Principais Serviços Prestados');
+
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(COLORS.DARK);
+    doc.text('Terceirização de Serviços de Facilities', margin, currentY);
+    currentY += 6;
+
+    addParagraph('Atuamos na gestão e execução de rotinas essenciais — como limpeza, manutenção e segurança — garantindo um ambiente organizado, seguro e eficiente. Assumimos a operação com responsabilidade e padronização, reduzindo falhas e aumentando a previsibilidade do serviço.');
+
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(COLORS.DARK);
+    doc.text('Limpeza em Altura', margin, currentY);
+    currentY += 6;
+
+    addParagraph('Serviço especializado para áreas de difícil acesso (fachadas, janelas externas e estruturas elevadas), com uso de equipamentos adequados e técnicas seguras. Entregamos limpeza com precisão, segurança e qualidade visual, preservando a estética do patrimônio e mitigando riscos operacionais.');
+
+
+    // --- PAGE BREAK if needed ---
+    if (currentY > 200) { doc.addPage(); currentY = 25; }
+
+
+    // 4. ESCOPO E INVESTIMENTO (Inserted dynamically based on simulation)
+    addSectionTitle('Escopo Proposto e Investimento');
+
+    const tableData = resultado.programacao.map(item => [
+        item.cargo,
+        item.quantidade,
+        item.escala,
+        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(item.custoMensal)
     ]);
 
     autoTable(doc, {
-        startY: 30,
-        head: [['Serviço / Cargo', 'Qtd', 'Escala / Horário', 'Valor Mensal Total']],
+        startY: currentY,
+        head: [['Cargo / Função', 'Qtd', 'Escala', 'Valor Mensal Unit.']],
         body: tableData,
-        headStyles: { fillColor: primaryColor, fontSize: 12 },
-        styles: { fontSize: 11, cellPadding: 3 },
+        theme: 'grid',
+        headStyles: { fillColor: COLORS.PRIMARY, fontStyle: 'bold' },
+        styles: { fontSize: 10, cellPadding: 4 },
         columnStyles: {
-            3: { halign: 'right', fontStyle: 'bold' }
-        },
-        margin: { left: 20, right: 20 }
+            0: { cellWidth: 'auto' },
+            1: { cellWidth: 20, halign: 'center' },
+            2: { cellWidth: 30, halign: 'center' },
+            3: { cellWidth: 40, halign: 'right' }
+        }
     });
 
-    const finalY = (doc as any).lastAutoTable.finalY + 15;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Nota: Esta proposta tem validade de 10 dias.', 20, finalY);
+    // @ts-ignore
+    currentY = doc.lastAutoTable.finalY + 10;
+
+    // Total
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(COLORS.DARK);
+    doc.text('INVESTIMENTO MENSAL TOTAL:', margin, currentY);
+
+    doc.setFontSize(16);
+    doc.setTextColor(COLORS.PRIMARY);
+    const totalSemAdicionais = resultado.custoMensalTotal; // Assuming simple sum for now
+    doc.text(
+        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalSemAdicionais),
+        pageWidth - margin,
+        currentY,
+        { align: 'right' }
+    );
+    currentY += 15;
 
 
-    // --- DETAILED BREAKDOWN (One per Page/Slide) ---
-    resultado.servicos.forEach((item, index) => {
-        doc.addPage();
-        const d = item.detalhamento;
+    // 5. NOSSOS DIFERENCIAIS
+    addSectionTitle('Nossos Diferenciais');
 
-        // Header Strip
-        doc.setFillColor(secondaryColor);
-        doc.rect(0, 0, pageWidth, 25, 'F');
-        doc.setTextColor('#FFFFFF');
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        const roleTitle = item.config.cargo ? `${item.config.funcao} - ${item.config.cargo}` : item.config.funcao;
-        doc.text(`EXTRATO DE CUSTOS: ${roleTitle}`, 20, 16);
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(11);
+    doc.text('Abordagem Estratégica e Personalizada', margin, currentY);
+    currentY += 5;
+    addParagraph('Entendemos o cenário de cada cliente e estruturamos a operação com uma abordagem personalizada, focada em eficiência, previsibilidade e alinhamento com os objetivos do contrato.');
 
-        const fmt = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(11);
+    doc.text('Experiência', margin, currentY);
+    currentY += 5;
+    addParagraph('Nosso time é composto por gestores experientes em Facilities, do setor de operações à diretoria, com mais de 20 anos de atuação contínua no mercado de prestação de serviços.');
 
-        // Layout: 2 Columns for Data Tables (A/B Left, C/D Right) to use Landscape width
-        const leftColX = 20;
-        const rightColX = pageWidth / 2 + 10;
-        const colWidth = (pageWidth / 2) - 30;
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(11);
+    doc.text('Padronização de Processos e Indicadores', margin, currentY);
+    currentY += 5;
+    addParagraph('Aprimoramos continuamente nossos processos internos e evoluímos junto à tecnologia para aumentar controle, gestão e desempenho. Isso nos permite acompanhar metas, indicadores e resultados com consistência, garantindo qualidade e transparência ao cliente.');
 
-        // --- LEFT COLUMN ---
 
-        // Group A: Labor
-        const totalAdicionais = d.adicionais.total;
-        const totalProvisoes = d.provisoes.total;
-        const totalEncargos = d.encargos;
-        const montanteA = d.salarioBase + (d.gratificacoes || 0) + totalAdicionais + totalEncargos + totalProvisoes;
+    // 6. CONDIÇÕES COMERCIAIS
+    if (currentY > 220) { doc.addPage(); currentY = 25; }
+    addSectionTitle('Condições Comerciais');
+    addBullets([
+        'Faturamento dos serviços entre os dias 25 e 30 do mês da prestação dos serviços, com vencimento no 3º dia útil do mês subsequente;',
+        'Reajuste anual, automático e equivalente ao dissídio da categoria no mês de referência citado em CCT de cada ano subsequente;',
+        'Próximo reajuste: Janeiro/2026.'
+    ]);
 
-        const bodyA = [
-            ['Salário Base / Piso', fmt(d.salarioBase)],
-            ...(d.gratificacoes ? [['Gratificações', fmt(d.gratificacoes)]] : []),
-            ...(d.adicionais.copa ? [['Adicional Copa', fmt(d.adicionais.copa)]] : []),
-            ...(d.adicionais.insalubridade ? [['Adic. Insalubridade', fmt(d.adicionais.insalubridade)]] : []),
-            ...(d.adicionais.periculosidade ? [['Adic. Periculosidade', fmt(d.adicionais.periculosidade)]] : []),
-            ...(d.adicionais.noturno ? [['Adic. Noturno', fmt(d.adicionais.noturno)]] : []),
-            ...(d.adicionais.intrajornada ? [['Intrajornada', fmt(d.adicionais.intrajornada)]] : []),
-            ...(d.adicionais.dsr ? [['DSR', fmt(d.adicionais.dsr)]] : []),
-            ['Encargos Sociais', fmt(d.encargos)],
-            ['Provisão Férias+1/3', fmt(d.provisoes.ferias)],
-            ['Provisão 13º Salário', fmt(d.provisoes.decimoTerceiro)],
-            ['Provisão Rescisão', fmt(d.provisoes.rescisao)]
-        ];
 
-        autoTable(doc, {
-            startY: 40,
-            margin: { left: leftColX },
-            tableWidth: colWidth,
-            head: [['Montante "A" - Mão-de-obra', fmt(montanteA)]],
-            body: bodyA,
-            theme: 'striped',
-            headStyles: { fillColor: '#059669', fontSize: 10 },
-            styles: { fontSize: 9, cellPadding: 1.5 },
-            columnStyles: { 1: { halign: 'right' } }
-        });
-
-        // Group B: Inputs
-        const montanteB = d.insumos + (d.custosOperacionais?.total || 0);
-        const bodyB = [
-            ['Materiais / Equip.', fmt(d.insumos)],
-            ['Exames (PCMSO)', fmt(d.custosOperacionais?.examesMedicos || 0)]
-        ];
-
-        autoTable(doc, {
-            startY: (doc as any).lastAutoTable.finalY + 5,
-            margin: { left: leftColX },
-            tableWidth: colWidth,
-            head: [['Montante "B" - Insumos', fmt(montanteB)]],
-            body: bodyB,
-            theme: 'striped',
-            headStyles: { fillColor: '#059669', fontSize: 10 },
-            styles: { fontSize: 9, cellPadding: 1.5 },
-            columnStyles: { 1: { halign: 'right' } }
-        });
-
-        // --- RIGHT COLUMN ---
-
-        // Group C: Benefits
-        const montanteC = d.beneficios.total;
-        const bodyC = [
-            ['Vale Refeição', fmt(d.beneficios.valeRefeicao)],
-            ['Vale Transporte', fmt(d.beneficios.valeTransporte)],
-            ['Cesta Básica', fmt(d.beneficios.cestaBasica)],
-            ['Uniformes / EPIs', fmt(d.beneficios.uniforme)],
-            ...(d.beneficios.vaSobreFerias ? [['Prov. VA Férias', fmt(d.beneficios.vaSobreFerias)]] : []),
-            ...(d.beneficios.descontoVA < 0 ? [['(-) Desc. VA', fmt(d.beneficios.descontoVA)]] : []),
-            ...(d.beneficios.descontoVT < 0 ? [['(-) Desc. VT', fmt(d.beneficios.descontoVT)]] : [])
-        ];
-
-        autoTable(doc, {
-            startY: 40,
-            margin: { left: rightColX },
-            tableWidth: colWidth,
-            head: [['Montante "C" - Benefícios', fmt(montanteC)]],
-            body: bodyC,
-            theme: 'striped',
-            headStyles: { fillColor: '#059669', fontSize: 10 },
-            styles: { fontSize: 9, cellPadding: 2 },
-            columnStyles: { 1: { halign: 'right' } }
-        });
-
-        // Subtotal + Margin + Taxes Box (Right Side, Below Group C)
-        const subtotal = montanteA + montanteB + montanteC;
-        const currentY = (doc as any).lastAutoTable.finalY + 10;
-
-        doc.setFillColor('#F3F4F6');
-        doc.rect(rightColX, currentY, colWidth, 60, 'F');
-
-        let y = currentY + 10;
-        doc.setTextColor(secondaryColor);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-
-        // Custom Table-like drawing for totals
-        const row = (label: string, val: string, bold = false) => {
-            doc.setFont('helvetica', bold ? 'bold' : 'normal');
-            doc.text(label, rightColX + 5, y);
-            doc.text(val, rightColX + colWidth - 5, y, { align: 'right' });
-            y += 7;
-        };
-
-        row('Custo Operacional:', fmt(subtotal));
-        row('Margem / Lucro:', fmt(d.lucro));
-        row('Impostos (16,25%):', fmt(d.tributos));
-        y += 5;
-        doc.setDrawColor('#E5E7EB');
-        doc.line(rightColX + 5, y - 5, rightColX + colWidth - 5, y - 5);
-
-        doc.setTextColor(primaryColor);
-        doc.setFontSize(14);
-        row('PREÇO UNITÁRIO:', fmt(item.custoTotal / item.config.quantidade), true);
-
-        doc.setFillColor(primaryColor);
-        doc.rect(rightColX, y + 2, colWidth, 15, 'F');
-        doc.setTextColor('#FFFFFF');
-        doc.setFontSize(12);
-        doc.setFont('helvetica', 'bold');
-        doc.text(`TOTAL MENSAL (${item.config.quantidade}x): ${fmt(item.custoTotal)}`, rightColX + colWidth / 2, y + 12, { align: 'center' });
-
-    });
-
-    // --- SLIDE FINAL: OBRIGADO ---
-    renderObrigado(doc, pageWidth, pageHeight, logoData);
-
-    // Footer
-    const totalPages = (doc.internal as any).getNumberOfPages();
-    for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor('#9CA3AF');
-        doc.text('Grupo JVS Facilities - www.grupojvsserv.com.br', 20, pageHeight - 10);
-        doc.text(`Página ${i} de ${totalPages}`, pageWidth - 20, pageHeight - 10, { align: 'right' });
-    }
-
-    doc.save(`Proposta_JVS_${client.empresa || 'Cliente'}.pdf`);
+    // Save JSON
+    doc.save(`Proposta_JVS_${client.empresa || 'Comercial'}_${resultado.id}.pdf`);
 };
