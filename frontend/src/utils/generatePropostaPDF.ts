@@ -54,7 +54,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     let currentY = 20;
 
-    // --- COVER PAGE (Clean "Proposta Comercial" Layout) ---
+    // --- COVER PAGE (Clean "Proposta Comercial" Layout - V62) ---
 
     // Logo (Top Left or just Text)
     doc.setFont(FONTS.TITLE, 'bold');
@@ -120,7 +120,12 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.setTextColor(COLORS.PRIMARY); // Green Title
         doc.text(title.toUpperCase(), margin, currentY);
 
-        currentY += 10;
+        // Line under title
+        doc.setDrawColor(COLORS.PRIMARY);
+        doc.setLineWidth(0.5);
+        doc.line(margin, currentY + 3, pageWidth - margin, currentY + 3);
+
+        currentY += 15;
     };
 
     // Helper: Add Paragraph
@@ -133,7 +138,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         if (currentY + (lines.length * 4) > 270) { doc.addPage(); currentY = 25; }
 
         doc.text(lines, margin, currentY);
-        currentY += (lines.length * 4) + 4;
+        currentY += (lines.length * 4) + 6;
     };
 
     // Helper: Add Bullets
@@ -147,23 +152,49 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
             const lines = doc.splitTextToSize(prefix + item, contentWidth);
             if (currentY + (lines.length * 4) > 270) { doc.addPage(); currentY = 25; }
             doc.text(lines, margin, currentY);
-            currentY += (lines.length * 4) + 1;
+            currentY += (lines.length * 4) + 2;
         });
         currentY += 4;
     };
 
 
-    // 1. RESUMO EXECUTIVO
+    // 1. RESUMO EXECUTIVO (Restored)
     addSectionTitle('Resumo Executivo');
-    addParagraph('Somos uma empresa com mais de 30 anos de atuação em Facilities, especializada em terceirização e execução de serviços de limpeza profissional e similares. Atendemos operações que exigem padronização, confiabilidade e continuidade.');
+    addParagraph('Somos uma empresa com mais de 30 anos de atuação em Facilities, especializada em terceirização e execução de serviços de limpeza profissional e similares. Atendemos operações que exigem padronização, confiabilidade e continuidade, com foco em eficiência e segurança no dia a dia.');
+    addParagraph('Nossa entrega combina equipe dimensionada conforme a necessidade, gestão próxima e processos em evolução contínua, garantindo qualidade percebida e previsibilidade para o cliente.');
 
-    // 2. QUEM SOMOS
+    // 2. QUEM SOMOS (Restored)
     addSectionTitle('Quem Somos');
-    addParagraph('Há mais de 30 anos no mercado de Facilities, atuamos com excelência na terceirização. Nosso foco é garantir continuidade operacional e padronização.');
+    addParagraph('Há mais de 30 anos no mercado de Facilities, atuamos com excelência na terceirização e na execução de serviços de limpeza profissional e soluções correlatas. Nosso foco é garantir continuidade operacional, padronização e tranquilidade na gestão, para que o cliente concentre energia no seu core business.');
+    addBullets([
+        '30 anos de experiência em terceirização de equipes;',
+        'Execução de tratamento de pisos em mais de 500.000m²;',
+        'Mais de 100.000m² de limpeza em altura efetuada;',
+        'Cultura de desenvolvimento voltada às pessoas e à qualidade;',
+        'Dimensionamento personalizado conforme a necessidade de cada operação.'
+    ]);
 
-    // 3. SEU INVESTIMENTO
-    // Just a clean table summary before the details
-    addSectionTitle('Resumo do Investimento');
+    // 3. PRINCIPAIS SERVIÇOS PRESTADOS (Restored)
+    addSectionTitle('Principais Serviços Prestados');
+
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(COLORS.DARK);
+    doc.text('Terceirização de Serviços de Facilities', margin, currentY);
+    currentY += 6;
+    addParagraph('Atuamos na gestão e execução de rotinas essenciais — como limpeza, manutenção e segurança — garantindo um ambiente organizado, seguro e eficiente. Assumimos a operação com responsabilidade e padronização, reduzindo falhas e aumentando a previsibilidade do serviço.');
+
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(COLORS.DARK);
+    doc.text('Limpeza em Altura', margin, currentY);
+    currentY += 6;
+    addParagraph('Serviço especializado para áreas de difícil acesso (fachadas, janelas externas e estruturas elevadas), com uso de equipamentos adequados e técnicas seguras. Entregamos limpeza com precisão, segurança e qualidade visual, preservando a estética do patrimônio e mitigando riscos operacionais.');
+
+
+    // 4. ESCOPO PROPOSTO E INVESTIMENTO (Summary Table)
+    if (currentY > 200) { doc.addPage(); currentY = 25; }
+    addSectionTitle('Escopo Proposto e Investimento');
 
     const tableDataResumo = resultado.servicos.map(item => {
         const config = item.config;
@@ -180,12 +211,26 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         styles: { fontSize: 10, cellPadding: 3 }
     });
     // @ts-ignore
-    currentY = doc.lastAutoTable.finalY + 15;
+    currentY = doc.lastAutoTable.finalY + 10;
+
+    // Total Investment
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(COLORS.DARK);
+    doc.text('INVESTIMENTO MENSAL TOTAL:', margin, currentY);
+
+    doc.setFontSize(14);
+    doc.setTextColor(COLORS.PRIMARY);
+    doc.text(
+        formatCurrency(resultado.resumo.custoMensalTotal),
+        pageWidth - margin,
+        currentY,
+        { align: 'right' }
+    );
+    currentY += 15;
 
 
-    // 4. DETALHAMENTO DE CUSTOS (The Specific Table)
-    if (currentY > 200) { doc.addPage(); currentY = 25; }
-
+    // 5. DETALHAMENTO DE CUSTOS (The Specific Table - V62 High Fidelity)
     // Loop through each service and create a FULL PAGE table
     resultado.servicos.forEach((item, index) => {
         doc.addPage(); // Start each detailed table on a new page for clarity
@@ -211,8 +256,6 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         const det = item.detalhamento;
 
         // --- CONSTRUCT THE TABLE ROWS ---
-        // We use specific styling for headers (Green BG) and totals (Black/Gray BG)
-
         const body: RowInput[] = [];
 
         // Montante A
@@ -220,7 +263,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         body.push(['1) Salário Base / Piso', '', { content: formatCurrency(det.salarioBase), styles: { halign: 'right' } }]);
         body.push(['Gratificações / Função', '', { content: formatCurrency(det.gratificacoes || 0), styles: { halign: 'right' } }]);
         body.push(['Adicionais (Insalubridade/Peric./Noturno)', '', { content: formatCurrency(det.adicionais.total), styles: { halign: 'right' } }]);
-        // Encargos & Provisões (Grouped for brevity to fit, or expanded if preferred. Expanding as per screenshot request usually means detail)
+
         body.push([{ content: "Encargos & Provisões", colSpan: 3, styles: { fontStyle: 'bold', fillColor: COLORS.BG_LIGHT } }]);
         body.push(['2) Encargos Sociais (INSS, FGTS, RAT...)', '', { content: formatCurrency(det.encargos), styles: { halign: 'right' } }]);
         body.push(['3) Provisão Férias + 1/3', '', { content: formatCurrency(det.provisoes.ferias), styles: { halign: 'right' } }]);
@@ -238,7 +281,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         body.push(['2) Vale Transporte', '', { content: formatCurrency(det.beneficios.valeTransporte), styles: { halign: 'right' } }]);
         body.push(['3) Cesta Básica', '', { content: formatCurrency(det.beneficios.cestaBasica), styles: { halign: 'right' } }]);
         body.push(['4) Uniformes', '', { content: formatCurrency(det.beneficios.uniforme), styles: { halign: 'right' } }]);
-        // Discounts (Red)
+
         if (det.beneficios.descontoVA < 0) {
             body.push([{ content: '(-) Desconto VA', styles: { textColor: COLORS.RED } }, '', { content: formatCurrency(det.beneficios.descontoVA), styles: { textColor: COLORS.RED, halign: 'right' } }]);
         }
@@ -289,22 +332,58 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     });
 
 
-    // 6. NOSSOS DIFERENCIAIS And FINAL CONTACTS
-    if (doc.getNumberOfPages() % 2 !== 0) doc.addPage(); // Ensure start on new page if needed or just add page
+    // 6. NOSSOS DIFERENCIAIS And ENCERRAMENTO (Restored)
+    if (doc.getNumberOfPages() % 2 !== 0) doc.addPage(); // Ensure start on new page if needed
     doc.addPage();
     currentY = 25;
 
-    addSectionTitle('Diferenciais & Encerramento');
-    addParagraph('Estamos à disposição para apresentar detalhadamente esta proposta.');
+    addSectionTitle('Nossos Diferenciais', false);
 
-    currentY += 10;
     doc.setFont(FONTS.TITLE, 'bold');
-    doc.setFontSize(12);
-    doc.text('Entre em contato:', margin, currentY);
-    currentY += 6;
+    doc.setFontSize(11);
+    doc.text('Abordagem Estratégica e Personalizada', margin, currentY);
+    currentY += 5;
+    addParagraph('Entendemos o cenário de cada cliente e estruturamos a operação com uma abordagem personalizada, focada em eficiência, previsibilidade e alinhamento com os objetivos do contrato.');
+
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(11);
+    doc.text('Experiência', margin, currentY);
+    currentY += 5;
+    addParagraph('Nosso time é composto por gestores experientes em Facilities, do setor de operações à diretoria, com mais de 20 anos de atuação contínua no mercado de prestação de serviços.');
+
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(11);
+    doc.text('Padronização de Processos e Indicadores', margin, currentY);
+    currentY += 5;
+    addParagraph('Aprimoramos continuamente nossos processos internos e evoluímos junto à tecnologia para aumentar controle, gestão e desempenho.');
+
+
+    // 7. CONDIÇÕES COMERCIAIS (Restored)
+    if (currentY > 220) { doc.addPage(); currentY = 25; }
+    addSectionTitle('Condições Comerciais');
+    addBullets([
+        'Faturamento dos serviços entre os dias 25 e 30 do mês da prestação dos serviços, com vencimento no 3º dia útil do mês subsequente;',
+        'Reajuste anual, automático e equivalente ao dissídio da categoria no mês de referência citado em CCT de cada ano subsequente;',
+        'Próximo reajuste: Janeiro/2026.'
+    ]);
+
+
+    // OBRIGADO + CONTATOS
+    currentY += 20;
+    doc.setFillColor(COLORS.BG_LIGHT);
+    doc.rect(margin, currentY, contentWidth, 40, 'F');
+
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(COLORS.PRIMARY);
+    doc.text('Obrigado pela oportunidade!', margin + 10, currentY + 15);
+
+    doc.setFontSize(10);
     doc.setFont(FONTS.BODY, 'normal');
-    doc.text('comercial@jvsfacilities.com.br', margin, currentY);
+    doc.setTextColor(COLORS.TEXT);
+    doc.text('Ficamos à disposição para esclarecimentos e ajustes nesta proposta.', margin + 10, currentY + 22);
+    doc.text(`Contato: ${client.email}`, margin + 10, currentY + 30);
 
     // Save
-    doc.save(`Proposta_JVS_V62_${resultado.id}.pdf`);
+    doc.save(`Proposta_JVS_V63_${client.empresa || 'Comercial'}.pdf`);
 };
