@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V52 (Add Meta Pixel)
+    // Force Deploy Checkpoint: Final Release V53 (Hero Refactor for Premium B2B)
 
     // HEADER
     const margin = 20;

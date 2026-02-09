@@ -23,64 +23,63 @@ export default function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                     >
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 mb-6">
-                            <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                            <span className="text-sm font-medium text-gray-300">Simulador Online v1.0</span>
-                        </div>
-
-                        <h1 className="text-4xl md:text-6xl font-heading font-bold leading-tight mb-4">
-                            Automatize Propostas e <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-green-400">
-                                Otimize Custos de Facilities
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold leading-tight mb-6">
+                            Você não contrata mão de obra. <br className="hidden md:block" />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
+                                Você contrata método e padrão de entrega.
                             </span>
                         </h1>
 
-                        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto md:mx-0 leading-relaxed">
-                            Gere orçamentos precisos em minutos com nosso simulador inteligente de serviços terceirizados.
-                            Reduza custos operacionais com transparência total.
+                        <p className="text-lg text-slate-300 max-w-2xl mx-auto md:mx-0 leading-relaxed mb-8">
+                            Facilities B2B com governança por criticidade, rastreabilidade digital e gestão preditiva — para reduzir risco operacional e garantir execução do programado ao realizado.
                         </p>
-                    </motion.div>
 
-                    <motion.div
-                        className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                    >
-                        <Link
-                            href="/simulador"
-                            className="group relative px-8 py-4 bg-primary hover:bg-green-500 text-white font-bold rounded-xl shadow-[0_10px_30px_rgba(16,185,129,0.4)] hover:shadow-[0_20px_40px_rgba(16,185,129,0.5)] transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3 text-lg"
-                        >
-                            SIMULE AGORA SUA PROPOSTA
-                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-
-                        <Link
-                            href="#playbook"
-                            className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl border border-slate-700 transition-all flex items-center justify-center"
-                        >
-                            Como Funciona
-                        </Link>
-                    </motion.div>
-
-                    <motion.div
-                        className="pt-8 flex items-center justify-center md:justify-start gap-6 text-sm text-gray-400"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
-                    >
-                        <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-primary" />
-                            <span>Orçamento em 5 min</span>
+                        {/* Prova / Badges */}
+                        <div className="flex flex-wrap gap-3 justify-center md:justify-start mb-8">
+                            {[
+                                "Retorno em até 1h útil",
+                                "Reposição de posto em até 2h",
+                                "Checklist ≥ 85%",
+                                "SLA ≥ 80%"
+                            ].map((badge, i) => (
+                                <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700 text-xs font-semibold text-emerald-400">
+                                    <CheckCircle className="w-3.5 h-3.5" />
+                                    <span>{badge}</span>
+                                </div>
+                            ))}
                         </div>
-                        <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-primary" />
+
+                        {/* Segmentos */}
+                        <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-8">
+                            Atendemos Curitiba e Região Metropolitana • Hospitais • Indústrias • Varejo • Condomínios corporativos
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                            <Link
+                                href="/simulador"
+                                className="group relative px-8 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/20 transition-all duration-300 transform hover:-translate-y-1 flex items-center justify-center gap-3 text-lg"
+                            >
+                                Simular proposta em 5 minutos
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+
+                            <a
+                                href="https://wa.me/5541992252968?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20um%20diagn%C3%B3stico%20de%20facilities."
+                                target="_blank"
+                                className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2"
+                            >
+                                Agendar diagnóstico no WhatsApp
+                            </a>
+                        </div>
+
+                        {/* Microcopy */}
+                        <p className="text-xs text-slate-500 mt-4 flex items-center gap-2 justify-center md:justify-start">
                             <span>Sem compromisso</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-primary" />
-                            <span>Dados 100% Seguros</span>
-                        </div>
+                            <span className="w-1 h-1 rounded-full bg-slate-600" />
+                            <span>Diagnóstico rápido</span>
+                            <span className="w-1 h-1 rounded-full bg-slate-600" />
+                            <span>Evidências e relatórios mensais</span>
+                        </p>
                     </motion.div>
                 </div>
 
