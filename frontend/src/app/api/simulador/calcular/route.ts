@@ -1,17 +1,8 @@
 import { NextResponse } from 'next/server';
 import { ParametrosCustos, RegraCCT } from '@/types/simulador';
-// removed MOCK_REGRAS
 import prisma from '@/lib/prisma';
 
-// ... (existing code)
-
-            } as unknown as RegraCCT;
-        });
-    } catch (e) {
-    console.error("Failed to fetch rules from DB:", e);
-    return []; // Return empty instead of MOCK
-}
-}
+// --- Types ---
 interface BackendConfigPayload {
     funcao: string; // Service ID (e.g., 'LIMPEZA', 'PORTARIA')
     estado: string;
@@ -42,11 +33,8 @@ interface DetailedBreakdown {
 
 async function fetchActiveRules(): Promise<RegraCCT[]> {
     try {
-        // Fix: Removed 'where: { ativo: true }' because 'ativo' field does not exist in schema.
-        // Assuming all rules in DB are valid or we filter by valid date 'vigencia' if needed.
-        // For now, grabbing all rules.
         const dbRules = await prisma.convencaoColetiva.findMany({
-            orderBy: { createdAt: 'desc' } // Get latest rules generally
+            orderBy: { createdAt: 'desc' }
         });
 
         // Map DB simplified schema to Application RegraCCT schema
@@ -60,48 +48,25 @@ async function fetchActiveRules(): Promise<RegraCCT[]> {
                 }
             };
 
-            // Note: DB schema has 'beneficios' and 'adicionais' as String (JSON)
-            // It does NOT have 'aliquotas', 'cargos', 'detalhes' explicitly in standard schema shown in logs.
-            // However, usually they might be packed into one of the JSON fields or the schema shown was incomplete.
-            // Let's assume they might be in 'beneficios' or 'adicionais' as a fallback, or we ignore them if missing.
-
-            // IMPORTANT: Based on schema provided:
-            // model ConvencaoColetiva { id, funcao, estado, piso, beneficios, adicionais, vigencia ... }
-            // It DOES NOT have 'aliquotas' column.
-
-            // So we must assume Aliquotas are defaults OR stored inside one of the JSON blobs.
-            // Let's assume they are DEFAULT unless we find a way to store them. 
-            // OR maybe I should use MOCK values if DB structure is insufficient for full 'aliquotas'.
-
-            // BUT user said "I adjusted rules...". If they adjusted ALiquotas (Percentuals), where did it save?
-            // If the Admin UI saves to a field not in Prisma Schema, it fails.
-            // Assuming Admin UI saves extra data into 'adicionais' or 'beneficios' JSON?
-
             const parsedBeneficios = safeParse(r.beneficios, {});
             const parsedAdicionais = safeParse(r.adicionais, {});
 
-            // Attempt to extract 'aliquotas' from parsed blobs if present (Convention: maybe stored in adicionais metadata?)
-            // If not found, we will fall back to default, which defeats the purpose if User edited them.
-            // Check if there is an 'aliquotas' property inside 'adicionais' JSON ?
             const extractedAliquotas = parsedAdicionais.aliquotas || {};
             const extractedProvisoes = parsedAdicionais.provisoes || {};
             const extractedCargos = parsedAdicionais.cargos || [];
 
             return {
                 id: r.id,
-                uf: r.estado, // DB has 'estado'
-                cidade: '', // DB doesn't have 'cidade' column in the strict schema shown? 
-                // Wait, user might have strict schema. Schema shown: 'municipio' in Tributo model, but Convencao has 'estado'.
-                // If it's State-wide level, cidade defaults to '' or '*'.
-
+                uf: r.estado,
+                cidade: '',
                 funcao: r.funcao,
-                dataBase: r.vigencia.toISOString(), // mapped to dataBase
+                dataBase: r.vigencia.toISOString(),
                 salarioPiso: Number(r.piso),
                 piso: Number(r.piso),
                 // @ts-ignore
-                sindicato: 'SINDEPRESTEM', // Mock
+                sindicato: 'SINDEPRESTEM',
 
-                aliquotas: extractedAliquotas, // loaded from JSON inside adicionais
+                aliquotas: extractedAliquotas,
                 beneficios: parsedBeneficios,
                 adicionais: parsedAdicionais,
                 cargos: extractedCargos,
@@ -110,8 +75,8 @@ async function fetchActiveRules(): Promise<RegraCCT[]> {
             } as unknown as RegraCCT;
         });
     } catch (e) {
-        console.error("Failed to fetch rules from DB, using MOCK:", e);
-        return MOCK_REGRAS;
+        console.error("Failed to fetch rules from DB:", e);
+        return [];
     }
 }
 
@@ -134,7 +99,6 @@ function getMatchingRule(
         // 1. Location Match
         const rUf = r.uf?.toUpperCase() || '';
         const cUf = config.estado?.toUpperCase() || '';
-        // Strict city checking only if rule has city. If rule has empty city, it matches all cities in state.
         const rCidade = r.cidade?.toLowerCase() || '';
         const cCidade = config.cidade?.toLowerCase() || '';
 
@@ -292,8 +256,6 @@ function getValoresFinais(
 function calcularEncargosSociais(remuneracao: number, valores: ReturnType<typeof getValoresFinais>): number {
     const { INSS, FGTS, RAT } = valores.ALIQUOTAS;
     const aliquotaTotal = INSS + FGTS + RAT;
-    // Ensure accurate floating point calc, maybe round?
-    // Using standard float logic for now.
     return remuneracao * aliquotaTotal;
 }
 
@@ -317,7 +279,6 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 
     let adicionalCopa = 0;
     if (config.copa) {
-        // Safe access to Copa from Values
         const copaRule = (valores.VALORES_BASE as any).ADICIONAL_COPA || 0;
         adicionalCopa = copaRule + AdicionalCopaManual;
         if (adicionalCopa === 0) adicionalCopa = salarioBase * 0.20;
@@ -372,7 +333,7 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     const totalProvisoes = provisoesBreakdown.ferias + provisoesBreakdown.decimoTerceiro + provisoesBreakdown.rescisao;
 
     const exames = valores.CUSTOS_OPS.examesMedicos || 0;
-    // Core calculation: 
+
     const custoOperacional = remuneracaoTotal + totalBeneficios + encargos + totalProvisoes + Materials + exames;
 
     const lucro = custoOperacional * valores.ALIQUOTAS.MARGEM_LUCRO;
@@ -430,8 +391,8 @@ export async function POST(request: Request) {
             regrasDB = await fetchActiveRules();
         } catch (e) {
             console.error("Error fetching active rules, proceeding with empty rules:", e);
-            // regrasDB is already initialized to []
         }
+
         const globalVals = getValores(parametros);
 
         const servicosCalculados = configs.map(config => {
