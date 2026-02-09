@@ -53,7 +53,17 @@ async function fetchActiveRules(): Promise<RegraCCT[]> {
 
             const extractedAliquotas = parsedAdicionais.aliquotas || {};
             const extractedProvisoes = parsedAdicionais.provisoes || {};
-            const extractedCargos = parsedAdicionais.cargos || [];
+            // Fix V74: Support both legacy list "cargos" AND single-row "cargo" property
+            const extractedCargos = Array.isArray(parsedAdicionais.cargos) ? parsedAdicionais.cargos : [];
+
+            if (parsedAdicionais.cargo && typeof parsedAdicionais.cargo === 'string') {
+                extractedCargos.push({
+                    nome: parsedAdicionais.cargo,
+                    piso: Number(r.piso) || 0,
+                    gratificacao: 0,
+                    adicionalCopa: 0
+                });
+            }
 
             return {
                 id: r.id,
