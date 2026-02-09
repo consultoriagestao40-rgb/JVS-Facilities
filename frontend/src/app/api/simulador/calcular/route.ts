@@ -93,6 +93,8 @@ function getMatchingRule(
     let bestMatch: RegraCCT | null = null;
     let maxScore = -1;
 
+    const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
     for (const r of validRules) {
         let score = 0;
 
@@ -108,7 +110,7 @@ function getMatchingRule(
 
         // City Match bonus
         if (rCidade && rCidade === cCidade) score += 10;
-        else if (rCidade && rCidade !== cCidade) continue; // Specific city rule, but wrong city -> Skip
+        else if (rCidade && rCidade !== cCidade) continue;
 
         // 2. Cargo Match
         const configCargo = (config as any).cargo;
@@ -117,7 +119,8 @@ function getMatchingRule(
         let foundSpecific = false;
 
         if (configCargo) {
-            const matchCargo = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
+            // Normalized comparison
+            const matchCargo = ruleCargosList.find(c => normalize(c.nome) === normalize(configCargo));
             if (matchCargo) {
                 score += 5;
                 foundSpecific = true;
@@ -133,7 +136,7 @@ function getMatchingRule(
         if (score > maxScore) {
             maxScore = score;
             if (foundSpecific && configCargo) {
-                const specificRole = ruleCargosList.find(c => c.nome.toLowerCase() === configCargo.toLowerCase());
+                const specificRole = ruleCargosList.find(c => normalize(c.nome) === normalize(configCargo));
                 if (specificRole) {
                     bestMatch = {
                         ...r,
