@@ -111,7 +111,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     // Helper: Add Section Title
     const addSectionTitle = (title: string, newPage = false) => {
-        if (newPage || currentY > 250) {
+        if (newPage || currentY > 260) { // Increased threshold to keep content on page
             if (newPage) doc.addPage();
             currentY = 25;
         }
@@ -124,9 +124,9 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         // Line under title
         doc.setDrawColor(COLORS.PRIMARY);
         doc.setLineWidth(0.5);
-        doc.line(margin, currentY + 3, pageWidth - margin, currentY + 3);
+        doc.line(margin, currentY + 2, pageWidth - margin, currentY + 2); // Slightly tighter line
 
-        currentY += 15;
+        currentY += 12; // Reduced spacing
     };
 
     // Helper: Add Paragraph
@@ -136,10 +136,10 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.setTextColor(COLORS.TEXT);
         const lines = doc.splitTextToSize(text, contentWidth);
 
-        if (currentY + (lines.length * 4) > 270) { doc.addPage(); currentY = 25; }
+        if (currentY + (lines.length * 4) > 275) { doc.addPage(); currentY = 25; }
 
         doc.text(lines, margin, currentY);
-        currentY += (lines.length * 4) + 6;
+        currentY += (lines.length * 4) + 4; // Reduced spacing
     };
 
     // Helper: Add Bullets
@@ -151,28 +151,26 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         items.forEach(item => {
             const prefix = '• ';
             const lines = doc.splitTextToSize(prefix + item, contentWidth);
-            if (currentY + (lines.length * 4) > 270) { doc.addPage(); currentY = 25; }
+            if (currentY + (lines.length * 4) > 275) { doc.addPage(); currentY = 25; }
             doc.text(lines, margin, currentY);
-            currentY += (lines.length * 4) + 2;
+            currentY += (lines.length * 4) + 1;
         });
-        currentY += 4;
+        currentY += 3;
     };
 
 
     // 1. RESUMO EXECUTIVO
     addSectionTitle('Resumo Executivo');
-    addParagraph('Somos uma empresa com mais de 30 anos de atuação em Facilities, especializada em terceirização e execução de serviços de limpeza profissional e similares. Atendemos operações que exigem padronização, confiabilidade e continuidade, com foco em eficiência e segurança no dia a dia.');
+    addParagraph('Somos uma empresa com mais de 30 anos de atuação em Facilities, especializada em terceirização e execução de serviços.');
     addParagraph('Nossa entrega combina equipe dimensionada conforme a necessidade, gestão próxima e processos em evolução contínua, garantindo qualidade percebida e previsibilidade para o cliente.');
 
     // 2. QUEM SOMOS
     addSectionTitle('Quem Somos');
-    addParagraph('Há mais de 30 anos no mercado de Facilities, atuamos com excelência na terceirização e na execução de serviços de limpeza profissional e soluções correlatas. Nosso foco é garantir continuidade operacional, padronização e tranquilidade na gestão, para que o cliente concentre energia no seu core business.');
+    addParagraph('Há mais de 30 anos no mercado de Facilities, atuamos com excelência na terceirização e na execução de serviços de limpeza profissional e soluções correlatas.');
     addBullets([
         '30 anos de experiência em terceirização de equipes;',
         'Execução de tratamento de pisos em mais de 500.000m²;',
-        'Mais de 100.000m² de limpeza em altura efetuada;',
-        'Cultura de desenvolvimento voltada às pessoas e à qualidade;',
-        'Dimensionamento personalizado conforme a necessidade de cada operação.'
+        'Mais de 100.000m² de limpeza em altura efetuada;'
     ]);
 
     // 3. PRINCIPAIS SERVIÇOS PRESTADOS
@@ -182,19 +180,20 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     doc.setFontSize(11);
     doc.setTextColor(COLORS.DARK);
     doc.text('Terceirização de Serviços de Facilities', margin, currentY);
-    currentY += 6;
-    addParagraph('Atuamos na gestão e execução de rotinas essenciais — como limpeza, manutenção e segurança — garantindo um ambiente organizado, seguro e eficiente. Assumimos a operação com responsabilidade e padronização, reduzindo falhas e aumentando a previsibilidade do serviço.');
+    currentY += 5;
+    addParagraph('Atuamos na gestão e execução de rotinas essenciais — como limpeza, manutenção e segurança — garantindo um ambiente organizado, seguro e eficiente.');
 
     doc.setFont(FONTS.TITLE, 'bold');
     doc.setFontSize(11);
     doc.setTextColor(COLORS.DARK);
     doc.text('Limpeza em Altura', margin, currentY);
-    currentY += 6;
-    addParagraph('Serviço especializado para áreas de difícil acesso (fachadas, janelas externas e estruturas elevadas), com uso de equipamentos adequados e técnicas seguras. Entregamos limpeza com precisão, segurança e qualidade visual, preservando a estética do patrimônio e mitigando riscos operacionais.');
+    currentY += 5;
+    addParagraph('Serviço especializado para áreas de difícil acesso (fachadas, janelas externas e estruturas elevadas).');
 
 
     // 4. ESCOPO PROPOSTO E INVESTIMENTO (Summary Table)
-    if (currentY > 200) { doc.addPage(); currentY = 25; }
+    // Relaxed threshold: Try to fit on same page if we are not too far down (e.g. 250mm)
+    if (currentY > 250) { doc.addPage(); currentY = 25; }
     addSectionTitle('Escopo Proposto e Investimento');
 
     const tableDataResumo = resultado.servicos.map(item => {
@@ -215,6 +214,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     currentY = doc.lastAutoTable.finalY + 10;
 
     // Total Investment
+    if (currentY > 270) { doc.addPage(); currentY = 25; }
     doc.setFont(FONTS.TITLE, 'bold');
     doc.setFontSize(12);
     doc.setTextColor(COLORS.DARK);
@@ -228,12 +228,13 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         currentY,
         { align: 'right' }
     );
-    currentY += 15;
+    currentY += 10;
 
 
     // 5. DETALHAMENTO DE CUSTOS (High Fidelity Tables)
+    // ALWAYS start detailed tables on a new page to use the empty space as requested
     resultado.servicos.forEach((item, index) => {
-        doc.addPage(); // Start each detailed table on a new page
+        doc.addPage(); // Force new page for each detailed table
         currentY = 20;
 
         const config = item.config;
@@ -418,5 +419,5 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
 
     // Save
-    doc.save(`Proposta_JVS_V64_${client.empresa || 'Comercial'}.pdf`);
+    doc.save(`Proposta_JVS_V65_${client.empresa || 'Comercial'}.pdf`);
 };
