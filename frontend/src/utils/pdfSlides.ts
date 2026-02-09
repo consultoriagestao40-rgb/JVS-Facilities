@@ -82,7 +82,7 @@ export const renderQuemSomos = (doc: jsPDF, width: number, height: number) => {
     // Decoration (Subtle Curve)
     doc.setFillColor(COLORS.BG_CARD);
     doc.circle(width, 0, 140, 'F');
-    // Force Deploy Checkpoint: Final Release V50 (Set Google Tag ID)
+    // Force Deploy Checkpoint: Final Release V51 (Fix Google Tag Build Error)
 
     // HEADER
     const margin = 20;
