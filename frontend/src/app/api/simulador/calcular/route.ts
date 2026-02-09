@@ -112,6 +112,7 @@ async function fetchActiveRules(): Promise<RegraCCT[]> {
                 adicionais: parsedAdicionais,
                 cargos: extractedCargos,
                 provisoes: extractedProvisoes,
+                custosOperacionais: parsedAdicionais.custosOperacionais || {},
                 gratificacoes: 0
             } as unknown as RegraCCT;
         });
