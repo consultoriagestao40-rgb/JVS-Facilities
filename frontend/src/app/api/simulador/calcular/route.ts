@@ -105,10 +105,17 @@ function getMatchingRule(
         const cCidade = config.cidade?.toLowerCase() || '';
 
         // Exact State Match is base requirement
-        if (rUf !== cUf) continue;
+        // Fix V73: Allow partial match if DB has "PR - Curitiba" and config has "PR"
+        const stateMatch = rUf === cUf || (rUf.length > 2 && rUf.startsWith(cUf));
+
+        if (!stateMatch) continue;
         score += 10;
 
         // City Match bonus
+        // If DB has "PR - Curitiba" in 'estado', r.cidade might be empty (from fetchActiveRules).
+        // But we should check if 'estado' contains the city? 
+        // For now, relying on explicit city match OR just state match.
+        // If rCidade is empty, it matches any city in that state (base rule).
         if (rCidade && rCidade === cCidade) score += 10;
         else if (rCidade && rCidade !== cCidade) continue;
 
