@@ -40,6 +40,7 @@ export const simuladorService = {
             adicionalCopa: (config as any).adicionalCopa || 0,
             intrajornada: config.intrajornada || false,
             copa: (config as any).copa || false, // Pass the checkbox flag
+            grauInsalubridade: (config as any).grauInsalubridade, // Pass the degree (0.2 or 0.4)
             adicionais: {
                 insalubridade: (config as any).insalubridade || false,
                 periculosidade: (config as any).periculosidade || false
