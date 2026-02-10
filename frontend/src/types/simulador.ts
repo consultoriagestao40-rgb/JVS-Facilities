@@ -27,6 +27,7 @@ export type ConfiguracaoServico = {
     cargo?: string; // Selected Sub-role (e.g. 'Zelador')
     materiais?: number; // Cost of materials
     adicionalCopa?: number; // Manual additional cost
+    grauInsalubridade?: number; // 0.1, 0.2, 0.4
 };
 
 

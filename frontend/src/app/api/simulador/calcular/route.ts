@@ -20,6 +20,7 @@ interface BackendConfigPayload {
     };
     intrajornada?: boolean;
     copa?: boolean;
+    grauInsalubridade?: number;
 }
 
 interface DetailedBreakdown {
@@ -348,7 +349,9 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
 
     if (config.adicionais?.insalubridade) {
         const baseIns = valores.ADICIONAIS_CONFIG.baseInsalubridade === 'SALARIO_BASE' ? salarioBase : 1412;
-        insalubridade = baseIns * (valores.ADICIONAIS_CONFIG.grauInsalubridade || 0.20);
+        // User selection (config) takes precedence over Rule Default (valores)
+        const degree = config.grauInsalubridade || valores.ADICIONAIS_CONFIG.grauInsalubridade || 0.20;
+        insalubridade = baseIns * degree;
     }
     if (config.adicionais?.periculosidade) periculosidade = salarioBase * 0.30;
     if (config.horarioEntrada && config.horarioSaida) {

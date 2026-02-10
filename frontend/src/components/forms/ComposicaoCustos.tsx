@@ -8,6 +8,7 @@ type FormValues = {
     necessitaMateriais: boolean;
     valorMateriais: number;
     insalubridade: boolean;
+    grauInsalubridade: string; // "0.20" | "0.40"
     periculosidade: boolean;
     copa: boolean;
 };
@@ -22,6 +23,7 @@ export default function ComposicaoCustos() {
             necessitaMateriais: false,
             valorMateriais: 0,
             insalubridade: false,
+            grauInsalubridade: "0.20",
             periculosidade: false,
             copa: false
         }
@@ -42,6 +44,7 @@ export default function ComposicaoCustos() {
                 materiais: data.necessitaMateriais ? data.valorMateriais : config.materiais,
                 // adicionalCopa preserved from ...config
                 insalubridade: data.insalubridade,
+                grauInsalubridade: data.insalubridade ? Number(data.grauInsalubridade) : 0,
                 periculosidade: data.periculosidade,
                 copa: data.copa // Boolean flag to enable copa calculation
             };
@@ -105,17 +108,47 @@ export default function ComposicaoCustos() {
                     </div>
 
                     <div className="space-y-3">
-                        <label className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
-                            <input
-                                type="checkbox"
-                                {...register('insalubridade')}
-                                className="w-5 h-5 text-primary rounded focus:ring-primary"
-                            />
-                            <div className="flex flex-col">
-                                <span className="text-gray-700 font-medium">Adicional de Insalubridade</span>
-                                <span className="text-xs text-gray-500">Grau médio (20%) ou máximo (40%)</span>
-                            </div>
-                        </label>
+                        {/* INSALUBRIDADE */}
+                        <div className="bg-white rounded-lg border border-gray-200 p-3">
+                            <label className="flex items-center gap-3 cursor-pointer mb-2">
+                                <input
+                                    type="checkbox"
+                                    {...register('insalubridade')}
+                                    className="w-5 h-5 text-primary rounded focus:ring-primary"
+                                />
+                                <div className="flex flex-col">
+                                    <span className="text-gray-700 font-medium">Adicional de Insalubridade</span>
+                                </div>
+                            </label>
+
+                            {watch('insalubridade') && (
+                                <div className="ml-8 mt-2 space-y-2 animate-slide-down">
+                                    <div className="flex items-center gap-4">
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                value="0.20"
+                                                {...register('grauInsalubridade')}
+                                                className="text-primary focus:ring-primary"
+                                            />
+                                            <span className="text-sm text-gray-600">Grau Médio (20%)</span>
+                                        </label>
+                                        <label className="flex items-center gap-2 cursor-pointer">
+                                            <input
+                                                type="radio"
+                                                value="0.40"
+                                                {...register('grauInsalubridade')}
+                                                className="text-primary focus:ring-primary"
+                                            />
+                                            <span className="text-sm text-gray-600">Grau Máximo (40%)</span>
+                                        </label>
+                                    </div>
+                                    <p className="text-xs text-orange-600 bg-orange-50 p-1 rounded">
+                                        Calculado sobre a base definida na regra da CCT.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
 
                         <label className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors">
                             <input
