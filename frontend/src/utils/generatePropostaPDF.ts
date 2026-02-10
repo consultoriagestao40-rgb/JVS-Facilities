@@ -9,15 +9,17 @@ const FONTS = {
 };
 
 const COLORS = {
-    PRIMARY: '#10B981',      // JVS Emerald (System Brand)
-    SECONDARY: '#064E3B',    // Dark Emerald (Text/Headers)
+    PRIMARY: '#10B981',      // JVS Emerald
+    SECONDARY: '#064E3B',    // Dark Emerald
     ACCENT: '#34D399',       // Light Emerald
     DARK: '#111827',         // Slate 900
     TEXT: '#374151',         // Slate 700
     LIGHT_TEXT: '#6B7280',   // Slate 500
-    BG_HEADER: '#065F46',    // Deep Teal for Table Headers
-    BG_ROW_GRAY: '#F9FAFB',  // Very Light Gray for rows
-    BORDER: '#E5E7EB'        // Light Gray Border
+    BG_HEADER: '#065F46',    // Deep Teal
+    BG_ROW_GRAY: '#F9FAFB',  // Very Light Gray
+    BORDER: '#E5E7EB',       // Light Gray Border
+    WARNING_BG: '#FFF7ED',   // Orange/Yellow Tint for Disclaimer
+    WARNING_TEXT: '#9A3412'  // Dark Orange for Disclaimer Text
 };
 
 // --- HELPERS ---
@@ -29,20 +31,20 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pageWidth = doc.internal.pageSize.width; // 210mm
     const pageHeight = doc.internal.pageSize.height; // 297mm
-    const margin = 20; // Enterprise standard margin
+    const margin = 20;
     const contentWidth = pageWidth - (margin * 2);
 
     let currentY = 20;
 
     // --- REUSABLE COMPONENTS ---
     const addHeaderFooter = (pageNumber: number, totalPages: number) => {
-        // Header (Small Logo/Brand)
+        // Header
         doc.setFillColor(COLORS.PRIMARY);
-        doc.rect(0, 0, pageWidth, 2, 'F'); // Top colored strip
+        doc.rect(0, 0, pageWidth, 2, 'F');
 
         doc.setFontSize(8);
         doc.setTextColor(COLORS.LIGHT_TEXT);
-        doc.text('JVS Facilities - Proposta Comercial', margin, 10);
+        doc.text(`Simulação #${resultado.id || 'N/A'} - JVS Facilities`, margin, 10);
 
         doc.setTextColor(COLORS.LIGHT_TEXT);
         doc.text(new Date().toLocaleDateString('pt-BR'), pageWidth - margin, 10, { align: 'right' });
@@ -59,11 +61,10 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.text(`Página ${pageNumber} de ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
     };
 
-    // --- TEXT LAYOUT HELPERS ---
     const checkSpace = (heightNeeded: number) => {
         if (currentY + heightNeeded > pageHeight - 20) {
             doc.addPage();
-            currentY = 25; // Header space
+            currentY = 25;
             return true;
         }
         return false;
@@ -73,7 +74,6 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         checkSpace(20);
         currentY += 5;
 
-        // Green Vertical Bar
         doc.setFillColor(COLORS.PRIMARY);
         doc.rect(margin, currentY, 1.5, 6, 'F');
 
@@ -112,7 +112,6 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.setFontSize(10);
         doc.setTextColor(COLORS.TEXT);
 
-        // Bullet point
         const bulletPrefix = '•';
         const indent = 5;
         const textWidth = contentWidth - indent;
@@ -129,30 +128,28 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
 
     // ==========================================
-    // 1. COVER PAGE (System Style)
+    // 1. COVER PAGE
     // ==========================================
-    // Dark Background like Hero Section
     doc.setFillColor(COLORS.DARK);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    // Abstract Green Shapes (Branding)
+    // Artwork
     doc.setFillColor(COLORS.PRIMARY);
-    doc.circle(pageWidth, 0, 80, 'F'); // Top Right
-
+    doc.circle(pageWidth, 0, 80, 'F');
     doc.setFillColor(COLORS.SECONDARY);
-    doc.circle(0, pageHeight, 100, 'F'); // Bottom Left (Darker)
+    doc.circle(0, pageHeight, 100, 'F');
 
-    // Content Box (White Glassmorphism-ish)
+    // Box
     doc.setFillColor('#FFFFFF');
-    doc.roundedRect(margin, 80, pageWidth - (margin * 2), 120, 2, 2, 'F');
+    doc.roundedRect(margin, 70, pageWidth - (margin * 2), 150, 2, 2, 'F');
 
-    let coverY = 110;
+    let coverY = 100;
 
-    // Title
+    // "Tagline" changed to Simulation
     doc.setFont(FONTS.TITLE, 'bold');
     doc.setFontSize(10);
-    doc.setTextColor(COLORS.PRIMARY);
-    doc.text('DOCUMENTO OFICIAL', pageWidth / 2, coverY - 15, { align: 'center' });
+    doc.setTextColor(COLORS.LIGHT_TEXT);
+    doc.text('SIMULAÇÃO PRELIMINAR', pageWidth / 2, coverY - 15, { align: 'center' });
 
     doc.setFontSize(36);
     doc.setTextColor(COLORS.DARK);
@@ -160,31 +157,42 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     doc.text('COMERCIAL', pageWidth / 2, coverY + 12, { align: 'center' });
 
     coverY += 30;
-    // Divider
     doc.setDrawColor(COLORS.BORDER);
     doc.line(pageWidth / 2 - 20, coverY, pageWidth / 2 + 20, coverY);
 
     coverY += 20;
-    doc.setFontSize(12);
+    doc.setFontSize(10);
     doc.setTextColor(COLORS.LIGHT_TEXT);
-    doc.text('Preparado para:', pageWidth / 2, coverY, { align: 'center' });
+    doc.text('PREPARADO PARA:', pageWidth / 2, coverY, { align: 'center' });
 
-    coverY += 8;
-    doc.setFontSize(18);
+    coverY += 6;
+    doc.setFontSize(16);
     doc.setTextColor(COLORS.SECONDARY);
     doc.text((client.empresa || client.nome).toUpperCase(), pageWidth / 2, coverY, { align: 'center' });
 
-    coverY += 40;
+    coverY += 15;
+
+    // New Contact Info Block
+    doc.setFontSize(10);
+    doc.setTextColor(COLORS.TEXT);
+    doc.text(`A/C: ${client.nome}`, pageWidth / 2, coverY, { align: 'center' });
+
+    const contactInfo = [client.email, client.whatsapp].filter(Boolean).join('  |  ');
+    doc.text(contactInfo, pageWidth / 2, coverY + 5, { align: 'center' });
+
+    coverY += 25;
+    // Sim ID and Date
     doc.setFontSize(9);
     doc.setTextColor(COLORS.LIGHT_TEXT);
-    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth / 2, coverY, { align: 'center' });
+    doc.text(`Simulação Nº: ${resultado.id || 'Nova'}`, pageWidth / 2, coverY, { align: 'center' });
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth / 2, coverY + 5, { align: 'center' });
 
 
     // ==========================================
     // 2. INTERNAL PAGES
     // ==========================================
     doc.addPage();
-    currentY = 25; // Adjusted for Header
+    currentY = 25;
 
     // --- RESUMO EXECUTIVO ---
     addSectionTitle('Resumo Executivo');
@@ -214,12 +222,11 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     currentY += 5;
 
     // ==========================================
-    // 3. FINANCEIRO (FULL WIDTH & OPTIMIZED)
+    // 3. FINANCEIRO
     // ==========================================
     checkSpace(60);
     addSectionTitle('Proposta Financeira', 'Dimensionamento e Investimento Mensal Estimado.');
 
-    // --- Summary Table ---
     const summaryData = resultado.servicos.map(item => [
         item.config.funcao + (item.config.cargo ? ` - ${item.config.cargo}` : ''),
         item.config.quantidade,
@@ -246,24 +253,20 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
             cellPadding: 3
         },
         columnStyles: {
-            0: { cellWidth: 'auto' }, // Fluid width for Name
-            3: { halign: 'right', fontStyle: 'bold', cellWidth: 40 } // Fixed width for Price
+            0: { cellWidth: 'auto' },
+            3: { halign: 'right', fontStyle: 'bold', cellWidth: 40 }
         },
-        margin: { left: margin, right: margin }, // Full Width
+        margin: { left: margin, right: margin },
         tableWidth: 'auto'
     });
 
     // @ts-ignore
     currentY = doc.lastAutoTable.finalY + 15;
 
-
-    // --- Detailed COST Breakdown (Opened) ---
-    // Full width to match styles
-
+    // Detailed Tables
     resultado.servicos.forEach((item, index) => {
-        checkSpace(80); // Ensure space for header + some rows
+        checkSpace(80);
 
-        // Subheader
         doc.setFontSize(11);
         doc.setFont(FONTS.TITLE, 'bold');
         doc.setTextColor(COLORS.SECONDARY);
@@ -273,7 +276,6 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         const det = item.detalhamento;
 
         const bodyRows = [
-            // Section A
             [{ content: "A. MÃO DE OBRA DIRETA", colSpan: 2, styles: { fillColor: COLORS.BG_ROW_GRAY, fontStyle: 'bold' } }],
             ['Salário Base / Piso', formatCurrency(det.salarioBase)],
             ['Gratificações / Função', formatCurrency(det.gratificacoes || 0)],
@@ -281,21 +283,17 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
             ['Encargos Sociais (Subtotal)', formatCurrency(det.encargos)],
             ['Provisões (Férias, 13º, Rescisão)', formatCurrency(det.provisoes.total)],
 
-            // Section B
             [{ content: "B. BENEFÍCIOS", colSpan: 2, styles: { fillColor: COLORS.BG_ROW_GRAY, fontStyle: 'bold' } }],
             ['Total Benefícios (VR, VT, Cesta, etc.)', formatCurrency(det.beneficios.total)],
 
-            // Section C
             [{ content: "C. INSUMOS E OPERACIONAIS", colSpan: 2, styles: { fillColor: COLORS.BG_ROW_GRAY, fontStyle: 'bold' } }],
             ['Materiais / Equipamentos', formatCurrency(det.insumos)],
             ['Custos Operacionais (Exames / EPIs)', formatCurrency(det.custosOperacionais.total)],
 
-            // Section D
             [{ content: "D. TRIBUTOS E MARGEM", colSpan: 2, styles: { fillColor: COLORS.BG_ROW_GRAY, fontStyle: 'bold' } }],
             ['Tributos Indiretos', formatCurrency(det.tributos)],
             ['Margem / Lucro Estimado', formatCurrency(det.lucro)],
 
-            // Final Row
             [{ content: 'VALOR MENSAL UNITÁRIO', styles: { fontStyle: 'bold', fillColor: COLORS.SECONDARY, textColor: '#FFFFFF' } as any }, { content: formatCurrency(item.custoUnitario), styles: { fontStyle: 'bold', fillColor: COLORS.SECONDARY, textColor: '#FFFFFF', halign: 'right' } as any }]
         ];
 
@@ -320,7 +318,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
                 0: { cellWidth: 'auto' },
                 1: { halign: 'right', cellWidth: 50 }
             },
-            margin: { left: margin, right: margin }, // FULL WIDTH
+            margin: { left: margin, right: margin },
             tableWidth: 'auto'
         });
 
@@ -335,7 +333,6 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     // --- DIFERENCIAIS ---
     addSectionTitle('Nossos Diferenciais');
-
     addParagraph('Abordagem Estratégica e Personalizada', 11, true);
     addParagraph('Entendemos o cenário de cada cliente e estruturamos a operação com uma abordagem personalizada, focada em eficiência, previsibilidade e alinhamento com os objetivos do contrato.');
     currentY += 4;
@@ -356,7 +353,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
 
     // ==========================================
-    // 5. BACK COVER
+    // 5. BACK COVER (Disclaimer + Thanks)
     // ==========================================
     doc.addPage();
     doc.setFillColor(COLORS.DARK);
@@ -365,22 +362,43 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     const centerX = pageWidth / 2;
     const centerY = pageHeight / 2;
 
-    // Decoration
+    // --- DISCLAIMER (Important) ---
+    // Yellow box
+    doc.setFillColor(COLORS.WARNING_BG);
+    doc.roundedRect(margin, centerY - 80, pageWidth - (margin * 2), 40, 2, 2, 'F');
+
+    doc.setFont(FONTS.TITLE, 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(COLORS.WARNING_TEXT);
+    doc.text('AVISO IMPORTANTE', centerX, centerY - 70, { align: 'center' });
+
+    doc.setFont(FONTS.BODY, 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(COLORS.WARNING_TEXT);
+    const disclaimerText = [
+        'Este documento trata-se de uma PROPOSTA DE SIMULAÇÃO DE CUSTOS prévia.',
+        'Caso haja interesse em formalizar o contrato, o solicitante deve entrar em contato',
+        'conosco para revisão técnica do escopo, oficialização da proposta e elaboração da minuta contratual.'
+    ];
+    doc.text(disclaimerText, centerX, centerY - 60, { align: 'center', lineHeightFactor: 1.5 });
+
+
+    // --- THANKS ---
     doc.setDrawColor(COLORS.PRIMARY);
     doc.setLineWidth(2);
-    doc.circle(centerX, centerY - 25, 60, 'S');
+    doc.circle(centerX, centerY + 10, 60, 'S');
 
     doc.setFont(FONTS.TITLE, 'bold');
     doc.setFontSize(32);
     doc.setTextColor(COLORS.PRIMARY);
-    doc.text('OBRIGADO!', centerX, centerY - 20, { align: 'center' });
+    doc.text('OBRIGADO!', centerX, centerY + 15, { align: 'center' });
 
     doc.setFontSize(12);
     doc.setTextColor('#E5E7EB');
-    doc.text('Agradecemos a oportunidade.', centerX, centerY + 5, { align: 'center' });
+    doc.text('Estamos à disposição para iniciarmos esta parceria.', centerX, centerY + 40, { align: 'center' });
 
     // Contacts
-    const contactY = centerY + 40;
+    const contactY = centerY + 70;
     doc.setTextColor('#FFFFFF');
     doc.setFontSize(11);
     doc.text('Av. Maringá, 1273 - Pinhais - PR', centerX, contactY, { align: 'center' });
@@ -391,16 +409,16 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
 
     // ==========================================
-    // 6. APPLY HEADER/FOOTER TO ALL PAGES
+    // 6. APPLY HEADER/FOOTER
     // ==========================================
     const totalPages = doc.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
         doc.setPage(i);
-        if (i > 1 && i < totalPages) { // Internal pages only (Skip Cover and Back)
+        if (i > 1 && i < totalPages) {
             addHeaderFooter(i, totalPages);
         }
     }
 
     // Save
-    doc.save(`Proposta_JVS_Facilities_${client.empresa.replace(/\s+/g, '_')}.pdf`);
+    doc.save(`Proposta_JVS_Facilities_${client.empresa.replace(/\s+/g, '_')}_${resultado.id || 'Sim'}.pdf`);
 };
