@@ -2,7 +2,7 @@
 
 import { useSimulador } from '@/context/SimuladorContext';
 import { ServicoTipo } from '@/types/simulador';
-import { Briefcase, Shield, User, Building, Wrench, Flower2 } from 'lucide-react'; // Example icons
+import { Briefcase, Shield, User, Building, Wrench, Flower2, ChefHat } from 'lucide-react'; // Example icons
 import clsx from 'clsx';
 
 const SERVICES: { id: ServicoTipo; label: string; icon: any }[] = [
@@ -12,6 +12,7 @@ const SERVICES: { id: ServicoTipo; label: string; icon: any }[] = [
     { id: 'SEGURANCA', label: 'Segurança Patrimonial', icon: Shield },
     { id: 'MANUTENCAO', label: 'Manutenção Predial', icon: Wrench },
     { id: 'JARDINAGEM', label: 'Jardinagem', icon: Flower2 },
+    { id: 'COZINHA', label: 'Cozinha', icon: ChefHat },
 ];
 
 export default function SelecaoServicos() {

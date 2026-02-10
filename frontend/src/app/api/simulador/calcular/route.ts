@@ -238,7 +238,8 @@ function getValores(params?: ParametrosCustos) {
             limpeza: 1900.00,
             seguranca: 2100.00,
             recepcao: 1750.00,
-            jardinagem: 1800.00
+            jardinagem: 1800.00,
+            cozinha: 1800.00
         },
         CUSTOS_OPS: { examesMedicos: 0, uniformeEpis: 0 },
         ADICIONAIS_CONFIG: { insalubridade: false, grauInsalubridade: 0.20, baseInsalubridade: 'SALARIO_MINIMO' as 'SALARIO_MINIMO' | 'SALARIO_BASE' }

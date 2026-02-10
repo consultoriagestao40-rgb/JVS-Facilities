@@ -6,7 +6,7 @@ export type UserData = {
     whatsapp: string;
 };
 
-export type ServicoTipo = 'LIMPEZA' | 'PORTARIA' | 'RECEPCAO' | 'SEGURANCA' | 'JARDINAGEM' | 'MANUTENCAO';
+export type ServicoTipo = 'LIMPEZA' | 'PORTARIA' | 'RECEPCAO' | 'SEGURANCA' | 'JARDINAGEM' | 'MANUTENCAO' | 'COZINHA';
 
 export type ServicoSelecionado = {
     id: ServicoTipo;

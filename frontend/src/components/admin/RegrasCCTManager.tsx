@@ -492,6 +492,7 @@ export default function RegrasCCTManager() {
                                     <option value="JARDINAGEM">Jardinagem</option>
                                     <option value="SEGURANCA">Segurança</option>
                                     <option value="MANUTENCAO">Manutenção</option>
+                                    <option value="COZINHA">Cozinha</option>
                                 </select>
                             </div>
                             <div>
