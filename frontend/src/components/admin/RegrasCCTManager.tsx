@@ -62,6 +62,7 @@ export default function RegrasCCTManager() {
     const [searchTerm, setSearchTerm] = useState('');
     const [previewItem, setPreviewItem] = useState<ItemResultado | null>(null);
     const [editingCargoIndex, setEditingCargoIndex] = useState<number | null>(null);
+    const [newCargoState, setNewCargoState] = useState({ nome: '', piso: '', gratificacao: '', copa: '' });
 
     const handleSimulateExtract = () => {
         // Construct a mock ItemResultado based on current rule values
@@ -746,7 +747,8 @@ export default function RegrasCCTManager() {
                                     <div className="flex-[2]">
                                         <label className="text-sm font-semibold text-gray-600 mb-1 block">Nome do Cargo</label>
                                         <input
-                                            id="newCargoName"
+                                            value={newCargoState.nome}
+                                            onChange={e => setNewCargoState({ ...newCargoState, nome: e.target.value })}
                                             type="text"
                                             placeholder="Ex: Zelador Líder"
                                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
@@ -755,7 +757,8 @@ export default function RegrasCCTManager() {
                                     <div className="flex-1">
                                         <label className="text-sm font-semibold text-gray-600 mb-1 block">Piso Salarial (R$)</label>
                                         <input
-                                            id="newCargoPiso"
+                                            value={newCargoState.piso}
+                                            onChange={e => setNewCargoState({ ...newCargoState, piso: e.target.value })}
                                             type="number"
                                             placeholder="0.00"
                                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
@@ -764,7 +767,8 @@ export default function RegrasCCTManager() {
                                     <div className="flex-1">
                                         <label className="text-sm font-semibold text-gray-600 mb-1 block">Gratificação (R$)</label>
                                         <input
-                                            id="newCargoGratificacao"
+                                            value={newCargoState.gratificacao}
+                                            onChange={e => setNewCargoState({ ...newCargoState, gratificacao: e.target.value })}
                                             type="number"
                                             placeholder="0.00"
                                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
@@ -773,7 +777,8 @@ export default function RegrasCCTManager() {
                                     <div className="flex-1">
                                         <label className="text-sm font-semibold text-gray-600 mb-1 block">Adicional Copa (R$)</label>
                                         <input
-                                            id="newCargoCopa"
+                                            value={newCargoState.copa}
+                                            onChange={e => setNewCargoState({ ...newCargoState, copa: e.target.value })}
                                             type="number"
                                             placeholder="0.00"
                                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
@@ -783,15 +788,10 @@ export default function RegrasCCTManager() {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                const nameInput = document.getElementById('newCargoName') as HTMLInputElement;
-                                                const pisoInput = document.getElementById('newCargoPiso') as HTMLInputElement;
-                                                const gratInput = document.getElementById('newCargoGratificacao') as HTMLInputElement;
-                                                const copaInput = document.getElementById('newCargoCopa') as HTMLInputElement;
-
-                                                const nome = nameInput.value;
-                                                const piso = parseFloat(pisoInput.value);
-                                                const gratificacao = parseFloat(gratInput.value) || 0;
-                                                const adicionalCopa = parseFloat(copaInput.value) || 0;
+                                                const nome = newCargoState.nome;
+                                                const piso = parseFloat(newCargoState.piso);
+                                                const gratificacao = parseFloat(newCargoState.gratificacao) || 0;
+                                                const adicionalCopa = parseFloat(newCargoState.copa) || 0;
 
                                                 if (nome && piso) {
                                                     const newCargoObj = { nome, piso, gratificacao, adicionalCopa };
@@ -809,14 +809,11 @@ export default function RegrasCCTManager() {
                                                     }
 
                                                     // Clear inputs
-                                                    nameInput.value = '';
-                                                    pisoInput.value = '';
-                                                    gratInput.value = '';
-                                                    copaInput.value = '';
+                                                    setNewCargoState({ nome: '', piso: '', gratificacao: '', copa: '' });
                                                 }
                                             }}
                                             className={clsx(
-                                                "px-6 py-3 rounded-lg font-bold shadow transition-all h-[50px] flex items-center flex-1 justify-center",
+                                                "px-6 py-3 rounded-lg font-bold shadow transition-all h-[50px] flex items-center flex-1 justify-center whitespace-nowrap",
                                                 editingCargoIndex !== null ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"
                                             )}
                                         >
@@ -828,12 +825,9 @@ export default function RegrasCCTManager() {
                                                 type="button"
                                                 onClick={() => {
                                                     setEditingCargoIndex(null);
-                                                    (document.getElementById('newCargoName') as HTMLInputElement).value = '';
-                                                    (document.getElementById('newCargoPiso') as HTMLInputElement).value = '';
-                                                    (document.getElementById('newCargoGratificacao') as HTMLInputElement).value = '';
-                                                    (document.getElementById('newCargoCopa') as HTMLInputElement).value = '';
+                                                    setNewCargoState({ nome: '', piso: '', gratificacao: '', copa: '' });
                                                 }}
-                                                className="px-4 py-3 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 font-bold h-[50px] flex items-center"
+                                                className="px-4 py-3 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 font-bold h-[50px] flex items-center justify-center"
                                             >
                                                 <X className="w-5 h-5" />
                                             </button>
@@ -863,33 +857,39 @@ export default function RegrasCCTManager() {
                                                 <td className="p-4 font-mono text-green-700 font-bold">R$ {c.piso.toFixed(2)}</td>
                                                 <td className="p-4 font-mono text-gray-600">{c.gratificacao ? `R$ ${c.gratificacao.toFixed(2)}` : '-'}</td>
                                                 <td className="p-4 font-mono text-gray-600">{c.adicionalCopa ? `R$ ${c.adicionalCopa.toFixed(2)}` : '-'}</td>
-                                                <td className="p-4 text-center space-x-2">
-                                                    <button
-                                                        onClick={() => {
-                                                            setEditingCargoIndex(idx);
-                                                            // Populate inputs
-                                                            (document.getElementById('newCargoName') as HTMLInputElement).value = c.nome;
-                                                            (document.getElementById('newCargoPiso') as HTMLInputElement).value = String(c.piso);
-                                                            (document.getElementById('newCargoGratificacao') as HTMLInputElement).value = String(c.gratificacao || '');
-                                                            (document.getElementById('newCargoCopa') as HTMLInputElement).value = String(c.adicionalCopa || '');
-                                                        }}
-                                                        className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-2 rounded-full transition-all"
-                                                        title="Editar Cargo"
-                                                    >
-                                                        <Edit className="w-5 h-5" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            const newCargos = [...(currentRegra.cargos || [])];
-                                                            newCargos.splice(idx, 1);
-                                                            setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
-                                                            if (editingCargoIndex === idx) setEditingCargoIndex(null);
-                                                        }}
-                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-all"
-                                                        title="Remover Cargo"
-                                                    >
-                                                        <Trash className="w-5 h-5" />
-                                                    </button>
+                                                <td className="p-4 text-center">
+                                                    <div className="flex justify-center items-center gap-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditingCargoIndex(idx);
+                                                                setNewCargoState({
+                                                                    nome: c.nome,
+                                                                    piso: String(c.piso),
+                                                                    gratificacao: String(c.gratificacao || ''),
+                                                                    copa: String(c.adicionalCopa || '')
+                                                                });
+                                                            }}
+                                                            className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-2 rounded-full transition-all"
+                                                            title="Editar Cargo"
+                                                        >
+                                                            <Edit className="w-5 h-5" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                const newCargos = [...(currentRegra.cargos || [])];
+                                                                newCargos.splice(idx, 1);
+                                                                setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
+                                                                if (editingCargoIndex === idx) {
+                                                                    setEditingCargoIndex(null);
+                                                                    setNewCargoState({ nome: '', piso: '', gratificacao: '', copa: '' });
+                                                                }
+                                                            }}
+                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-all"
+                                                            title="Remover Cargo"
+                                                        >
+                                                            <Trash className="w-5 h-5" />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
