@@ -348,7 +348,7 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     let insalubridade = 0, periculosidade = 0, noturno = 0, intrajornada = 0, dsr = 0;
 
     if (config.adicionais?.insalubridade) {
-        const baseIns = valores.ADICIONAIS_CONFIG.baseInsalubridade === 'SALARIO_BASE' ? salarioBase : 1412;
+        const baseIns = valores.ADICIONAIS_CONFIG.baseInsalubridade === 'SALARIO_BASE' ? salarioBase : valores.VALORES_BASE.SALARIO_MINIMO;
         // User selection (config) takes precedence over Rule Default (valores)
         const degree = config.grauInsalubridade || valores.ADICIONAIS_CONFIG.grauInsalubridade || 0.20;
         insalubridade = baseIns * degree;
