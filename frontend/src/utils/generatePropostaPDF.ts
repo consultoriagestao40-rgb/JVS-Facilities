@@ -71,8 +71,8 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     };
 
     const addSectionTitle = (title: string, subtitle?: string) => {
-        checkSpace(20);
-        currentY += 5;
+        checkSpace(25); // More space check
+        currentY += 10; // Extra breathing room before title
 
         doc.setFillColor(COLORS.PRIMARY);
         doc.rect(margin, currentY, 1.5, 6, 'F');
@@ -82,14 +82,14 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.setTextColor(COLORS.SECONDARY);
         doc.text(title.toUpperCase(), margin + 4, currentY + 4.5);
 
-        currentY += 8;
+        currentY += 12; // Increased from 8 to 12 for better separation from content
 
         if (subtitle) {
             doc.setFont(FONTS.BODY, 'normal');
             doc.setFontSize(10);
             doc.setTextColor(COLORS.LIGHT_TEXT);
             doc.text(subtitle, margin, currentY);
-            currentY += 6;
+            currentY += 8; // Increased from 6
         }
     };
 
@@ -99,7 +99,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.setTextColor(COLORS.TEXT);
 
         const lines = doc.splitTextToSize(text, contentWidth);
-        const heightNeeded = (lines.length * 5) + 2;
+        const heightNeeded = (lines.length * 5) + 4; // Increased spacing
 
         checkSpace(heightNeeded);
 
@@ -117,7 +117,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         const textWidth = contentWidth - indent;
 
         const lines = doc.splitTextToSize(text, textWidth);
-        const heightNeeded = (lines.length * 5) + 1;
+        const heightNeeded = (lines.length * 5) + 3; // Increased spacing
 
         checkSpace(heightNeeded);
 
@@ -172,7 +172,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     coverY += 15;
 
-    // New Contact Info Block
+    // Contact Info Block
     doc.setFontSize(10);
     doc.setTextColor(COLORS.TEXT);
     doc.text(`A/C: ${client.nome}`, pageWidth / 2, coverY, { align: 'center' });
@@ -198,28 +198,28 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     addSectionTitle('Resumo Executivo');
     addParagraph('Somos uma empresa com mais de 30 anos de atuação em Facilities, especializada em terceirização e execução de serviços de limpeza profissional e similares.');
     addParagraph('Atendemos operações que exigem padronização, confiabilidade e continuidade, com foco em eficiência e segurança no dia a dia. Nossa entrega combina equipe dimensionada conforme a necessidade, gestão próxima e processos em evolução contínua, garantindo qualidade percebida e previsibilidade para o cliente.');
-    currentY += 5;
+    currentY += 5; // Extra separation
 
     // --- QUEM SOMOS ---
     addSectionTitle('Quem Somos');
     addParagraph('Há mais de 30 anos no mercado de Facilities, atuamos com excelência na terceirização e na execução de serviços de limpeza profissional e soluções correlatas. Nosso foco é garantir continuidade operacional, padronização e tranquilidade na gestão, para que o cliente concentre energia no seu core business.');
-    currentY += 2;
+    currentY += 4;
     addBullet('30 anos de experiência em terceirização de equipes;');
     addBullet('Execução de tratamento de pisos em mais de 500.000m²;');
     addBullet('Mais de 100.000m² de limpeza em altura efetuada;');
     addBullet('Cultura de desenvolvimento voltada às pessoas e à qualidade;');
     addBullet('Dimensionamento personalizado conforme a necessidade de cada operação.');
-    currentY += 5;
+    currentY += 8; // Section break
 
     // --- PRINCIPAIS SERVIÇOS ---
     addSectionTitle('Principais Serviços Prestados');
     addParagraph('Terceirização de Serviços de Facilities', 11, true);
     addParagraph('Atuamos na gestão e execução de rotinas essenciais — como limpeza, manutenção e segurança — garantindo um ambiente organizado, seguro e eficiente. Assumimos a operação com responsabilidade e padronização, reduzindo falhas e aumentando a previsibilidade do serviço.');
-    currentY += 3;
+    currentY += 5;
 
     addParagraph('Limpeza em Altura', 11, true);
     addParagraph('Serviço especializado para áreas de difícil acesso (fachadas, janelas externas e estruturas elevadas), com uso de equipamentos adequados e técnicas seguras. Entregamos limpeza com precisão, segurança e qualidade visual, preservando a estética do patrimônio e mitigando riscos operacionais.');
-    currentY += 5;
+    currentY += 8;
 
     // ==========================================
     // 3. FINANCEIRO
@@ -261,7 +261,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     });
 
     // @ts-ignore
-    currentY = doc.lastAutoTable.finalY + 15;
+    currentY = doc.lastAutoTable.finalY + 20;
 
     // Detailed Tables
     resultado.servicos.forEach((item, index) => {
@@ -271,7 +271,7 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.setFont(FONTS.TITLE, 'bold');
         doc.setTextColor(COLORS.SECONDARY);
         doc.text(`Detalhamento: ${item.config.funcao} (${item.config.quantidade}x)`, margin, currentY);
-        currentY += 6;
+        currentY += 8; // More space before table matches title
 
         const det = item.detalhamento;
 
@@ -335,15 +335,15 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     addSectionTitle('Nossos Diferenciais');
     addParagraph('Abordagem Estratégica e Personalizada', 11, true);
     addParagraph('Entendemos o cenário de cada cliente e estruturamos a operação com uma abordagem personalizada, focada em eficiência, previsibilidade e alinhamento com os objetivos do contrato.');
-    currentY += 4;
+    currentY += 6;
 
     addParagraph('Experiência', 11, true);
     addParagraph('Nosso time é composto por gestores experientes em Facilities, do setor de operações à diretoria, com mais de 20 anos de atuação contínua no mercado de prestação de serviços.');
-    currentY += 4;
+    currentY += 6;
 
     addParagraph('Padronização de Processos e Indicadores', 11, true);
     addParagraph('Aprimoramos continuamente nossos processos internos e evoluímos junto à tecnologia para aumentar controle, gestão e desempenho. Isso nos permite acompanhar metas, indicadores e resultados com consistência, garantindo qualidade e transparência ao cliente.');
-    currentY += 5;
+    currentY += 6;
 
     // --- CONDIÇÕES ---
     addSectionTitle('Condições Comerciais');
@@ -384,21 +384,19 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
 
     // --- THANKS ---
-    doc.setDrawColor(COLORS.PRIMARY);
-    doc.setLineWidth(2);
-    doc.circle(centerX, centerY + 10, 60, 'S');
+    // CIRCLE REMOVED HERE AS REQUESTED
 
     doc.setFont(FONTS.TITLE, 'bold');
     doc.setFontSize(32);
     doc.setTextColor(COLORS.PRIMARY);
-    doc.text('OBRIGADO!', centerX, centerY + 15, { align: 'center' });
+    doc.text('OBRIGADO!', centerX, centerY + 10, { align: 'center' }); // Moved up slightly
 
     doc.setFontSize(12);
     doc.setTextColor('#E5E7EB');
-    doc.text('Estamos à disposição para iniciarmos esta parceria.', centerX, centerY + 40, { align: 'center' });
+    doc.text('Estamos à disposição para iniciarmos esta parceria.', centerX, centerY + 30, { align: 'center' });
 
     // Contacts
-    const contactY = centerY + 70;
+    const contactY = centerY + 60;
     doc.setTextColor('#FFFFFF');
     doc.setFontSize(11);
     doc.text('Av. Maringá, 1273 - Pinhais - PR', centerX, contactY, { align: 'center' });
