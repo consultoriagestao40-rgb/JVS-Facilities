@@ -9,13 +9,15 @@ const FONTS = {
 };
 
 const COLORS = {
-    PRIMARY: '#10B981',      // JVS Green
-    DARK_GREEN: '#064E3B',   // Darker Green for Text/Headers
+    PRIMARY: '#10B981',      // JVS Emerald (System Brand)
+    SECONDARY: '#064E3B',    // Dark Emerald (Text/Headers)
+    ACCENT: '#34D399',       // Light Emerald
     DARK: '#111827',         // Slate 900
     TEXT: '#374151',         // Slate 700
     LIGHT_TEXT: '#6B7280',   // Slate 500
     BG_HEADER: '#065F46',    // Deep Teal for Table Headers
-    BG_ROW_GRAY: '#F3F4F6'   // Light Gray for rows
+    BG_ROW_GRAY: '#F9FAFB',  // Very Light Gray for rows
+    BORDER: '#E5E7EB'        // Light Gray Border
 };
 
 // --- HELPERS ---
@@ -32,22 +34,63 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     let currentY = 20;
 
-    // --- HELPER: TEXT LAYOUT ---
-    const addSectionTitle = (title: string, marginTop = 10) => {
-        if (currentY > pageHeight - 40) { doc.addPage(); currentY = 20; }
+    // --- REUSABLE COMPONENTS ---
+    const addHeaderFooter = (pageNumber: number, totalPages: number) => {
+        // Header (Small Logo/Brand)
+        doc.setFillColor(COLORS.PRIMARY);
+        doc.rect(0, 0, pageWidth, 2, 'F'); // Top colored strip
 
-        currentY += marginTop;
+        doc.setFontSize(8);
+        doc.setTextColor(COLORS.LIGHT_TEXT);
+        doc.text('JVS Facilities - Proposta Comercial', margin, 10);
+
+        doc.setTextColor(COLORS.LIGHT_TEXT);
+        doc.text(new Date().toLocaleDateString('pt-BR'), pageWidth - margin, 10, { align: 'right' });
+
+        // Footer
+        const footerY = pageHeight - 10;
+        doc.setDrawColor(COLORS.BORDER);
+        doc.setLineWidth(0.1);
+        doc.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
+
+        doc.setFontSize(8);
+        doc.setTextColor(COLORS.LIGHT_TEXT);
+        doc.text('www.grupojvsserv.com.br', margin, footerY);
+        doc.text(`Página ${pageNumber} de ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
+    };
+
+    // --- TEXT LAYOUT HELPERS ---
+    const checkSpace = (heightNeeded: number) => {
+        if (currentY + heightNeeded > pageHeight - 20) {
+            doc.addPage();
+            currentY = 25; // Header space
+            return true;
+        }
+        return false;
+    };
+
+    const addSectionTitle = (title: string, subtitle?: string) => {
+        checkSpace(20);
+        currentY += 5;
+
+        // Green Vertical Bar
+        doc.setFillColor(COLORS.PRIMARY);
+        doc.rect(margin, currentY, 1.5, 6, 'F');
+
         doc.setFont(FONTS.TITLE, 'bold');
         doc.setFontSize(14);
-        doc.setTextColor(COLORS.DARK_GREEN);
-        doc.text(title.toUpperCase(), margin, currentY);
+        doc.setTextColor(COLORS.SECONDARY);
+        doc.text(title.toUpperCase(), margin + 4, currentY + 4.5);
 
-        // Underline
-        doc.setDrawColor(COLORS.PRIMARY);
-        doc.setLineWidth(0.5);
-        doc.line(margin, currentY + 2, margin + 20, currentY + 2); // Short underline
+        currentY += 8;
 
-        currentY += 10;
+        if (subtitle) {
+            doc.setFont(FONTS.BODY, 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(COLORS.LIGHT_TEXT);
+            doc.text(subtitle, margin, currentY);
+            currentY += 6;
+        }
     };
 
     const addParagraph = (text: string, fontSize = 10, isBold = false) => {
@@ -56,11 +99,12 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.setTextColor(COLORS.TEXT);
 
         const lines = doc.splitTextToSize(text, contentWidth);
+        const heightNeeded = (lines.length * 5) + 2;
 
-        if (currentY + (lines.length * 5) > pageHeight - 20) { doc.addPage(); currentY = 20; }
+        checkSpace(heightNeeded);
 
         doc.text(lines, margin, currentY);
-        currentY += (lines.length * 5) + 2;
+        currentY += heightNeeded;
     };
 
     const addBullet = (text: string) => {
@@ -68,99 +112,114 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         doc.setFontSize(10);
         doc.setTextColor(COLORS.TEXT);
 
-        const lines = doc.splitTextToSize(`• ${text}`, contentWidth);
+        // Bullet point
+        const bulletPrefix = '•';
+        const indent = 5;
+        const textWidth = contentWidth - indent;
 
-        if (currentY + (lines.length * 5) > pageHeight - 20) { doc.addPage(); currentY = 20; }
+        const lines = doc.splitTextToSize(text, textWidth);
+        const heightNeeded = (lines.length * 5) + 1;
 
-        doc.text(lines, margin, currentY);
-        currentY += (lines.length * 5) + 1;
+        checkSpace(heightNeeded);
+
+        doc.text(bulletPrefix, margin, currentY);
+        doc.text(lines, margin + indent, currentY);
+        currentY += heightNeeded;
     };
 
+
     // ==========================================
-    // 1. COVER PAGE
+    // 1. COVER PAGE (System Style)
     // ==========================================
-    // Clean, White Background with Logo area
-    doc.setFillColor('#FFFFFF');
+    // Dark Background like Hero Section
+    doc.setFillColor(COLORS.DARK);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    // Top Bar
-    doc.setFillColor(COLORS.DARK_GREEN);
-    doc.rect(0, 0, pageWidth, 5, 'F');
+    // Abstract Green Shapes (Branding)
+    doc.setFillColor(COLORS.PRIMARY);
+    doc.circle(pageWidth, 0, 80, 'F'); // Top Right
 
-    // Content Vertical Center approx
-    let coverY = 80;
+    doc.setFillColor(COLORS.SECONDARY);
+    doc.circle(0, pageHeight, 100, 'F'); // Bottom Left (Darker)
 
+    // Content Box (White Glassmorphism-ish)
+    doc.setFillColor('#FFFFFF');
+    doc.roundedRect(margin, 80, pageWidth - (margin * 2), 120, 2, 2, 'F');
+
+    let coverY = 110;
+
+    // Title
     doc.setFont(FONTS.TITLE, 'bold');
-    doc.setFontSize(36);
-    doc.setTextColor(COLORS.DARK_GREEN);
-    doc.text('PROPOSTA', margin, coverY);
+    doc.setFontSize(10);
     doc.setTextColor(COLORS.PRIMARY);
-    doc.text('COMERCIAL', margin, coverY + 15);
+    doc.text('DOCUMENTO OFICIAL', pageWidth / 2, coverY - 15, { align: 'center' });
 
-    coverY += 40;
-    doc.setDrawColor(COLORS.TEXT);
-    doc.setLineWidth(0.5);
-    doc.line(margin, coverY, pageWidth - margin, coverY);
+    doc.setFontSize(36);
+    doc.setTextColor(COLORS.DARK);
+    doc.text('PROPOSTA', pageWidth / 2, coverY, { align: 'center' });
+    doc.text('COMERCIAL', pageWidth / 2, coverY + 12, { align: 'center' });
+
+    coverY += 30;
+    // Divider
+    doc.setDrawColor(COLORS.BORDER);
+    doc.line(pageWidth / 2 - 20, coverY, pageWidth / 2 + 20, coverY);
 
     coverY += 20;
     doc.setFontSize(12);
     doc.setTextColor(COLORS.LIGHT_TEXT);
-    doc.text('PREPARADO EXCLUSIVAMENTE PARA:', margin, coverY);
+    doc.text('Preparado para:', pageWidth / 2, coverY, { align: 'center' });
 
-    coverY += 10;
-    doc.setFontSize(22);
-    doc.setTextColor(COLORS.DARK);
-    doc.text((client.empresa || client.nome).toUpperCase(), margin, coverY);
+    coverY += 8;
+    doc.setFontSize(18);
+    doc.setTextColor(COLORS.SECONDARY);
+    doc.text((client.empresa || client.nome).toUpperCase(), pageWidth / 2, coverY, { align: 'center' });
 
-    coverY += 60;
-    doc.setFontSize(10);
+    coverY += 40;
+    doc.setFontSize(9);
     doc.setTextColor(COLORS.LIGHT_TEXT);
-    doc.text(`Data de Emissão: ${new Date().toLocaleDateString('pt-BR')}`, margin, coverY);
-    doc.text(`Validade: 10 dias`, margin, coverY + 5);
+    doc.text(`Data: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth / 2, coverY, { align: 'center' });
+
 
     // ==========================================
-    // 2. CONTENT FLOW
+    // 2. INTERNAL PAGES
     // ==========================================
     doc.addPage();
-    currentY = 20;
+    currentY = 25; // Adjusted for Header
 
     // --- RESUMO EXECUTIVO ---
-    addSectionTitle('Resumo Executivo', 0);
+    addSectionTitle('Resumo Executivo');
     addParagraph('Somos uma empresa com mais de 30 anos de atuação em Facilities, especializada em terceirização e execução de serviços de limpeza profissional e similares.');
     addParagraph('Atendemos operações que exigem padronização, confiabilidade e continuidade, com foco em eficiência e segurança no dia a dia. Nossa entrega combina equipe dimensionada conforme a necessidade, gestão próxima e processos em evolução contínua, garantindo qualidade percebida e previsibilidade para o cliente.');
+    currentY += 5;
 
     // --- QUEM SOMOS ---
     addSectionTitle('Quem Somos');
     addParagraph('Há mais de 30 anos no mercado de Facilities, atuamos com excelência na terceirização e na execução de serviços de limpeza profissional e soluções correlatas. Nosso foco é garantir continuidade operacional, padronização e tranquilidade na gestão, para que o cliente concentre energia no seu core business.');
-
     currentY += 2;
     addBullet('30 anos de experiência em terceirização de equipes;');
     addBullet('Execução de tratamento de pisos em mais de 500.000m²;');
     addBullet('Mais de 100.000m² de limpeza em altura efetuada;');
     addBullet('Cultura de desenvolvimento voltada às pessoas e à qualidade;');
     addBullet('Dimensionamento personalizado conforme a necessidade de cada operação.');
+    currentY += 5;
 
-    // --- PRINCIPAIS SERVIÇOS PRESTADOS ---
+    // --- PRINCIPAIS SERVIÇOS ---
     addSectionTitle('Principais Serviços Prestados');
-
     addParagraph('Terceirização de Serviços de Facilities', 11, true);
     addParagraph('Atuamos na gestão e execução de rotinas essenciais — como limpeza, manutenção e segurança — garantindo um ambiente organizado, seguro e eficiente. Assumimos a operação com responsabilidade e padronização, reduzindo falhas e aumentando a previsibilidade do serviço.');
+    currentY += 3;
 
-    currentY += 4;
     addParagraph('Limpeza em Altura', 11, true);
     addParagraph('Serviço especializado para áreas de difícil acesso (fachadas, janelas externas e estruturas elevadas), com uso de equipamentos adequados e técnicas seguras. Entregamos limpeza com precisão, segurança e qualidade visual, preservando a estética do patrimônio e mitigando riscos operacionais.');
+    currentY += 5;
 
     // ==========================================
-    // 3. FINANCIALS (TABELAS DE CUSTOS)
+    // 3. FINANCEIRO (FULL WIDTH & OPTIMIZED)
     // ==========================================
+    checkSpace(60);
+    addSectionTitle('Proposta Financeira', 'Dimensionamento e Investimento Mensal Estimado.');
 
-    // Check space for Summary Table
-    if (currentY > pageHeight - 80) { doc.addPage(); currentY = 20; }
-
-    addSectionTitle('Proposta Financeira');
-    addParagraph('Abaixo apresentamos o dimensionamento e investimento mensal estimado para a operação.');
-
-    // Tabela Resumo
+    // --- Summary Table ---
     const summaryData = resultado.servicos.map(item => [
         item.config.funcao + (item.config.cargo ? ` - ${item.config.cargo}` : ''),
         item.config.quantidade,
@@ -174,60 +233,95 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
         head: [['Serviço / Cargo', 'Qtd', 'Frequência', 'Valor Total']],
         body: summaryData,
         theme: 'grid',
-        headStyles: { fillColor: COLORS.BG_HEADER, textColor: '#FFFFFF', fontStyle: 'bold', fontSize: 10 },
-        columnStyles: { 3: { halign: 'right', fontStyle: 'bold' } },
-        styles: { fontSize: 10, cellPadding: 3, textColor: COLORS.TEXT }
+        headStyles: {
+            fillColor: COLORS.PRIMARY,
+            textColor: '#FFFFFF',
+            fontStyle: 'bold',
+            fontSize: 10,
+            halign: 'left'
+        },
+        bodyStyles: {
+            fontSize: 10,
+            textColor: COLORS.TEXT,
+            cellPadding: 3
+        },
+        columnStyles: {
+            0: { cellWidth: 'auto' }, // Fluid width for Name
+            3: { halign: 'right', fontStyle: 'bold', cellWidth: 40 } // Fixed width for Price
+        },
+        margin: { left: margin, right: margin }, // Full Width
+        tableWidth: 'auto'
     });
 
     // @ts-ignore
-    currentY = doc.lastAutoTable.finalY + 10;
+    currentY = doc.lastAutoTable.finalY + 15;
 
-    // Tabelas Detalhadas (Abertas)
-    // "Deve ter a tabela dos custos aberta idêntica a que o sistema gera no simulador"
+
+    // --- Detailed COST Breakdown (Opened) ---
+    // Full width to match styles
+
     resultado.servicos.forEach((item, index) => {
-        if (currentY > pageHeight - 120) { doc.addPage(); currentY = 20; }
+        checkSpace(80); // Ensure space for header + some rows
 
+        // Subheader
         doc.setFontSize(11);
         doc.setFont(FONTS.TITLE, 'bold');
-        doc.setTextColor(COLORS.DARK);
+        doc.setTextColor(COLORS.SECONDARY);
         doc.text(`Detalhamento: ${item.config.funcao} (${item.config.quantidade}x)`, margin, currentY);
         currentY += 6;
 
         const det = item.detalhamento;
 
-        // Structure matches the "ComposicaoCustos" logic / breakdown
-        const bodyCols = [
-            [{ content: "A. MÃO DE OBRA DIRETA", colSpan: 2, styles: { fillColor: '#E5E7EB', fontStyle: 'bold' } as any }],
+        const bodyRows = [
+            // Section A
+            [{ content: "A. MÃO DE OBRA DIRETA", colSpan: 2, styles: { fillColor: COLORS.BG_ROW_GRAY, fontStyle: 'bold' } }],
             ['Salário Base / Piso', formatCurrency(det.salarioBase)],
             ['Gratificações / Função', formatCurrency(det.gratificacoes || 0)],
-            ['Adicionais (Insalubridade/Peric./Outros)', formatCurrency(det.adicionais.total)],
+            ['Adicionais (Insalubridade/Peric./Noturno)', formatCurrency(det.adicionais.total)],
             ['Encargos Sociais (Subtotal)', formatCurrency(det.encargos)],
             ['Provisões (Férias, 13º, Rescisão)', formatCurrency(det.provisoes.total)],
 
-            [{ content: "B. BENEFÍCIOS", colSpan: 2, styles: { fillColor: '#E5E7EB', fontStyle: 'bold' } as any }],
+            // Section B
+            [{ content: "B. BENEFÍCIOS", colSpan: 2, styles: { fillColor: COLORS.BG_ROW_GRAY, fontStyle: 'bold' } }],
             ['Total Benefícios (VR, VT, Cesta, etc.)', formatCurrency(det.beneficios.total)],
 
-            [{ content: "C. INSUMOS E OPERACIONAIS", colSpan: 2, styles: { fillColor: '#E5E7EB', fontStyle: 'bold' } as any }],
+            // Section C
+            [{ content: "C. INSUMOS E OPERACIONAIS", colSpan: 2, styles: { fillColor: COLORS.BG_ROW_GRAY, fontStyle: 'bold' } }],
             ['Materiais / Equipamentos', formatCurrency(det.insumos)],
-            ['Custos Operacionais (Exames/EPIs/Outros)', formatCurrency(det.custosOperacionais.total)],
+            ['Custos Operacionais (Exames / EPIs)', formatCurrency(det.custosOperacionais.total)],
 
-            [{ content: "D. TRIBUTOS E MARGEM", colSpan: 2, styles: { fillColor: '#E5E7EB', fontStyle: 'bold' } as any }],
+            // Section D
+            [{ content: "D. TRIBUTOS E MARGEM", colSpan: 2, styles: { fillColor: COLORS.BG_ROW_GRAY, fontStyle: 'bold' } }],
             ['Tributos Indiretos', formatCurrency(det.tributos)],
             ['Margem / Lucro Estimado', formatCurrency(det.lucro)],
 
-            [{ content: 'VALOR MENSAL UNITÁRIO', styles: { fontStyle: 'bold', fillColor: COLORS.DARK_GREEN, textColor: '#FFFFFF', halign: 'left' } as any }, { content: formatCurrency(item.custoUnitario), styles: { fontStyle: 'bold', fillColor: COLORS.DARK_GREEN, textColor: '#FFFFFF', halign: 'right' } as any }]
+            // Final Row
+            [{ content: 'VALOR MENSAL UNITÁRIO', styles: { fontStyle: 'bold', fillColor: COLORS.SECONDARY, textColor: '#FFFFFF' } as any }, { content: formatCurrency(item.custoUnitario), styles: { fontStyle: 'bold', fillColor: COLORS.SECONDARY, textColor: '#FFFFFF', halign: 'right' } as any }]
         ];
 
         autoTable(doc, {
             startY: currentY,
             head: [['Item de Custo', 'Valor (R$)']],
-            body: bodyCols,
-            theme: 'plain', // Clean look
-            styles: { fontSize: 9, cellPadding: 2, lineColor: '#E5E7EB', lineWidth: 0.1 },
-            headStyles: { fillColor: COLORS.BG_HEADER, textColor: '#FFFFFF', fontStyle: 'bold' },
-            columnStyles: { 1: { halign: 'right', cellWidth: 40 } },
-            // Make it compact width
-            margin: { left: margin, right: pageWidth - (margin + 120) }
+            body: bodyRows as any[],
+            theme: 'plain',
+            styles: {
+                fontSize: 9,
+                cellPadding: 3,
+                lineColor: COLORS.BORDER,
+                lineWidth: 0.1
+            },
+            headStyles: {
+                fillColor: COLORS.SECONDARY,
+                textColor: '#FFFFFF',
+                fontStyle: 'bold',
+                halign: 'left'
+            },
+            columnStyles: {
+                0: { cellWidth: 'auto' },
+                1: { halign: 'right', cellWidth: 50 }
+            },
+            margin: { left: margin, right: margin }, // FULL WIDTH
+            tableWidth: 'auto'
         });
 
         // @ts-ignore
@@ -236,10 +330,10 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
 
     // ==========================================
-    // 4. CLOSING TEXTS
+    // 4. FINAL TEXTS
     // ==========================================
 
-    // --- NOSSOS DIFERENCIAIS ---
+    // --- DIFERENCIAIS ---
     addSectionTitle('Nossos Diferenciais');
 
     addParagraph('Abordagem Estratégica e Personalizada', 11, true);
@@ -252,15 +346,17 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     addParagraph('Padronização de Processos e Indicadores', 11, true);
     addParagraph('Aprimoramos continuamente nossos processos internos e evoluímos junto à tecnologia para aumentar controle, gestão e desempenho. Isso nos permite acompanhar metas, indicadores e resultados com consistência, garantindo qualidade e transparência ao cliente.');
+    currentY += 5;
 
-    // --- CONDIÇÕES COMERCIAIS ---
+    // --- CONDIÇÕES ---
     addSectionTitle('Condições Comerciais');
     addBullet('Faturamento dos serviços entre os dias 25 e 30 do mês da prestação dos serviços, com vencimento no 3º dia útil do mês subsequente;');
     addBullet('Reajuste anual, automático e equivalente ao dissídio da categoria no mês de referência citado em CCT de cada ano subsequente;');
     addBullet('Próximo reajuste: Janeiro/2026.');
 
+
     // ==========================================
-    // 5. OBRIGADO (Back Cover)
+    // 5. BACK COVER
     // ==========================================
     doc.addPage();
     doc.setFillColor(COLORS.DARK);
@@ -269,6 +365,11 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
     const centerX = pageWidth / 2;
     const centerY = pageHeight / 2;
 
+    // Decoration
+    doc.setDrawColor(COLORS.PRIMARY);
+    doc.setLineWidth(2);
+    doc.circle(centerX, centerY - 25, 60, 'S');
+
     doc.setFont(FONTS.TITLE, 'bold');
     doc.setFontSize(32);
     doc.setTextColor(COLORS.PRIMARY);
@@ -276,18 +377,29 @@ export const generatePropostaPDF = async (resultado: ResultadoSimulacao, client:
 
     doc.setFontSize(12);
     doc.setTextColor('#E5E7EB');
-    doc.text('Estamos à disposição para iniciarmos esta parceria.', centerX, centerY, { align: 'center' });
+    doc.text('Agradecemos a oportunidade.', centerX, centerY + 5, { align: 'center' });
 
-    doc.setDrawColor(COLORS.PRIMARY);
-    doc.line(centerX - 30, centerY + 10, centerX + 30, centerY + 10);
-
-    // Contatos
-    const contactY = centerY + 30;
+    // Contacts
+    const contactY = centerY + 40;
+    doc.setTextColor('#FFFFFF');
     doc.setFontSize(11);
     doc.text('Av. Maringá, 1273 - Pinhais - PR', centerX, contactY, { align: 'center' });
     doc.text('(41) 3505-0020  |  comercial@grupojvsserv.com.br', centerX, contactY + 8, { align: 'center' });
+
     doc.setTextColor(COLORS.PRIMARY);
-    doc.text('www.grupojvsserv.com.br', centerX, contactY + 16, { align: 'center' });
+    doc.text('www.grupojvsserv.com.br', centerX, contactY + 18, { align: 'center' });
+
+
+    // ==========================================
+    // 6. APPLY HEADER/FOOTER TO ALL PAGES
+    // ==========================================
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i);
+        if (i > 1 && i < totalPages) { // Internal pages only (Skip Cover and Back)
+            addHeaderFooter(i, totalPages);
+        }
+    }
 
     // Save
     doc.save(`Proposta_JVS_Facilities_${client.empresa.replace(/\s+/g, '_')}.pdf`);
