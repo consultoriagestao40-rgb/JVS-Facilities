@@ -224,6 +224,7 @@ function getValores(params?: ParametrosCustos) {
         },
         VALORES_BASE: {
             SALARIO_MINIMO: params?.salarioMinimo ?? 1621.00,
+            SALARIO_MINIMO_NACIONAL: params?.salarioMinimo ?? 1621.00, // Preserved value
             VALE_REFEICAO_DIA: params?.beneficios.valeRefeicao ?? 25.00,
             VALE_TRANSPORTE_DIA: params?.beneficios.valeTransporte ?? 12.00,
             CESTA_BASICA: params?.beneficios.cestaBasica ?? 6.00,
@@ -278,7 +279,8 @@ function getValoresFinais(
         },
         VALORES_BASE: {
             ...global.VALORES_BASE,
-            SALARIO_MINIMO: Number(match.salarioPiso),
+            SALARIO_MINIMO: Number(match.salarioPiso), // WARNING: This overwrites SALARIO_MINIMO with Rule Floor.
+            // SALARIO_MINIMO_NACIONAL is preserved from ...global.VALORES_BASE
             VALE_REFEICAO_DIA: parseNum(ben.valeRefeicao, global.VALORES_BASE.VALE_REFEICAO_DIA),
             TIPO_VR: ben.tipoValeRefeicao || 'DIARIO',
             VALE_TRANSPORTE_DIA: parseNum(ben.valeTransporte, global.VALORES_BASE.VALE_TRANSPORTE_DIA),
@@ -324,7 +326,7 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     const Quantidade = Number(config.quantidade) || 1;
     const AdicionalCopaManual = Number(config.adicionalCopa) || 0;
 
-    const salarioBase = valores.VALORES_BASE.SALARIO_MINIMO; // PISO from Rule
+    const salarioBase = valores.VALORES_BASE.SALARIO_MINIMO; // This is actually the Rule Floor due to overwrite in getValoresFinais
     const gratificacoes = valores.VALORES_BASE.GRATIFICACOES;
 
     let adicionalCopa = 0;
@@ -348,7 +350,8 @@ function calcularItem(config: BackendConfigPayload, valores: ReturnType<typeof g
     let insalubridade = 0, periculosidade = 0, noturno = 0, intrajornada = 0, dsr = 0;
 
     if (config.adicionais?.insalubridade) {
-        const baseIns = valores.ADICIONAIS_CONFIG.baseInsalubridade === 'SALARIO_BASE' ? salarioBase : valores.VALORES_BASE.SALARIO_MINIMO;
+        // Fix: Use SALARIO_MINIMO_NACIONAL for the fallback, NOT salarioBase (which is Rule Floor)
+        const baseIns = valores.ADICIONAIS_CONFIG.baseInsalubridade === 'SALARIO_BASE' ? salarioBase : (valores.VALORES_BASE as any).SALARIO_MINIMO_NACIONAL;
         // User selection (config) takes precedence over Rule Default (valores)
         const degree = config.grauInsalubridade || valores.ADICIONAIS_CONFIG.grauInsalubridade || 0.20;
         insalubridade = baseIns * degree;
