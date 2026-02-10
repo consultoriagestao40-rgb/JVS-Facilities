@@ -14,6 +14,7 @@ type SimuladorContextType = {
     updateParametros: (params: ParametrosCustos) => void;
     updateRegrasCCT: (regras: RegraCCT[]) => void;
     novoCalculo: () => void; // New
+    goToStep: (step: number) => void;
 };
 
 const defaultState: SimuladorState = {
@@ -126,6 +127,10 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
         }));
     };
 
+    const goToStep = (step: number) => {
+        setState(prev => ({ ...prev, step }));
+    };
+
     return (
         <SimuladorContext.Provider value={{
             state,
@@ -134,10 +139,11 @@ export function SimuladorProvider({ children }: { children: React.ReactNode }) {
             updateUserData,
             toggleServico,
             updateConfiguracao,
-            removeConfiguracao, // New
+            removeConfiguracao,
             updateParametros,
             updateRegrasCCT,
-            novoCalculo // Fixed: Add to provider value
+            novoCalculo,
+            goToStep
         }}>
             {children}
         </SimuladorContext.Provider>
