@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import { useSimulador } from '@/context/SimuladorContext';
 import { simuladorService } from '@/services/simuladorService';
 import { ResultadoSimulacao } from '@/types/simulador';
-import { Download, FileText, CheckCircle, Loader2, ArrowRight, Settings } from 'lucide-react';
+import { Download, FileText, CheckCircle, Loader2, ArrowRight } from 'lucide-react';
 import { generatePropostaPDF } from '@/utils/generatePropostaPDF';
-import ConfiguracaoCustos from '@/components/admin/ConfiguracaoCustos';
 import PlanilhaCustos from '@/components/common/PlanilhaCustos';
 import { motion } from 'framer-motion';
 import { ItemResultado } from '@/types/simulador';
@@ -16,7 +15,6 @@ export default function ResumoProposta() {
     const [resultado, setResultado] = useState<ResultadoSimulacao | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [showConfig, setShowConfig] = useState(false);
     const [extractItem, setExtractItem] = useState<ItemResultado | null>(null);
 
     useEffect(() => {
@@ -66,13 +64,7 @@ export default function ResumoProposta() {
     return (
         <div className="space-y-8 animate-fade-in">
             <div className="text-center relative">
-                <button
-                    onClick={() => setShowConfig(true)}
-                    className="absolute right-0 top-0 p-2 text-gray-300 hover:text-gray-600 transition-colors"
-                    title="Configurar Parâmetros de Custo"
-                >
-                    <Settings className="w-5 h-5" />
-                </button>
+
                 <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-1 rounded-full text-sm font-bold mb-4">
                     <CheckCircle className="w-4 h-4" />
                     Proposta Gerada com Sucesso
@@ -181,7 +173,6 @@ export default function ResumoProposta() {
                 </button>
             </div>
 
-            {showConfig && <ConfiguracaoCustos onClose={() => setShowConfig(false)} />}
             {extractItem && <PlanilhaCustos item={extractItem} onClose={() => setExtractItem(null)} />}
         </div>
     );
