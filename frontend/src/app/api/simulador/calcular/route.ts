@@ -223,7 +223,7 @@ function getValores(params?: ParametrosCustos) {
             MARGEM_LUCRO: params?.aliquotas.margemLucro ?? 0.08,
         },
         VALORES_BASE: {
-            SALARIO_MINIMO: params?.salarioMinimo ?? 1518.00,
+            SALARIO_MINIMO: params?.salarioMinimo ?? 1621.00,
             VALE_REFEICAO_DIA: params?.beneficios.valeRefeicao ?? 25.00,
             VALE_TRANSPORTE_DIA: params?.beneficios.valeTransporte ?? 12.00,
             CESTA_BASICA: params?.beneficios.cestaBasica ?? 6.00,
