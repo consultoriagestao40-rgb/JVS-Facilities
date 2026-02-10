@@ -4,6 +4,7 @@ import { useSimulador } from '@/context/SimuladorContext';
 import { RegraCCT, RegraCCT as RegraCCTType } from '@/types/simulador';
 import { useState, useEffect } from 'react';
 import { Plus, Trash, Edit, Save, X, Search, FileText } from 'lucide-react';
+import { clsx } from 'clsx';
 import PlanilhaCustos from '@/components/common/PlanilhaCustos';
 import { ItemResultado, BreakdownCustos } from '@/types/simulador';
 
@@ -60,6 +61,7 @@ export default function RegrasCCTManager() {
     const [currentRegra, setCurrentRegra] = useState<RegraCCTType>(emptyRegra);
     const [searchTerm, setSearchTerm] = useState('');
     const [previewItem, setPreviewItem] = useState<ItemResultado | null>(null);
+    const [editingCargoIndex, setEditingCargoIndex] = useState<number | null>(null);
 
     const handleSimulateExtract = () => {
         // Construct a mock ItemResultado based on current rule values
@@ -777,32 +779,66 @@ export default function RegrasCCTManager() {
                                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                         />
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            const nameInput = document.getElementById('newCargoName') as HTMLInputElement;
-                                            const pisoInput = document.getElementById('newCargoPiso') as HTMLInputElement;
-                                            const gratInput = document.getElementById('newCargoGratificacao') as HTMLInputElement;
-                                            const copaInput = document.getElementById('newCargoCopa') as HTMLInputElement;
+                                    <div className="flex gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const nameInput = document.getElementById('newCargoName') as HTMLInputElement;
+                                                const pisoInput = document.getElementById('newCargoPiso') as HTMLInputElement;
+                                                const gratInput = document.getElementById('newCargoGratificacao') as HTMLInputElement;
+                                                const copaInput = document.getElementById('newCargoCopa') as HTMLInputElement;
 
-                                            const nome = nameInput.value;
-                                            const piso = parseFloat(pisoInput.value);
-                                            const gratificacao = parseFloat(gratInput.value) || 0;
-                                            const adicionalCopa = parseFloat(copaInput.value) || 0;
+                                                const nome = nameInput.value;
+                                                const piso = parseFloat(pisoInput.value);
+                                                const gratificacao = parseFloat(gratInput.value) || 0;
+                                                const adicionalCopa = parseFloat(copaInput.value) || 0;
 
-                                            if (nome && piso) {
-                                                const newCargos = [...(currentRegra.cargos || []), { nome, piso, gratificacao, adicionalCopa }];
-                                                setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
-                                                nameInput.value = '';
-                                                pisoInput.value = '';
-                                                gratInput.value = '';
-                                                copaInput.value = '';
-                                            }
-                                        }}
-                                        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-bold shadow transition-all h-[50px] flex items-center"
-                                    >
-                                        ADICIONAR
-                                    </button>
+                                                if (nome && piso) {
+                                                    const newCargoObj = { nome, piso, gratificacao, adicionalCopa };
+
+                                                    if (editingCargoIndex !== null) {
+                                                        // Update Existing
+                                                        const updatedCargos = [...(currentRegra.cargos || [])];
+                                                        updatedCargos[editingCargoIndex] = newCargoObj;
+                                                        setCurrentRegra(prev => ({ ...prev, cargos: updatedCargos }));
+                                                        setEditingCargoIndex(null);
+                                                    } else {
+                                                        // Add New
+                                                        const newCargos = [...(currentRegra.cargos || []), newCargoObj];
+                                                        setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
+                                                    }
+
+                                                    // Clear inputs
+                                                    nameInput.value = '';
+                                                    pisoInput.value = '';
+                                                    gratInput.value = '';
+                                                    copaInput.value = '';
+                                                }
+                                            }}
+                                            className={clsx(
+                                                "px-6 py-3 rounded-lg font-bold shadow transition-all h-[50px] flex items-center flex-1 justify-center",
+                                                editingCargoIndex !== null ? "bg-amber-500 hover:bg-amber-600 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"
+                                            )}
+                                        >
+                                            {editingCargoIndex !== null ? 'ATUALIZAR' : 'ADICIONAR'}
+                                        </button>
+
+                                        {editingCargoIndex !== null && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setEditingCargoIndex(null);
+                                                    (document.getElementById('newCargoName') as HTMLInputElement).value = '';
+                                                    (document.getElementById('newCargoPiso') as HTMLInputElement).value = '';
+                                                    (document.getElementById('newCargoGratificacao') as HTMLInputElement).value = '';
+                                                    (document.getElementById('newCargoCopa') as HTMLInputElement).value = '';
+                                                }}
+                                                className="px-4 py-3 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 font-bold h-[50px] flex items-center"
+                                            >
+                                                <X className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -827,12 +863,27 @@ export default function RegrasCCTManager() {
                                                 <td className="p-4 font-mono text-green-700 font-bold">R$ {c.piso.toFixed(2)}</td>
                                                 <td className="p-4 font-mono text-gray-600">{c.gratificacao ? `R$ ${c.gratificacao.toFixed(2)}` : '-'}</td>
                                                 <td className="p-4 font-mono text-gray-600">{c.adicionalCopa ? `R$ ${c.adicionalCopa.toFixed(2)}` : '-'}</td>
-                                                <td className="p-4 text-center">
+                                                <td className="p-4 text-center space-x-2">
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingCargoIndex(idx);
+                                                            // Populate inputs
+                                                            (document.getElementById('newCargoName') as HTMLInputElement).value = c.nome;
+                                                            (document.getElementById('newCargoPiso') as HTMLInputElement).value = String(c.piso);
+                                                            (document.getElementById('newCargoGratificacao') as HTMLInputElement).value = String(c.gratificacao || '');
+                                                            (document.getElementById('newCargoCopa') as HTMLInputElement).value = String(c.adicionalCopa || '');
+                                                        }}
+                                                        className="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-2 rounded-full transition-all"
+                                                        title="Editar Cargo"
+                                                    >
+                                                        <Edit className="w-5 h-5" />
+                                                    </button>
                                                     <button
                                                         onClick={() => {
                                                             const newCargos = [...(currentRegra.cargos || [])];
                                                             newCargos.splice(idx, 1);
                                                             setCurrentRegra(prev => ({ ...prev, cargos: newCargos }));
+                                                            if (editingCargoIndex === idx) setEditingCargoIndex(null);
                                                         }}
                                                         className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-all"
                                                         title="Remover Cargo"
