@@ -174,10 +174,15 @@ export default function ResumoProposta() {
                     <Download className="w-5 h-5" />
                     Baixar Proposta em PDF
                 </button>
-                <button className="flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all">
+                <a
+                    href={`https://wa.me/5541992252968?text=${encodeURIComponent(`Olá, gostaria de avançar com a Proposta Comercial ID: ${resultado.id}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all"
+                >
                     QUERO CONTRATAR
                     <ArrowRight className="w-5 h-5" />
-                </button>
+                </a>
             </div>
 
             {extractItem && <PlanilhaCustos item={extractItem} onClose={() => setExtractItem(null)} />}
