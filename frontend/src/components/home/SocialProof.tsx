@@ -48,7 +48,7 @@ export default function SocialProof() {
                     >
                         <h3 className="text-xl font-bold mb-6 text-center text-gray-300">Empresas que confiam na JVS Facilities</h3>
                         {/* Actual Client Logos */}
-                        <div className="grid grid-cols-3 gap-6">
+                        <div className="flex flex-wrap justify-center gap-4 md:gap-6 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
                             {[
                                 "/logos/cliente-1.png",
                                 "/logos/cliente-2.png",
@@ -57,11 +57,11 @@ export default function SocialProof() {
                                 "/logos/cliente-5.png",
                                 "/logos/cliente-6.png"
                             ].map((logoUrl, i) => (
-                                <div key={i} className="h-16 bg-white/5 rounded-lg flex items-center justify-center border border-white/10 hover:border-primary/50 hover:bg-white/10 transition-all p-2 group">
+                                <div key={i} className="w-24 md:w-32 h-16 md:h-20 bg-white rounded-lg flex items-center justify-center p-2 shadow-sm hover:scale-105 transition-transform duration-300">
                                     <img
                                         src={logoUrl}
                                         alt={`Cliente ${i + 1}`}
-                                        className="max-h-full max-w-full object-contain filter grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                                        className="max-w-full max-h-full object-contain"
                                     />
                                 </div>
                             ))}
