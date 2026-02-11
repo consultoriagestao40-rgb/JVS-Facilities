@@ -191,14 +191,14 @@ export default function AlturaPage() {
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/1-2.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/2-1.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/3-1.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/4-1.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/6-1.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/8-1.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/7-1.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/9-1.png"
+                            "/images/portfolio/trabalho-1.jpg",
+                            "/images/portfolio/trabalho-2.jpg",
+                            "/images/portfolio/trabalho-3.jpg",
+                            "/images/portfolio/trabalho-4.jpg",
+                            "/images/portfolio/trabalho-5.jpg",
+                            "/images/portfolio/trabalho-6.jpg",
+                            "/images/portfolio/trabalho-7.jpg",
+                            "/images/portfolio/trabalho-8.jpg"
                         ].map((img, i) => (
                             <div key={i} className="aspect-square overflow-hidden rounded-xl border border-slate-100 hover:shadow-lg transition-all group">
                                 <img
@@ -217,17 +217,15 @@ export default function AlturaPage() {
                 <div className="container mx-auto px-4 text-center">
                     <h2 className="text-2xl font-bold text-slate-800 mb-10">Nossos Clientes Confiam em Nós</h2>
                     <div className="flex flex-wrap justify-center gap-8 md:gap-12 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+
                         {[
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/11.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/10.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/9.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/8.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/7.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/6.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/5.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/4.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/3.png",
-                            "http://jvsfacilities.com.br/wp-content/uploads/2025/11/2.png",
+                            "/logos/cliente-1.png",
+                            "/logos/cliente-2.png",
+                            "/logos/cliente-3.png",
+                            "/logos/cliente-4.png",
+                            "/logos/cliente-5.png",
+                            "/logos/cliente-6.png",
+                            "/logos/cliente-7.png"
                         ].map((logo, i) => (
                             <div key={i} className="w-24 md:w-32 h-20 flex items-center justify-center p-2 bg-white rounded-lg shadow-sm">
                                 <img
