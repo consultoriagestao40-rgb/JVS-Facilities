@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import * as gtag from '@/lib/gtag';
 
 export default function Hero() {
     return (
@@ -66,6 +67,7 @@ export default function Hero() {
                             <a
                                 href="https://wa.me/5541992252968?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20um%20diagn%C3%B3stico%20de%20facilities."
                                 target="_blank"
+                                onClick={() => gtag.reportConversion()}
                                 className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2"
                             >
                                 Agendar diagnóstico no WhatsApp

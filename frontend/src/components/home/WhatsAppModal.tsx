@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { X, Send, Loader2 } from 'lucide-react';
+import * as gtag from '@/lib/gtag';
 
 interface WhatsAppModalProps {
     isOpen: boolean;
@@ -127,8 +128,9 @@ Gostaria de um diagnóstico personalizado para minha operação.`;
         // Use api.whatsapp.com/send which is often more reliable for text pre-filling on web
         const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${encodedMessage}`;
 
-        // Track event (mock)
+        // Track event
         console.log("whatsapp_click", { tier, ...formData });
+        gtag.reportConversion();
 
         window.open(url, '_blank');
         setLoading(false);

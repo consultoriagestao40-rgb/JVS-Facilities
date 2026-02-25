@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight, CheckCircle2, Shield, Clock, FileCheck, Phone, Mail, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import * as gtag from '@/lib/gtag';
 
 export default function AlturaPage() {
     return (
@@ -26,6 +27,7 @@ export default function AlturaPage() {
                     <a
                         href="https://wa.me/5541992252968?text=Ol%C3%A1%2C%20gostaria%20de%20um%20or%C3%A7amento%20para%20limpeza%20em%20altura."
                         target="_blank"
+                        onClick={() => gtag.reportConversion()}
                         className="inline-flex items-center bg-emerald-500 text-white font-bold py-4 px-8 rounded-lg hover:bg-emerald-600 transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/30"
                     >
                         Solicitar Orçamento
@@ -171,6 +173,7 @@ export default function AlturaPage() {
                             <a
                                 href="https://wa.me/5541992252968?text=Ol%C3%A1%2C%20vim%20pelo%20site%20e%20quero%20um%20or%C3%A7amento%20de%20altura."
                                 target="_blank"
+                                onClick={() => gtag.reportConversion()}
                                 className="block w-full text-center bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-xl transition-colors"
                             >
                                 Conversar no WhatsApp
@@ -249,6 +252,7 @@ export default function AlturaPage() {
                     <a
                         href="https://wa.me/5541992252968"
                         target="_blank"
+                        onClick={() => gtag.reportConversion()}
                         className="inline-block bg-white text-emerald-700 font-bold text-xl px-10 py-5 rounded-full shadow-2xl hover:bg-emerald-50 transform hover:scale-105 transition-all"
                     >
                         FALAR COM CONSULTOR
