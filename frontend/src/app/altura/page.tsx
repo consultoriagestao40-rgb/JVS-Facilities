@@ -27,13 +27,14 @@ export default function AlturaPage() {
                         Equipe certificada com mais de 20 anos de experiência em acesso por corda.
                     </p>
                     <a
-                        href="https://wa.me/5541992252968?text=Ol%C3%A1%2C%20gostaria%20de%20um%20or%C3%A7amento%20para%20limpeza%20em%20altura."
+                        href="https://wa.me/5541991443657"
                         target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-full font-bold hover:bg-indigo-700 transition-all hover:scale-105 shadow-lg shadow-indigo-200"
                         onClick={() => gtag.reportConversion()}
-                        className="inline-flex items-center bg-emerald-500 text-white font-bold py-4 px-8 rounded-lg hover:bg-emerald-600 transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/30"
                     >
-                        Solicitar Orçamento
-                        <ArrowRight className="ml-2 w-5 h-5" />
+                        Solicitar Orçamento Agora
+                        <ArrowRight className="w-5 h-5" />
                     </a>
                 </div>
             </section>
@@ -143,6 +144,16 @@ export default function AlturaPage() {
                                     <div>
                                         <h4 className="font-bold text-lg mb-1">Seguro de Responsabilidade</h4>
                                         <p className="text-slate-400 text-sm">Cobertura completa contra acidentes e danos durante toda a operação.</p>
+                                        <a
+                                            href="https://wa.me/5541991443657"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="bg-emerald-500 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-600 transition-all flex items-center justify-center gap-2 w-full group-hover:scale-105"
+                                            onClick={() => gtag.reportConversion()}
+                                        >
+                                            Solicitar Orçamento
+                                            <ArrowRight className="w-4 h-4" />
+                                        </a>
                                     </div>
                                 </div>
                                 <div className="flex gap-4">
