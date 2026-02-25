@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { ArrowRight, CheckCircle2, Shield, Clock, FileCheck, Phone, Mail, MapPin } from 'lucide-react';
 import Link from 'next/link';
