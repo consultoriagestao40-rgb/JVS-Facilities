@@ -1,29 +1,30 @@
 export interface ConfiguracaoServico {
-    funcao: string;
+    id: string; // Unique ID
+    servicoId: string; // matches ServicoTipo on frontend
+    funcao: string; // Legacy field for backend, will keep for compatibility
     estado: string;
     cidade: string;
-    dias: string[];
-    horarioEntrada: string;
-    horarioSaida: string;
+    diasSemana: string[]; // ['seg', 'ter', ...]
+    horarioEntrada: string; // '08:00'
+    horarioSaida: string; // '17:00'
     quantidade: number;
-    materiais?: number;
-    equipamentos?: string[];
-    adicionais?: {
-        insalubridade?: boolean;
-        periculosidade?: boolean;
-        noturno?: boolean;
-    };
+    intrajornada?: boolean; // Suppress break?
+    cargo?: string; // Selected Sub-role (e.g. 'Zelador')
+    materiais?: number; // Cost of materials
+    adicionalCopa?: number; // Manual additional cost
+    grauInsalubridade?: number; // 0.1, 0.2, 0.4
 }
 
 export interface BreakdownCustos {
     salarioBase: number;
-    gratificacoes?: number; // New field
+    gratificacoes?: number;
     adicionais: {
         insalubridade: number;
         periculosidade: number;
-        noturno: number; // New
-        intrajornada: number; // New
-        dsr: number; // New
+        noturno: number;
+        intrajornada: number;
+        dsr: number;
+        copa: number; // Moved from beneficios in sync with frontend
         total: number;
     };
     beneficios: {
@@ -31,20 +32,19 @@ export interface BreakdownCustos {
         valeTransporte: number;
         cestaBasica: number;
         uniforme: number;
-        adicionalCopa: number; // Moved from adicionais
-        vaSobreFerias: number; // New cost
+        vaSobreFerias: number;
         descontoVA: number; // Negative value
         descontoVT: number; // Negative value
         total: number;
     };
     encargos: number; // INSS + FGTS + RAT
-    provisoes?: { // Optional for now to avoid breaking too much logic
+    provisoes: {
         ferias: number;
         decimoTerceiro: number;
         rescisao: number;
         total: number;
     };
-    custosOperacionais?: { // New Section, optional
+    custosOperacionais: {
         examesMedicos: number;
         total: number;
     };
@@ -55,7 +55,7 @@ export interface BreakdownCustos {
 }
 
 export interface ResultadoSimulacao {
-    id: string; // ID da simulação/proposta
+    id: string;
     servicos: {
         config: ConfiguracaoServico;
         custoUnitario: number;
@@ -69,3 +69,4 @@ export interface ResultadoSimulacao {
         lucroEstimado: number;
     };
 }
+

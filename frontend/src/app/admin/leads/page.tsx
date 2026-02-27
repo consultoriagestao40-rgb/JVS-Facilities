@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Loader2, MessageCircle, FileText, Search, User, Filter, Trash2 } from 'lucide-react';
+import { Loader2, MessageCircle, FileText, Search, User, Filter, Trash2, Eye, X } from 'lucide-react';
+import PlanilhaCustos from '@/components/common/PlanilhaCustos';
+import { ItemResultado } from '@/types/simulador';
 
 interface Lead {
     id: string;
@@ -24,6 +26,8 @@ export default function LeadsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [viewingProposal, setViewingProposal] = useState<any | null>(null);
+    const [extractItem, setExtractItem] = useState<ItemResultado | null>(null);
 
     useEffect(() => {
         fetchLeads();
@@ -38,15 +42,12 @@ export default function LeadsPage() {
                 // FLATTEN: One row per Proposal
                 const flattenedProposals = leads.flatMap((lead: any) => {
                     if (!lead.propostas || lead.propostas.length === 0) {
-                        // Option: Show leads without proposals? For now, let's include them with null proposal
-                        // But user specifically wants multiple simulations "remaining", so focus on existing proposals.
                         return [];
                     }
                     return lead.propostas.map((prop: any) => ({
                         id: prop.id,
                         lead: lead,
                         ...prop
-                        // prop has id, servicos, custoMensal, status
                     }));
                 });
 
@@ -79,7 +80,6 @@ export default function LeadsPage() {
             matchesDate = matchesDate && new Date(p.createdAt) >= new Date(startDate);
         }
         if (endDate) {
-            // Add 1 day to include the end date fully
             const end = new Date(endDate);
             end.setDate(end.getDate() + 1);
             matchesDate = matchesDate && new Date(p.createdAt) < end;
@@ -92,7 +92,6 @@ export default function LeadsPage() {
         return acc + (p.custoMensal || 0);
     }, 0);
 
-    // Helper to parse services
     const getServiceDetails = (proposta: any) => {
         if (!proposta || !proposta.servicos) return { types: [], details: [] };
         try {
@@ -106,6 +105,8 @@ export default function LeadsPage() {
             return { types: ['Erro ao ler'], details: [] };
         }
     };
+
+    const formatBRL = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
     return (
         <div className="p-8 space-y-8 animate-in fade-in">
@@ -149,11 +150,10 @@ export default function LeadsPage() {
                 </div>
             </div>
 
-            {/* Totalizer Card */}
             <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl p-6 text-white shadow-lg">
                 <p className="text-slate-400 text-sm font-medium mb-1">Valor Total em Propostas (Filtrado)</p>
                 <div className="text-3xl font-bold">
-                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalValue)}
+                    {formatBRL(totalValue)}
                 </div>
                 <div className="text-sm text-slate-400 mt-2">
                     {filteredProposals.length} simulações encontradas
@@ -217,13 +217,20 @@ export default function LeadsPage() {
                                         <td className="px-6 py-4">
                                             <div>
                                                 <div className="font-mono font-bold text-green-700">
-                                                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(prop.custoMensal)}
+                                                    {formatBRL(prop.custoMensal)}
                                                 </div>
                                                 <div className="text-xs text-gray-400 lowercase">{prop.status}</div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => setViewingProposal(prop)}
+                                                    className="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                                                    title='Ver Detalhes'
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
                                                 {lead.whatsapp && (
                                                     <button
                                                         onClick={() => handleWhatsApp(lead)}
@@ -267,6 +274,80 @@ export default function LeadsPage() {
                     )}
                 </div>
             )}
+
+            {/* View Proposal Modal */}
+            {viewingProposal && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col">
+                        <div className="p-6 border-b flex justify-between items-center bg-slate-900 text-white rounded-t-2xl sticky top-0 z-10">
+                            <div>
+                                <h3 className="font-bold text-xl flex items-center gap-2">
+                                    <FileText className="text-primary" />
+                                    Simulação: {viewingProposal.id || viewingProposal.numeroSequencial}
+                                </h3>
+                                <p className="text-slate-400 text-sm">{viewingProposal.lead.nome} - {viewingProposal.lead.empresa}</p>
+                            </div>
+                            <button onClick={() => setViewingProposal(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="p-8 space-y-8">
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Custo Mensal</p>
+                                    <p className="text-3xl font-bold text-slate-900">{formatBRL(viewingProposal.custoMensal)}</p>
+                                </div>
+                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Custo Anual</p>
+                                    <p className="text-3xl font-bold text-slate-900">{formatBRL(viewingProposal.custoAnual)}</p>
+                                </div>
+                            </div>
+
+                            {/* Services List */}
+                            <div className="space-y-4">
+                                <h4 className="font-bold text-gray-800 border-l-4 border-primary pl-3">Serviços Selecionados</h4>
+                                {JSON.parse(viewingProposal.servicos).map((item: any, idx: number) => (
+                                    <div key={idx} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 hover:border-primary/30 transition-colors">
+                                        <div className="flex-1">
+                                            <h5 className="font-bold text-lg text-gray-900 flex items-center gap-2">
+                                                {item.config.funcao}
+                                            </h5>
+                                            <p className="text-gray-500 text-sm">
+                                                {item.config.quantidade}x {item.config.cargo || item.config.funcao} • {item.config.horarioEntrada} às {item.config.horarioSaida}
+                                            </p>
+                                        </div>
+                                        <div className="text-right mr-4">
+                                            <p className="text-xs text-slate-400 uppercase font-bold">Total Mensal</p>
+                                            <p className="text-xl font-bold text-green-700">{formatBRL(item.custoTotal)}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => setExtractItem(item)}
+                                            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 font-bold text-sm transition-all border border-slate-200"
+                                        >
+                                            Ver Planilha Completa
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="p-6 bg-slate-50 border-t flex justify-end gap-3 rounded-b-2xl">
+                            <button
+                                onClick={() => setViewingProposal(null)}
+                                className="px-6 py-2 bg-white border border-slate-200 text-slate-600 font-bold rounded-lg hover:bg-slate-100"
+                            >
+                                Fechar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Use the PlanilhaCustos component from common */}
+            {extractItem && <PlanilhaCustos item={extractItem} onClose={() => setExtractItem(null)} />}
         </div>
     );
 }
+
