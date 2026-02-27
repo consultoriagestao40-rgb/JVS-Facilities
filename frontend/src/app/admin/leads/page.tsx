@@ -277,73 +277,135 @@ export default function LeadsPage() {
 
             {/* View Proposal Modal */}
             {viewingProposal && (
-                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col">
-                        <div className="p-6 border-b flex justify-between items-center bg-slate-900 text-white rounded-t-2xl sticky top-0 z-10">
-                            <div>
-                                <h3 className="font-bold text-xl flex items-center gap-2">
-                                    <FileText className="text-primary" />
-                                    Simulação: {viewingProposal.id || viewingProposal.numeroSequencial}
+                <div className="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col border border-slate-700/10">
+                        {/* Header Premium */}
+                        <div className="p-8 border-b flex justify-between items-start bg-slate-900 text-white relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-32 bg-primary/20 blur-[80px] rounded-full pointer-events-none"></div>
+                            <div className="relative z-10">
+                                <div className="inline-flex items-center gap-2 bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 border border-green-500/30">
+                                    <FileText className="w-3 h-3" />
+                                    Visualização de Simulação
+                                </div>
+                                <h3 className="font-bold text-2xl flex items-center gap-2 font-heading">
+                                    Proposta Comercia {viewingProposal.id || viewingProposal.numeroSequencial}
                                 </h3>
-                                <p className="text-slate-400 text-sm">{viewingProposal.lead.nome} - {viewingProposal.lead.empresa}</p>
+                                <p className="text-slate-400 text-sm mt-1">{viewingProposal.lead.nome} • <span className="text-primary font-bold">{viewingProposal.lead.empresa}</span></p>
                             </div>
-                            <button onClick={() => setViewingProposal(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                                <X size={24} />
+                            <button onClick={() => setViewingProposal(null)} className="p-2 hover:bg-white/10 rounded-full transition-colors relative z-10">
+                                <X size={28} />
                             </button>
                         </div>
 
-                        <div className="p-8 space-y-8">
-                            {/* Summary Cards */}
+                        <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-gray-50/50">
+                            {/* Dashboard de Valores */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Custo Mensal</p>
-                                    <p className="text-3xl font-bold text-slate-900">{formatBRL(viewingProposal.custoMensal)}</p>
+                                <div className="bg-slate-900 text-white p-8 rounded-2xl shadow-xl flex flex-col justify-between relative overflow-hidden border border-slate-800">
+                                    <div className="absolute top-0 right-0 p-24 bg-primary/10 blur-[60px] rounded-full pointer-events-none"></div>
+                                    <div className="relative z-10">
+                                        <p className="text-slate-400 text-xs font-black uppercase tracking-widest mb-2">Investimento Mensal</p>
+                                        <h3 className="text-4xl md:text-5xl font-black text-primary">
+                                            {formatBRL(viewingProposal.custoMensal)}
+                                        </h3>
+                                    </div>
+                                    <div className="mt-8 pt-6 border-t border-slate-800 flex justify-between items-center relative z-10">
+                                        <span className="text-xs text-slate-500 font-bold uppercase tracking-widest">Investimento Anual</span>
+                                        <span className="text-xl font-bold text-white font-mono">
+                                            {formatBRL(viewingProposal.custoAnual || (viewingProposal.custoMensal * 12))}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                                    <p className="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">Custo Anual</p>
-                                    <p className="text-3xl font-bold text-slate-900">{formatBRL(viewingProposal.custoAnual)}</p>
+
+                                <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm flex flex-col">
+                                    <h3 className="font-black text-slate-800 text-xs uppercase tracking-widest mb-6 border-b pb-4">Detalhamento Simplificado</h3>
+                                    <div className="space-y-4 flex-1">
+                                        {JSON.parse(viewingProposal.servicos).map((item: any, idx: number) => (
+                                            <div key={idx} className="flex justify-between items-center pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+                                                <div>
+                                                    <p className="font-bold text-slate-900 text-sm">{item.config.funcao}</p>
+                                                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-tighter">{item.config.quantidade} profissional(is)</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-bold text-slate-800 text-sm">{formatBRL(item.custoTotal)}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Services List */}
+                            {/* Services List Detailed */}
                             <div className="space-y-4">
-                                <h4 className="font-bold text-gray-800 border-l-4 border-primary pl-3">Serviços Selecionados</h4>
+                                <h4 className="font-black text-slate-800 text-xs uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                    <div className="w-8 h-[2px] bg-primary"></div>
+                                    Serviços e Configurações
+                                </h4>
                                 {JSON.parse(viewingProposal.servicos).map((item: any, idx: number) => (
-                                    <div key={idx} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 hover:border-primary/30 transition-colors">
-                                        <div className="flex-1">
-                                            <h5 className="font-bold text-lg text-gray-900 flex items-center gap-2">
-                                                {item.config.funcao}
-                                            </h5>
-                                            <p className="text-gray-500 text-sm">
-                                                {item.config.quantidade}x {item.config.cargo || item.config.funcao} • {item.config.horarioEntrada} às {item.config.horarioSaida}
-                                            </p>
+                                    <div key={idx} className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 group hover:border-primary/50 transition-all">
+                                        <div className="flex-1 flex items-start gap-4">
+                                            <div className="bg-slate-100 text-slate-600 p-4 rounded-xl group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                                                <FileText size={24} />
+                                            </div>
+                                            <div>
+                                                <h5 className="font-black text-xl text-slate-900 tracking-tight">
+                                                    {item.config.funcao}
+                                                </h5>
+                                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                                                    <p className="text-gray-500 text-sm font-medium">
+                                                        {item.config.quantidade}x {item.config.cargo || 'Padrão'}
+                                                    </p>
+                                                    <p className="text-gray-400 text-sm">
+                                                        🕒 {item.config.horarioEntrada} às {item.config.horarioSaida}
+                                                    </p>
+                                                </div>
+
+                                                {/* Tags Detalhadas */}
+                                                <div className="flex gap-2 mt-3">
+                                                    {item.detalhamento.adicionais.noturno > 0 &&
+                                                        <span className="text-[10px] bg-indigo-50 text-indigo-600 px-2 py-1 rounded-md font-black uppercase tracking-wider border border-indigo-100 italic">🌙 Adic. Noturno Real</span>
+                                                    }
+                                                    {item.detalhamento.adicionais.intrajornada > 0 &&
+                                                        <span className="text-[10px] bg-amber-50 text-amber-600 px-2 py-1 rounded-md font-black uppercase tracking-wider border border-amber-100 italic">🍽️ Intrajornada</span>
+                                                    }
+                                                    {item.detalhamento.adicionais.insalubridade > 0 &&
+                                                        <span className="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded-md font-black uppercase tracking-wider border border-red-100 italic">⚠️ Insalubridade</span>
+                                                    }
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="text-right mr-4">
-                                            <p className="text-xs text-slate-400 uppercase font-bold">Total Mensal</p>
-                                            <p className="text-xl font-bold text-green-700">{formatBRL(item.custoTotal)}</p>
+
+                                        <div className="text-center md:text-right md:px-8 border-x border-gray-100 flex-shrink-0">
+                                            <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-1">Custo Unitário Final</p>
+                                            <p className="text-2xl font-black text-slate-900">{formatBRL(item.custoUnitario)}</p>
                                         </div>
+
                                         <button
                                             onClick={() => setExtractItem(item)}
-                                            className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 font-bold text-sm transition-all border border-slate-200"
+                                            className="w-full md:w-auto px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-primary transition-all font-black text-xs uppercase tracking-widest shadow-lg active:scale-95"
                                         >
-                                            Ver Planilha Completa
+                                            Ver Extrato Detalhado
                                         </button>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="p-6 bg-slate-50 border-t flex justify-end gap-3 rounded-b-2xl">
+                        {/* Footer Premium */}
+                        <div className="p-6 bg-white border-t flex flex-col md:flex-row justify-between items-center gap-4 px-8">
+                            <p className="text-xs text-gray-400 font-medium">
+                                * Esta visualização reflete os valores e configurações salvos no momento da simulação.
+                            </p>
                             <button
                                 onClick={() => setViewingProposal(null)}
-                                className="px-6 py-2 bg-white border border-slate-200 text-slate-600 font-bold rounded-lg hover:bg-slate-100"
+                                className="w-full md:w-auto px-10 py-3 bg-gray-100 border border-gray-200 text-slate-600 font-black rounded-xl hover:bg-slate-200 transition-all uppercase tracking-widest text-xs"
                             >
-                                Fechar
+                                Fechar Visualização
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+
 
             {/* Use the PlanilhaCustos component from common */}
             {extractItem && <PlanilhaCustos item={extractItem} onClose={() => setExtractItem(null)} />}
