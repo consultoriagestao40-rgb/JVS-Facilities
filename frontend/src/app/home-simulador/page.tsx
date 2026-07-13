@@ -1,4 +1,3 @@
-import Hero from '@/components/home/Hero';
 import Benefits from '@/components/home/Benefits';
 import Services from '@/components/home/Services';
 import SocialProof from '@/components/home/SocialProof';
@@ -9,11 +8,43 @@ import TechFeatureSection from '@/components/home/TechFeatureSection';
 import RiskMitigationSection from '@/components/home/RiskMitigationSection';
 import ComparisonTable from '@/components/home/ComparisonTable';
 import WhatsAppFloat from '@/components/common/WhatsAppFloat';
+import { SimuladorProvider } from '@/context/SimuladorContext';
+import SimuladorContainer from '@/components/simulador/SimuladorContainer';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
-export default function Home() {
+export default function HomeSimulador() {
     return (
         <main className="flex min-h-screen flex-col">
-            <Hero />
+            {/* Hero com o Simulador no topo */}
+            <section className="relative bg-gradient-hero text-white overflow-hidden pt-16 pb-20 md:pt-24 md:pb-28">
+                <div className="absolute -top-32 -right-32 w-96 h-96 bg-jvs-gold/10 rounded-full blur-[110px] pointer-events-none"></div>
+                <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-jvs-gold/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+                <div className="container mx-auto px-4 relative z-10">
+                    <div className="text-center max-w-3xl mx-auto mb-10">
+                        <span className="text-jvs-gold font-bold tracking-wider text-sm uppercase mb-3 block">
+                            Simulador de Propostas
+                        </span>
+                        <h1 className="text-3xl md:text-4xl lg:text-5xl font-heading font-bold tracking-tight mb-4 leading-[1.1]">
+                            Monte sua proposta de facilities em{' '}
+                            <span className="text-jvs-gold">5 minutos</span>
+                        </h1>
+                        <p className="text-lg text-slate-300 leading-relaxed">
+                            Configure os serviços, postos e turnos e receba uma estimativa transparente,
+                            com governança por criticidade — do programado ao realizado.
+                        </p>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-4xl mx-auto border border-white/10">
+                        <ErrorBoundary>
+                            <SimuladorProvider>
+                                <SimuladorContainer />
+                            </SimuladorProvider>
+                        </ErrorBoundary>
+                    </div>
+                </div>
+            </section>
+
             <StatsSection />
             <PlaybookSection />
             <TechFeatureSection />

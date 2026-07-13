@@ -35,7 +35,7 @@ export default function CadastroInicial() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
                     <input
                         {...register('nome')}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-jvs-gold focus:border-transparent outline-none transition-all"
                         placeholder="Seu nome"
                     />
                     {errors.nome && <p className="text-red-500 text-sm mt-1">{errors.nome.message}</p>}
@@ -45,7 +45,7 @@ export default function CadastroInicial() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
                     <input
                         {...register('empresa')}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-jvs-gold focus:border-transparent outline-none transition-all"
                         placeholder="Nome da sua empresa"
                     />
                     {errors.empresa && <p className="text-red-500 text-sm mt-1">{errors.empresa.message}</p>}
@@ -55,7 +55,7 @@ export default function CadastroInicial() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">CNPJ</label>
                     <input
                         {...register('cnpj')}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-jvs-gold focus:border-transparent outline-none transition-all"
                         placeholder="00.000.000/0000-00"
                     />
                     {errors.cnpj && <p className="text-red-500 text-sm mt-1">{errors.cnpj.message}</p>}
@@ -66,7 +66,7 @@ export default function CadastroInicial() {
                     <input
                         {...register('email')}
                         type="email"
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-jvs-gold focus:border-transparent outline-none transition-all"
                         placeholder="voce@empresa.com.br"
                     />
                     {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
@@ -76,7 +76,7 @@ export default function CadastroInicial() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp</label>
                     <input
                         {...register('whatsapp')}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-jvs-gold focus:border-transparent outline-none transition-all"
                         placeholder="(11) 99999-9999"
                     />
                     {errors.whatsapp && <p className="text-red-500 text-sm mt-1">{errors.whatsapp.message}</p>}
@@ -86,7 +86,7 @@ export default function CadastroInicial() {
             <div className="flex justify-end pt-6">
                 <button
                     type="submit"
-                    className="bg-primary hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow transition-colors"
+                    className="bg-gradient-gold hover:scale-[1.02] text-jvs-navy font-bold py-3 px-8 rounded-lg shadow transition-all"
                 >
                     Próximo Passo &rarr;
                 </button>

@@ -8,3 +8,5 @@ coverage
 *.log
 .vercel
 .env*.local
+
+.cursor

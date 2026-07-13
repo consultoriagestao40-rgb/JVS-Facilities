@@ -138,35 +138,35 @@ Gostaria de um diagnóstico personalizado para minha operação.`;
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-jvs-navy/70 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Header */}
-                <div className="bg-slate-900 p-4 flex justify-between items-center text-white">
+                <div className="bg-gradient-hero p-4 flex justify-between items-center text-white">
                     <h3 className="font-bold text-lg flex items-center gap-2">
-                        <span className="text-green-400"><Send size={18} /></span>
+                        <span className="text-jvs-gold"><Send size={18} /></span>
                         Configurar Mensagem WhatsApp
                     </h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-slate-300 hover:text-white transition-colors">
                         <X size={20} />
                     </button>
                 </div>
 
                 {/* Body */}
                 <div className="p-6 max-h-[80vh] overflow-y-auto space-y-4">
-                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-100 mb-4">
-                        <p className="text-sm text-gray-600">
-                            Você escolheu o pacote <strong className="text-primary">{tier}</strong>.
+                    <div className="bg-jvs-bg-alt p-3 rounded-lg border border-jvs-border mb-4">
+                        <p className="text-sm text-jvs-muted">
+                            Você escolheu o pacote <strong className="text-jvs-navy">{tier}</strong>.
                             Preencha os dados abaixo para agilizar seu atendimento.
                         </p>
                     </div>
 
                     {/* Common Fields */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Segmento</label>
+                        <label className="block text-sm font-medium text-jvs-text mb-1">Segmento</label>
                         <select
                             value={formData.segmento}
                             onChange={e => setFormData({ ...formData, segmento: e.target.value })}
-                            className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none"
+                            className="w-full p-2 border border-jvs-border rounded-lg text-sm focus:ring-2 focus:ring-jvs-gold outline-none"
                         >
                             <option value="">Selecione...</option>
                             {SEGMENTOS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -174,16 +174,16 @@ Gostaria de um diagnóstico personalizado para minha operação.`;
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Serviços de Interesse</label>
+                        <label className="block text-sm font-medium text-jvs-text mb-2">Serviços de Interesse</label>
                         <div className="grid grid-cols-2 gap-2">
                             {SERVICOS_OPTIONS.map(s => (
                                 <button
                                     key={s}
                                     onClick={() => toggleService(s)}
-                                    className={`text-xs p-2 rounded border transition-colors text-left
+                                    className={`text-xs p-2 rounded-lg border transition-colors text-left
                                         ${formData.servicos.includes(s)
-                                            ? 'bg-primary text-white border-primary'
-                                            : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                            ? 'bg-jvs-navy text-white border-jvs-navy'
+                                            : 'bg-white text-jvs-muted border-jvs-border hover:bg-jvs-bg-alt'
                                         }
                                     `}
                                 >
@@ -194,26 +194,26 @@ Gostaria de um diagnóstico personalizado para minha operação.`;
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Postos / Turnos</label>
+                        <label className="block text-sm font-medium text-jvs-text mb-1">Postos / Turnos</label>
                         <input
                             type="text"
                             placeholder="Ex: 2 Porteiros 12x36, 1 Limpeza 44h"
                             value={formData.postos_turnos}
                             onChange={e => setFormData({ ...formData, postos_turnos: e.target.value })}
-                            className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none"
+                            className="w-full p-2 border border-jvs-border rounded-lg text-sm focus:ring-2 focus:ring-jvs-gold outline-none"
                         />
                     </div>
 
                     {/* Conditional Fields */}
                     {tier === "PRATA" && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Principal Dor Hoje</label>
+                            <label className="block text-sm font-medium text-jvs-text mb-1">Principal Dor Hoje</label>
                             <input
                                 type="text"
                                 placeholder="Ex: Faltas constantes, falta de supervisão..."
                                 value={formData.dor_principal}
                                 onChange={e => setFormData({ ...formData, dor_principal: e.target.value })}
-                                className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none"
+                                className="w-full p-2 border border-jvs-border rounded-lg text-sm focus:ring-2 focus:ring-jvs-gold outline-none"
                             />
                         </div>
                     )}
@@ -221,22 +221,22 @@ Gostaria de um diagnóstico personalizado para minha operação.`;
                     {tier === "OURO" && (
                         <>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Criticidade do Ambiente</label>
+                                <label className="block text-sm font-medium text-jvs-text mb-1">Criticidade do Ambiente</label>
                                 <select
                                     value={formData.criticidade}
                                     onChange={e => setFormData({ ...formData, criticidade: e.target.value })}
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none"
+                                    className="w-full p-2 border border-jvs-border rounded-lg text-sm focus:ring-2 focus:ring-jvs-gold outline-none"
                                 >
                                     <option value="">Selecione...</option>
                                     {CRITICIDADES.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Melhor Horário (Reunião)</label>
+                                <label className="block text-sm font-medium text-jvs-text mb-1">Melhor Horário (Reunião)</label>
                                 <select
                                     value={formData.janela_horario}
                                     onChange={e => setFormData({ ...formData, janela_horario: e.target.value })}
-                                    className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none"
+                                    className="w-full p-2 border border-jvs-border rounded-lg text-sm focus:ring-2 focus:ring-jvs-gold outline-none"
                                 >
                                     <option value="">Selecione...</option>
                                     {JANELAS.map(j => <option key={j} value={j}>{j}</option>)}
@@ -247,13 +247,13 @@ Gostaria de um diagnóstico personalizado para minha operação.`;
 
                     {tier === "DIAMANTE" && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Áreas Críticas / Riscos</label>
+                            <label className="block text-sm font-medium text-jvs-text mb-1">Áreas Críticas / Riscos</label>
                             <input
                                 type="text"
                                 placeholder="Ex: UTI, Centro Cirúrgico, Controle de Acesso..."
                                 value={formData.areas_criticas}
                                 onChange={e => setFormData({ ...formData, areas_criticas: e.target.value })}
-                                className="w-full p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none"
+                                className="w-full p-2 border border-jvs-border rounded-lg text-sm focus:ring-2 focus:ring-jvs-gold outline-none"
                             />
                         </div>
                     )}
@@ -261,17 +261,17 @@ Gostaria de um diagnóstico personalizado para minha operação.`;
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <div className="p-4 bg-jvs-bg-alt border-t border-jvs-border flex justify-end gap-3">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 text-gray-600 font-medium hover:text-gray-800 transition-colors"
+                        className="px-4 py-2 text-jvs-muted font-medium hover:text-jvs-text transition-colors"
                     >
                         Cancelar
                     </button>
                     <button
                         onClick={handleSend}
                         disabled={loading}
-                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg shadow-green-200 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                        className="bg-gradient-gold text-jvs-navy px-6 py-2 rounded-full font-bold shadow-lg shadow-jvs-navy/10 transition-all hover:scale-[1.02] flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
                         {loading ? <Loader2 className="animate-spin w-4 h-4" /> : <Send className="w-4 h-4" />}
                         {tier === 'BRONZE' ? 'Chamar no WhatsApp' : 'Agendar Diagnóstico'}

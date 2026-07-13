@@ -16,6 +16,20 @@ const config: Config = {
                 error: "#EF4444",
                 warning: "#F59E0B",
                 info: "#3B82F6",
+                jvs: {
+                    navy: "#0E2240",
+                    "navy-light": "#1E3A63",
+                    gold: "#C5A059",
+                    "gold-light": "#DFCE9F",
+                    "bg-alt": "#F4F7FA",
+                    text: "#1E293B",
+                    muted: "#64748B",
+                    border: "#E2E8F0",
+                },
+            },
+            backgroundImage: {
+                "gradient-hero": "linear-gradient(135deg, #0E2240 0%, #1A365D 100%)",
+                "gradient-gold": "linear-gradient(90deg, #C5A059 0%, #E5C483 100%)",
             },
             fontFamily: {
                 sans: ['var(--font-inter)'],

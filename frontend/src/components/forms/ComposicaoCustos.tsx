@@ -77,7 +77,7 @@ export default function ComposicaoCustos() {
                             <input
                                 type="checkbox"
                                 {...register('necessitaMateriais')}
-                                className="w-5 h-5 text-primary rounded focus:ring-primary"
+                                className="w-5 h-5 text-jvs-navy rounded focus:ring-jvs-gold"
                             />
                             <span className="text-gray-700 font-medium">Incluir fornecimento de materiais</span>
                         </label>
@@ -90,7 +90,7 @@ export default function ComposicaoCustos() {
                                 <input
                                     type="number"
                                     {...register('valorMateriais', { min: 0 })}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-jvs-gold focus:border-transparent outline-none"
                                     placeholder="Ex: 500,00"
                                 />
                             </div>
@@ -114,7 +114,7 @@ export default function ComposicaoCustos() {
                                 <input
                                     type="checkbox"
                                     {...register('insalubridade')}
-                                    className="w-5 h-5 text-primary rounded focus:ring-primary"
+                                    className="w-5 h-5 text-jvs-navy rounded focus:ring-jvs-gold"
                                 />
                                 <div className="flex flex-col">
                                     <span className="text-gray-700 font-medium">Adicional de Insalubridade</span>
@@ -129,7 +129,7 @@ export default function ComposicaoCustos() {
                                                 type="radio"
                                                 value="0.20"
                                                 {...register('grauInsalubridade')}
-                                                className="text-primary focus:ring-primary"
+                                                className="text-jvs-navy focus:ring-jvs-gold"
                                             />
                                             <span className="text-sm text-gray-600">Grau Médio (20%)</span>
                                         </label>
@@ -138,7 +138,7 @@ export default function ComposicaoCustos() {
                                                 type="radio"
                                                 value="0.40"
                                                 {...register('grauInsalubridade')}
-                                                className="text-primary focus:ring-primary"
+                                                className="text-jvs-navy focus:ring-jvs-gold"
                                             />
                                             <span className="text-sm text-gray-600">Grau Máximo (40%)</span>
                                         </label>
@@ -154,7 +154,7 @@ export default function ComposicaoCustos() {
                             <input
                                 type="checkbox"
                                 {...register('periculosidade')}
-                                className="w-5 h-5 text-primary rounded focus:ring-primary"
+                                className="w-5 h-5 text-jvs-navy rounded focus:ring-jvs-gold"
                             />
                             <div className="flex flex-col">
                                 <span className="text-gray-700 font-medium">Adicional de Periculosidade</span>
@@ -165,7 +165,7 @@ export default function ComposicaoCustos() {
                             <input
                                 type="checkbox"
                                 {...register('copa')}
-                                className="w-5 h-5 text-primary rounded focus:ring-primary"
+                                className="w-5 h-5 text-jvs-navy rounded focus:ring-jvs-gold"
                             />
                             <div className="flex flex-col">
                                 <span className="text-gray-700 font-medium">Adicional de Copa</span>
@@ -198,7 +198,7 @@ export default function ComposicaoCustos() {
 
                 <button
                     type="submit"
-                    className="flex items-center gap-2 px-8 py-3 bg-primary hover:bg-green-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                    className="flex items-center gap-2 px-8 py-3 bg-gradient-gold hover:scale-[1.02] text-jvs-navy font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
                 >
                     Ver Proposta Final
                     <ArrowRight className="w-5 h-5" />

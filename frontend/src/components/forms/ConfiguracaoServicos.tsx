@@ -162,13 +162,13 @@ export default function ConfiguracaoServicos() {
                     return (
                         <div key={serviceType} className="space-y-4">
                             <div className="flex justify-between items-center border-b pb-2">
-                                <h3 className="font-bold text-xl text-primary flex items-center gap-2">
+                                <h3 className="font-bold text-xl text-jvs-navy flex items-center gap-2">
                                     {/* Icon could go here */}
                                     {serviceType}
                                 </h3>
                                 <button
                                     onClick={() => handleAdd(serviceType)}
-                                    className="text-sm bg-green-50 text-green-700 px-3 py-1 rounded-full hover:bg-green-100 font-medium transition-colors flex items-center gap-1"
+                                    className="text-sm bg-jvs-gold/10 text-jvs-navy px-3 py-1 rounded-full hover:bg-jvs-gold/20 font-medium transition-colors flex items-center gap-1"
                                 >
                                     + Adicionar Outro Profissional
                                 </button>
@@ -221,7 +221,7 @@ export default function ConfiguracaoServicos() {
                                                             handleUpdate(config.id, 'estado', e.target.value);
                                                             handleUpdate(config.id, 'cargo', ''); // Reset cargo
                                                         }}
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-jvs-gold outline-none text-gray-900 bg-white"
                                                     >
                                                         <option value="">Selecione...</option>
                                                         {uniqueUfs.map(uf => (
@@ -240,7 +240,7 @@ export default function ConfiguracaoServicos() {
                                                         value={config.cidade || ''}
                                                         onChange={(e) => handleUpdate(config.id, 'cidade', e.target.value)}
                                                         placeholder="Ex: Curitiba"
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-jvs-gold outline-none text-gray-900 bg-white"
                                                     />
                                                 </div>
 
@@ -253,7 +253,7 @@ export default function ConfiguracaoServicos() {
                                                         value={selectedCargo}
                                                         onChange={(e) => handleUpdate(config.id, 'cargo', e.target.value)}
                                                         disabled={!selectedUF}
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none disabled:bg-gray-100 disabled:text-gray-400 text-gray-900 bg-white"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-jvs-gold outline-none disabled:bg-gray-100 disabled:text-gray-400 text-gray-900 bg-white"
                                                     >
                                                         <option value="">{selectedUF ? 'Selecione o Cargo...' : 'Selecione o Estado primeiro'}</option>
                                                         {availableRoles.map(role => (
@@ -278,7 +278,7 @@ export default function ConfiguracaoServicos() {
                                                                 className={clsx(
                                                                     "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                                                                     isSelected
-                                                                        ? "bg-primary text-white shadow-sm"
+                                                                        ? "bg-jvs-navy text-white shadow-sm"
                                                                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                                                                 )}
                                                             >
@@ -299,7 +299,7 @@ export default function ConfiguracaoServicos() {
                                                         type="time"
                                                         value={config.horarioEntrada}
                                                         onChange={(e) => handleUpdate(config.id, 'horarioEntrada', e.target.value)}
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-jvs-gold outline-none text-gray-900 bg-white"
                                                     />
                                                 </div>
                                                 <div>
@@ -310,7 +310,7 @@ export default function ConfiguracaoServicos() {
                                                         type="time"
                                                         value={config.horarioSaida}
                                                         onChange={(e) => handleUpdate(config.id, 'horarioSaida', e.target.value)}
-                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
+                                                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-jvs-gold outline-none text-gray-900 bg-white"
                                                     />
                                                 </div>
                                             </div>
@@ -325,7 +325,7 @@ export default function ConfiguracaoServicos() {
                                                     min="1"
                                                     value={config.quantidade}
                                                     onChange={(e) => handleUpdate(config.id, 'quantidade', parseInt(e.target.value) || 1)}
-                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
+                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-jvs-gold outline-none text-gray-900 bg-white"
                                                 />
                                             </div>
 
@@ -341,7 +341,7 @@ export default function ConfiguracaoServicos() {
                                                     placeholder="0,00"
                                                     value={config.materiais || ''}
                                                     onChange={(e) => handleUpdate(config.id, 'materiais', parseFloat(e.target.value) || 0)}
-                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
+                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-jvs-gold outline-none text-gray-900 bg-white"
                                                 />
                                             </div>
 
@@ -357,7 +357,7 @@ export default function ConfiguracaoServicos() {
                                                     placeholder="0,00"
                                                     value={config.adicionalCopa || ''}
                                                     onChange={(e) => handleUpdate(config.id, 'adicionalCopa', parseFloat(e.target.value) || 0)}
-                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary outline-none text-gray-900 bg-white"
+                                                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-jvs-gold outline-none text-gray-900 bg-white"
                                                 />
                                             </div>
 
@@ -367,7 +367,7 @@ export default function ConfiguracaoServicos() {
                                                     id={`intrajornada-${config.id}`}
                                                     checked={!!config.intrajornada}
                                                     onChange={(e) => handleUpdate(config.id, 'intrajornada', e.target.checked)}
-                                                    className="w-5 h-5 text-primary rounded focus:ring-primary border-gray-300"
+                                                    className="w-5 h-5 text-jvs-navy rounded focus:ring-jvs-gold border-gray-300"
                                                 />
                                                 <label htmlFor={`intrajornada-${config.id}`} className="text-sm text-gray-700 cursor-pointer select-none">
                                                     <strong>Indenizar Intrajornada</strong> (Pagar 1h Extra/dia por supressão de intervalo)
@@ -391,7 +391,7 @@ export default function ConfiguracaoServicos() {
                 </button>
                 <button
                     onClick={handleNext}
-                    className="bg-primary hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-green-200 transition-all hover:-translate-y-0.5"
+                    className="bg-gradient-gold text-jvs-navy font-bold py-3 px-8 rounded-lg shadow-lg shadow-jvs-gold/20 transition-all hover:-translate-y-0.5 hover:scale-[1.02]"
                 >
                     Calcular Custos &rarr;
                 </button>

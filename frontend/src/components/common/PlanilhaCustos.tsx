@@ -10,7 +10,7 @@ const formatCurrency = (val: number) =>
     new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 
 const SectionHeader = ({ title, total }: { title: string, total: number }) => (
-    <tr className="bg-green-800 text-white font-bold text-sm">
+    <tr className="bg-jvs-navy-light text-white font-bold text-sm">
         <td colSpan={3} className="px-4 py-2 uppercase tracking-wide">{title}</td>
         <td className="px-4 py-2 text-right">{formatCurrency(total)}</td>
     </tr>
@@ -76,7 +76,7 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                 <div className="p-6 space-y-6 bg-white">
                     <table className="w-full border-collapse">
                         <thead>
-                            <tr className="bg-green-900 text-white text-xs uppercase">
+                            <tr className="bg-jvs-navy text-white text-xs uppercase">
                                 <th className="px-4 py-2 text-left" colSpan={2}>Discriminação</th>
                                 <th className="px-4 py-2 text-center w-24">% ref.</th>
                                 <th className="px-4 py-2 text-right w-32">Valor (R$)</th>
@@ -135,14 +135,14 @@ export default function PlanilhaCustos({ item, onClose }: PlanilhaCustosProps) {
                             <LineItem name="1) Margem de Lucro Estimada" value={d.lucro} />
 
                             {/* TRIBUTOS */}
-                            <tr className="bg-green-800 text-white font-bold text-sm mt-4 border-t-4 border-white">
+                            <tr className="bg-jvs-navy-light text-white font-bold text-sm mt-4 border-t-4 border-white">
                                 <td colSpan={3} className="px-4 py-2 uppercase tracking-wide">Impostos Indiretos (PIS/COFINS/ISS)</td>
                                 <td className="px-4 py-2 text-right">{formatCurrency(impostos)}</td>
                             </tr>
                             <LineItem name="Tributos sobre Faturamento" value={impostos} />
 
                             {/* FINAL */}
-                            <tr className="bg-black text-white font-bold text-lg">
+                            <tr className="bg-jvs-gold text-jvs-navy font-bold text-lg">
                                 <td colSpan={3} className="px-4 py-4 text-right uppercase">Preço Total Unitário</td>
                                 <td className="px-4 py-4 text-right header-currency">{formatCurrency(totalGeral)}</td>
                             </tr>

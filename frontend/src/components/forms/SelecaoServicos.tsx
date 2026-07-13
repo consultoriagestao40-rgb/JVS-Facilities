@@ -39,14 +39,14 @@ export default function SelecaoServicos() {
                             className={clsx(
                                 "cursor-pointer rounded-xl border-2 p-6 flex flex-col items-center justify-center gap-4 transition-all duration-200 hover:shadow-md",
                                 selected
-                                    ? "border-primary bg-green-50 text-primary"
-                                    : "border-gray-200 bg-white text-gray-600 hover:border-green-200"
+                                    ? "border-jvs-gold bg-jvs-gold/10 text-jvs-navy"
+                                    : "border-gray-200 bg-white text-gray-600 hover:border-jvs-gold/30"
                             )}
                         >
                             <Icon size={40} strokeWidth={1.5} />
                             <span className="font-medium text-center">{service.label}</span>
                             {selected && (
-                                <div className="absolute top-2 right-2 text-primary">
+                                <div className="absolute top-2 right-2 text-jvs-gold">
                                     {/* Checkmark icon could go here */}
                                 </div>
                             )}
@@ -66,9 +66,9 @@ export default function SelecaoServicos() {
                     onClick={nextStep}
                     disabled={!canProceed}
                     className={clsx(
-                        "font-bold py-3 px-8 rounded-lg shadow transition-colors",
+                        "font-bold py-3 px-8 rounded-lg shadow transition-all",
                         canProceed
-                            ? "bg-primary hover:bg-green-600 text-white"
+                            ? "bg-gradient-gold hover:scale-[1.02] text-jvs-navy"
                             : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     )}
                 >

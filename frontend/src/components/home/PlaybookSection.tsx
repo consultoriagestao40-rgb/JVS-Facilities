@@ -1,9 +1,12 @@
-import { CheckCircle2, ClipboardList, Clock, ShieldCheck, HardHat, FileText } from 'lucide-react';
+"use client";
+
+import { motion } from 'framer-motion';
+import { ClipboardList, Clock, ShieldCheck, HardHat, FileText } from 'lucide-react';
 
 const PlaybookSection = () => {
     const cards = [
         {
-            icon: <Clock className="w-8 h-8 text-primary" />,
+            icon: Clock,
             title: "PIC: Implantação Premium em 30 dias",
             bullets: [
                 "Kickoff executivo e alinhamento de expectativas",
@@ -12,7 +15,7 @@ const PlaybookSection = () => {
             ]
         },
         {
-            icon: <ClipboardList className="w-8 h-8 text-primary" />,
+            icon: ClipboardList,
             title: "Checklists digitais (programado x realizado)",
             bullets: [
                 "Rotinas por área, turno e criticidade",
@@ -21,7 +24,7 @@ const PlaybookSection = () => {
             ]
         },
         {
-            icon: <FileText className="w-8 h-8 text-primary" />,
+            icon: FileText,
             title: "SLA + relatório mensal automático",
             bullets: [
                 "KPIs de qualidade, pessoas e atendimento",
@@ -30,7 +33,7 @@ const PlaybookSection = () => {
             ]
         },
         {
-            icon: <Clock className="w-8 h-8 text-primary" />, // Or another icon for attendance?
+            icon: Clock,
             title: "Ponto online + cobertura preditiva de faltas",
             bullets: [
                 "Controle de presença e escalas em tempo real",
@@ -39,7 +42,7 @@ const PlaybookSection = () => {
             ]
         },
         {
-            icon: <HardHat className="w-8 h-8 text-primary" />,
+            icon: HardHat,
             title: "Uniformes, EPIs e compliance",
             bullets: [
                 "Padrão visual e postura profissional",
@@ -48,7 +51,7 @@ const PlaybookSection = () => {
             ]
         },
         {
-            icon: <ShieldCheck className="w-8 h-8 text-primary" />,
+            icon: ShieldCheck,
             title: "Governança com visitas executivas",
             bullets: [
                 "Supervisor: checklist semanal ou quinzenal",
@@ -59,65 +62,121 @@ const PlaybookSection = () => {
     ];
 
     return (
-        <section id="playbook" className="py-24 bg-gray-50">
+        <section id="playbook" className="py-24 bg-jvs-bg-alt">
             <div className="container mx-auto px-4">
                 {/* Header */}
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
-                        Como garantimos um padrão acima do mercado
-                    </h2>
-                    <p className="text-lg text-gray-600">
-                        Método operacional com gestão preditiva, rastreabilidade digital e governança executiva — do programado ao realizado.
-                    </p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-80px' }}
+                        transition={{ duration: 0.6 }}
+                        className="text-center lg:text-left max-w-2xl mx-auto lg:mx-0"
+                    >
+                        <span className="text-jvs-gold font-bold tracking-wider text-sm uppercase mb-3 block">Nosso Método</span>
+                        <h2 className="text-3xl md:text-4xl font-heading font-bold text-jvs-text mb-4 tracking-tight">
+                            Como garantimos um padrão acima do mercado
+                        </h2>
+                        <p className="text-lg text-jvs-muted leading-relaxed">
+                            Método operacional com gestão preditiva, rastreabilidade digital e governança executiva — do programado ao realizado.
+                        </p>
+                    </motion.div>
+
+                    <motion.div
+                        initial={{ opacity: 0, x: 30 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true, margin: '-80px' }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
+                        className="relative hidden lg:block"
+                    >
+                        <div className="relative rounded-2xl overflow-hidden aspect-[4/3] shadow-xl border border-jvs-border">
+                            <img
+                                src="/images/home/playbook-audit.jpg"
+                                alt="Auditoria de checklist digital em campo pela equipe JVS"
+                                className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-jvs-navy/50 via-transparent to-transparent" />
+                        </div>
+                        <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-xl border border-jvs-border flex items-center gap-3">
+                            <div className="bg-jvs-gold/10 p-2 rounded-full">
+                                <ShieldCheck className="w-6 h-6 text-jvs-gold" />
+                            </div>
+                            <div>
+                                <div className="text-xs font-bold text-jvs-muted">Conformidade média</div>
+                                <div className="text-lg font-bold text-jvs-text">≥ 85%</div>
+                            </div>
+                        </div>
+                    </motion.div>
                 </div>
 
                 {/* Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                    {cards.map((card, index) => (
-                        <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-100 flex flex-col h-full">
-                            <div className="mb-6 p-4 bg-green-50 rounded-xl w-fit">
-                                {card.icon}
-                            </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 h-14 flex items-center">
-                                {card.title}
-                            </h3>
-                            <ul className="space-y-3 flex-1">
-                                {card.bullets.map((bullet, i) => (
-                                    <li key={i} className="flex items-start gap-3 text-gray-600 text-sm">
-                                        <div className="mt-1.5 min-w-[6px] min-h-[6px] rounded-full bg-primary" />
-                                        <span>{bullet}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+                    {cards.map((card, index) => {
+                        const Icon = card.icon;
+                        return (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 24 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: '-60px' }}
+                                transition={{ duration: 0.5, delay: (index % 3) * 0.08, ease: 'easeOut' }}
+                                className="group relative bg-white p-8 rounded-2xl border border-jvs-border overflow-hidden hover:border-jvs-gold/40 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full"
+                            >
+                                <span className="pointer-events-none select-none absolute -top-3 -right-1 text-7xl font-black text-jvs-navy/[0.04] group-hover:text-jvs-gold/10 transition-colors">
+                                    0{index + 1}
+                                </span>
+                                <div className="relative z-10 flex flex-col h-full">
+                                    <div className="w-14 h-14 bg-jvs-navy/5 rounded-xl flex items-center justify-center mb-6 group-hover:bg-jvs-navy transition-colors">
+                                        <Icon className="w-6 h-6 text-jvs-navy group-hover:text-jvs-gold transition-colors" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-jvs-text mb-4 leading-snug">
+                                        {card.title}
+                                    </h3>
+                                    <ul className="space-y-3 flex-1">
+                                        {card.bullets.map((bullet, i) => (
+                                            <li key={i} className="flex items-start gap-3 text-jvs-muted text-sm leading-relaxed">
+                                                <div className="mt-1.5 min-w-[6px] min-h-[6px] rounded-full bg-jvs-gold shrink-0" />
+                                                <span>{bullet}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </motion.div>
+                        );
+                    })}
                 </div>
 
                 {/* Microprova */}
-                <div className="text-center mb-16">
-                    <p className="text-xl md:text-2xl font-medium text-gray-800 italic">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    className="text-center mb-14"
+                >
+                    <p className="text-xl md:text-2xl font-medium text-jvs-text italic max-w-3xl mx-auto leading-relaxed">
                         "Facilities premium não é promessa: é método, governança e evidência de execução."
                     </p>
-                </div>
+                </motion.div>
 
                 {/* CTA */}
                 <div className="flex flex-col md:flex-row items-center justify-center gap-4">
                     <a
                         href="/simulador"
-                        className="w-full md:w-auto bg-primary hover:bg-green-700 text-white font-bold text-lg px-8 py-4 rounded-xl shadow-lg shadow-green-200 transition-all hover:-translate-y-1 text-center"
+                        className="w-full md:w-auto bg-gradient-gold text-jvs-navy font-bold text-lg px-8 py-4 rounded-full shadow-xl shadow-jvs-navy/10 transition-all hover:scale-[1.02] text-center"
                     >
                         Simular minha operação agora
                     </a>
                     <a
-                        href="https://wa.me/5541992252968" // Number updated
+                        href="https://wa.me/5541992252968"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full md:w-auto bg-white hover:bg-gray-50 text-gray-700 font-bold text-lg px-8 py-4 rounded-xl border border-gray-200 transition-colors flex items-center justify-center gap-2"
+                        className="w-full md:w-auto bg-white hover:bg-jvs-bg-alt text-jvs-text font-bold text-lg px-8 py-4 rounded-full border border-jvs-border transition-colors flex items-center justify-center gap-2"
                     >
                         <span>Falar com um especialista</span>
                     </a>
                 </div>
-                <p className="text-center text-sm text-gray-500 mt-4">
+                <p className="text-center text-sm text-jvs-muted mt-4">
                     Atendemos Curitiba e Região Metropolitana.
                 </p>
             </div>

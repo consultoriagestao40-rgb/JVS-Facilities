@@ -42,7 +42,7 @@ export default function ResumoProposta() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+                <Loader2 className="w-12 h-12 text-jvs-navy animate-spin mb-4" />
                 <p className="text-gray-600 font-medium">Calculando melhor proposta...</p>
             </div>
         );
@@ -65,8 +65,8 @@ export default function ResumoProposta() {
         <div className="space-y-8 animate-fade-in">
             <div className="text-center relative">
 
-                <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-1 rounded-full text-sm font-bold mb-4">
-                    <CheckCircle className="w-4 h-4" />
+                <div className="inline-flex items-center gap-2 bg-jvs-gold/10 text-jvs-navy border border-jvs-gold/30 px-4 py-1 rounded-full text-sm font-bold mb-4">
+                    <CheckCircle className="w-4 h-4 text-jvs-gold" />
                     Proposta Gerada com Sucesso
                 </div>
                 <h2 className="text-3xl font-heading font-bold text-gray-900">
@@ -80,17 +80,17 @@ export default function ResumoProposta() {
                 <motion.div
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="bg-slate-900 text-white p-8 rounded-2xl shadow-xl flex flex-col justify-between relative overflow-hidden"
+                    className="bg-gradient-hero text-white p-8 rounded-2xl shadow-xl flex flex-col justify-between relative overflow-hidden"
                 >
-                    <div className="absolute top-0 right-0 p-32 bg-primary/20 blur-[80px] rounded-full pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 p-32 bg-jvs-gold/20 blur-[80px] rounded-full pointer-events-none"></div>
                     <div>
-                        <p className="text-gray-400 text-sm uppercase tracking-wider font-bold">Investimento Mensal</p>
-                        <h3 className="text-4xl md:text-5xl font-bold mt-2 text-primary">
+                        <p className="text-slate-300 text-sm uppercase tracking-wider font-bold">Investimento Mensal</p>
+                        <h3 className="text-4xl md:text-5xl font-bold mt-2 text-jvs-gold">
                             {formatBRL(resultado.resumo.custoMensalTotal)}
                         </h3>
                     </div>
-                    <div className="mt-8 pt-6 border-t border-slate-700">
-                        <div className="flex justify-between text-sm text-gray-400">
+                    <div className="mt-8 pt-6 border-t border-white/10">
+                        <div className="flex justify-between text-sm text-slate-300">
                             <span>Investimento Anual</span>
                             <span className="text-white font-bold">{formatBRL(resultado.resumo.custoAnualTotal)}</span>
                         </div>
@@ -156,20 +156,20 @@ export default function ResumoProposta() {
             <div className="flex flex-col md:flex-row gap-4 justify-center pt-8">
                 <button
                     onClick={() => novoCalculo()}
-                    className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-slate-600 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-jvs-muted font-bold rounded-xl border border-jvs-border hover:bg-jvs-bg-alt hover:border-jvs-navy/20 transition-colors"
                 >
                     Nova Simulação
                 </button>
 
                 <button
                     onClick={() => goToStep(3)}
-                    className="flex items-center justify-center gap-2 px-8 py-4 bg-blue-50 text-blue-700 font-bold rounded-xl border border-blue-200 hover:bg-blue-100 transition-colors"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-jvs-navy/5 text-jvs-navy font-bold rounded-xl border border-jvs-navy/10 hover:bg-jvs-navy/10 transition-colors"
                 >
                     Editar Simulação
                 </button>
                 <button
                     onClick={() => resultado && generatePropostaPDF(resultado, state.userData)}
-                    className="flex items-center justify-center gap-2 px-8 py-4 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700 transition-colors"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-jvs-navy text-white font-bold rounded-xl hover:bg-jvs-navy-light transition-colors"
                 >
                     <Download className="w-5 h-5" />
                     Baixar Proposta em PDF
@@ -178,7 +178,7 @@ export default function ResumoProposta() {
                     href={`https://wa.me/5541992252968?text=${encodeURIComponent(`Olá, gostaria de avançar com a Proposta Comercial ID: ${resultado.id}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-green-600 hover:shadow-xl hover:-translate-y-1 transition-all"
+                    className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-gold text-jvs-navy font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all"
                 >
                     QUERO CONTRATAR
                     <ArrowRight className="w-5 h-5" />

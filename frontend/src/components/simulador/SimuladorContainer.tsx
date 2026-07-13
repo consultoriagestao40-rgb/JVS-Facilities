@@ -30,20 +30,20 @@ export default function SimuladorContainer() {
     return (
         <div className="w-full">
             {/* Progress Bar */}
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+            <div className="w-full bg-jvs-border rounded-full h-2.5 mb-8">
                 <div
-                    className="bg-primary h-2.5 rounded-full transition-all duration-500 ease-out"
+                    className="bg-jvs-gold h-2.5 rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${(state.step / 5) * 100}%` }}
                 ></div>
             </div>
 
             {/* Step Indicator */}
             <div className="flex justify-between mb-8 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                <span className={state.step >= 1 ? "text-primary" : ""}>1. Dados</span>
-                <span className={state.step >= 2 ? "text-primary" : ""}>2. Serviços</span>
-                <span className={state.step >= 3 ? "text-primary" : ""}>3. Configuração</span>
-                <span className={state.step >= 4 ? "text-primary" : ""}>4. Custos</span>
-                <span className={state.step >= 5 ? "text-primary" : ""}>5. Proposta</span>
+                <span className={state.step >= 1 ? "text-jvs-navy font-bold" : ""}>1. Dados</span>
+                <span className={state.step >= 2 ? "text-jvs-navy font-bold" : ""}>2. Serviços</span>
+                <span className={state.step >= 3 ? "text-jvs-navy font-bold" : ""}>3. Configuração</span>
+                <span className={state.step >= 4 ? "text-jvs-navy font-bold" : ""}>4. Custos</span>
+                <span className={state.step >= 5 ? "text-jvs-navy font-bold" : ""}>5. Proposta</span>
             </div>
 
             {renderStep()}
