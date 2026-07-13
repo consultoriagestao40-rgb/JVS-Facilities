@@ -139,3 +139,7 @@ Registrar aqui cada tarefa concluída: data, tarefa, o que mudou e arquivos afet
   - **ComparisonTable** (`ComparisonTable.tsx`): tabela comparativa estilo SaaS pricing (Mercado Tradicional vs. Padrão JVS) com 4 critérios (Gestão de Faltas, Cobertura Operacional, Auditoria, Passivo Trabalhista). Coluna "Padrão JVS" destacada em navy com badge "Recomendado" e checks dourados; coluna "Mercado" com X vermelho. **Responsiva**: grid de 3 colunas no desktop e cards empilhados no mobile (`md:hidden` / `hidden md:grid`). CTA "Quero o padrão JVS" ao final.
   - Ordem final das seções (idêntica nas duas páginas, com ritmo de fundos alternados): Hero/Simulador → **Stats (dark)** → Playbook (alt) → **TechFeature (dark)** → Governance (white) → **RiskMitigation (alt)** → Benefits (white) → Services (alt) → **ComparisonTable (white)** → SocialProof (dark) → CTA (alt).
   - Validado no navegador em ambas as rotas: contadores animando, mockups da seção de tecnologia, grid de compliance (opacidade confirmada via DOM) e tabela comparativa com colunas Mercado/JVS. Nenhum erro de lint introduzido.
+
+- **2026-07-13 — Instalação do Google Tag Manager (GTM-N2CQJ98Z)**
+  - Snippet GTM adicionado no layout raiz conforme instrução oficial: script no `<head>` (via `next/script`, `afterInteractive`) e `<noscript>` iframe imediatamente após a abertura do `<body>`. Container ID: `GTM-N2CQJ98Z`.
+  - Mantidos os scripts já existentes de Google Ads (`AW-10778063853`) e Meta Pixel — o GTM passa a coexistir com eles. Arquivo: `frontend/src/app/layout.tsx`.
