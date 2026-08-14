@@ -148,6 +148,6 @@ Registrar aqui cada tarefa concluída: data, tarefa, o que mudou e arquivos afet
   - Páginas originais `/` e `/altura` **intocadas**. Cópias de validação: `/home-v2` e `/altura-v2`.
   - **Home v2**: estrutura enxuta (“carteirada”) — Hero B2B → Clientes (vitrine) → Segmentos (indústria/hospital/varejo) → Stats → 4 pilares de serviço → Benefits → Comparativo → CTA. Removidos da primeira dobra: Playbook, TechFeature, Governance, RiskMitigation.
   - **Altura v2**: badge “Especialistas em acesso por corda” (no lugar de NR-35); clientes subidos; faixa de segmentos; diferenciais reforçando homologação/documentação; portfólio e CTA mantidos.
-  - **Selo 32 anos**: slot pronto (`BrandSeal`), mas **não** usa o arquivo enviado (era “25 Anos”). Aguardando arte correta de 32 anos.
+  - **Selo 32 anos**: arte correta (branco + cor) em `public/images/brand/selo-32-anos-*.png`. Fundo preto original removido (PNG transparente). `BrandSeal` ativo no hero de `/home-v2` e `/altura-v2`, e no **Footer global** (todas as páginas: `/`, `/altura`, `/simulador`, v2, etc.).
   - **Logos**: pastas `public/logos/home/` e `public/logos/altura/` + arrays em `src/data/clientLogosHome.ts` e `clientLogosAltura.ts` (vazios = placeholder na UI).
   - Componentes novos em `frontend/src/components/v2/`.

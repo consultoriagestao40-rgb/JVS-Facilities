@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import BrandSeal from '@/components/v2/BrandSeal';
 
 export default function Footer() {
     return (
@@ -17,6 +18,9 @@ export default function Footer() {
                                 alt="JVS Facilities"
                                 className="h-10 w-auto"
                             />
+                        </div>
+                        <div className="mb-6">
+                            <BrandSeal variant="white" className="h-12 md:h-14" />
                         </div>
                         <p className="text-lg text-white font-semibold leading-relaxed mb-6">
                             Soluções inteligentes em terceirização de serviços e facilities.
