@@ -143,3 +143,11 @@ Registrar aqui cada tarefa concluída: data, tarefa, o que mudou e arquivos afet
 - **2026-07-13 — Instalação do Google Tag Manager (GTM-N2CQJ98Z)**
   - Snippet GTM adicionado no layout raiz conforme instrução oficial: script no `<head>` (via `next/script`, `afterInteractive`) e `<noscript>` iframe imediatamente após a abertura do `<body>`. Container ID: `GTM-N2CQJ98Z`.
   - Mantidos os scripts já existentes de Google Ads (`AW-10778063853`) e Meta Pixel — o GTM passa a coexistir com eles. Arquivo: `frontend/src/app/layout.tsx`.
+
+- **2026-08-14 — Cópias v2 das LPs (Home + Altura) conforme reunião 04/08**
+  - Páginas originais `/` e `/altura` **intocadas**. Cópias de validação: `/home-v2` e `/altura-v2`.
+  - **Home v2**: estrutura enxuta (“carteirada”) — Hero B2B → Clientes (vitrine) → Segmentos (indústria/hospital/varejo) → Stats → 4 pilares de serviço → Benefits → Comparativo → CTA. Removidos da primeira dobra: Playbook, TechFeature, Governance, RiskMitigation.
+  - **Altura v2**: badge “Especialistas em acesso por corda” (no lugar de NR-35); clientes subidos; faixa de segmentos; diferenciais reforçando homologação/documentação; portfólio e CTA mantidos.
+  - **Selo 32 anos**: slot pronto (`BrandSeal`), mas **não** usa o arquivo enviado (era “25 Anos”). Aguardando arte correta de 32 anos.
+  - **Logos**: pastas `public/logos/home/` e `public/logos/altura/` + arrays em `src/data/clientLogosHome.ts` e `clientLogosAltura.ts` (vazios = placeholder na UI).
+  - Componentes novos em `frontend/src/components/v2/`.
