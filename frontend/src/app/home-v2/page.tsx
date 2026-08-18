@@ -2,7 +2,7 @@ import HeroV2 from "@/components/v2/HeroV2";
 import ClientsShowcase from "@/components/v2/ClientsShowcase";
 import SegmentsB2B from "@/components/v2/SegmentsB2B";
 import ServicesFourPillars from "@/components/v2/ServicesFourPillars";
-import Benefits from "@/components/home/Benefits";
+import BenefitsV2 from "@/components/v2/BenefitsV2";
 import ComparisonTable from "@/components/home/ComparisonTable";
 import StatsSection from "@/components/home/StatsSection";
 import WhatsAppFloat from "@/components/common/WhatsAppFloat";
@@ -29,7 +29,7 @@ export default function HomeV2() {
             <SegmentsB2B />
             <StatsSection />
             <ServicesFourPillars />
-            <Benefits />
+            <BenefitsV2 />
             <ComparisonTable />
 
             <section className="py-20 md:py-28 bg-jvs-bg-alt">

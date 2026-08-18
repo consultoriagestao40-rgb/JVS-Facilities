@@ -13,14 +13,7 @@ export default function Footer() {
                     {/* Brand & Resume */}
                     <div className="col-span-1 md:col-span-1">
                         <div className="mb-6">
-                            <img
-                                src="https://grupojvsserv.com.br/wp-content/uploads/2023/11/logo-branco-200px.png"
-                                alt="JVS Facilities"
-                                className="h-10 w-auto"
-                            />
-                        </div>
-                        <div className="mb-6">
-                            <BrandSeal variant="white" className="h-12 md:h-14" />
+                            <BrandSeal variant="white" className="h-12 md:h-14 drop-shadow-none" />
                         </div>
                         <p className="text-lg text-white font-semibold leading-relaxed mb-6">
                             Soluções inteligentes em terceirização de serviços e facilities.

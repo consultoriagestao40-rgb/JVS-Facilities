@@ -50,7 +50,7 @@ export default function AlturaV2Page() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, ease: "easeOut" }}
                     >
-                        <div className="mb-6 flex justify-center">
+                        <div className="mb-8 flex justify-center">
                             <BrandSeal variant="white" />
                         </div>
 
@@ -68,7 +68,7 @@ export default function AlturaV2Page() {
                             homologação em grandes clientes.
                         </p>
                         <a
-                            href="https://wa.me/5541991443657"
+                            href="https://wa.me/5541992252968"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 bg-gradient-gold text-jvs-navy px-9 py-4 rounded-full font-bold text-lg hover:scale-[1.03] transition-all shadow-xl shadow-jvs-navy/40"
@@ -132,6 +132,35 @@ export default function AlturaV2Page() {
                 />
             </div>
 
+            {/* Portfólio — subido para evidenciar fotos reais */}
+            <section className="py-16 md:py-24 bg-jvs-bg-alt">
+                <div className="container mx-auto px-4">
+                    <motion.div {...fadeUp} className="text-center mb-14">
+                        <span className="text-jvs-gold font-bold tracking-wider uppercase text-sm mb-3 flex items-center justify-center gap-1.5">
+                            Portfólio
+                            <ArrowUpRight className="w-4 h-4" />
+                        </span>
+                        <h2 className="text-3xl md:text-4xl font-bold text-jvs-navy tracking-tight">
+                            Nossos Trabalhos
+                        </h2>
+                        <div className="w-16 h-1 bg-jvs-gold mx-auto mt-5 rounded-full" />
+                    </motion.div>
+
+                    <PortfolioCarousel
+                        images={[
+                            "/images/portfolio/trabalho-1.jpg",
+                            "/images/portfolio/trabalho-2.jpg",
+                            "/images/portfolio/trabalho-3.jpg",
+                            "/images/portfolio/trabalho-4.jpg",
+                            "/images/portfolio/trabalho-5.jpg",
+                            "/images/portfolio/trabalho-6.jpg",
+                            "/images/portfolio/trabalho-7.jpg",
+                            "/images/portfolio/trabalho-8.jpg",
+                        ]}
+                    />
+                </div>
+            </section>
+
             <SegmentsAltura />
 
             {/* Soluções */}
@@ -155,28 +184,28 @@ export default function AlturaV2Page() {
                                 icon: Shield,
                                 title: "Limpeza de Fachadas",
                                 desc: "Limpeza profissional com técnicas de acesso por corda. Utilizamos produtos que preservam a integridade dos materiais.",
-                                image: "/images/altura/solucao-limpeza-fachadas.jpg",
+                                image: "/images/portfolio/trabalho-1.jpg",
                             },
                             {
                                 n: "02",
                                 icon: FileCheck,
                                 title: "Lavação de Vidros",
                                 desc: "Resultado cristalino garantido em fachadas de vidro e áreas de difícil acesso com sistemas de segurança rigorosos.",
-                                image: "/images/altura/solucao-lavacao-vidros.jpg",
+                                image: "/images/portfolio/trabalho-3.jpg",
                             },
                             {
                                 n: "03",
                                 icon: Shield,
                                 title: "Acesso por Corda",
                                 desc: "Técnica especializada com duplo talabarte. Ideal para estruturas de alto risco e áreas de acesso limitado.",
-                                image: "/images/altura/solucao-acesso-corda.jpg",
+                                image: "/images/portfolio/trabalho-2.jpg",
                             },
                             {
                                 n: "04",
                                 icon: Clock,
                                 title: "Parada de Fábrica",
                                 desc: "Limpeza profunda durante paradas industriais. Equipe treinada para ambientes complexos e confinados.",
-                                image: "/images/altura/solucao-parada-fabrica.jpg",
+                                image: "/images/portfolio/trabalho-7.jpg",
                             },
                         ].map((item, i) => {
                             const Icon = item.icon;
@@ -290,7 +319,7 @@ export default function AlturaV2Page() {
                                                 Cobertura completa contra acidentes e danos durante toda a operação.
                                             </p>
                                             <a
-                                                href="https://wa.me/5541991443657"
+                                                href="https://wa.me/5541992252968"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center gap-1.5 text-jvs-gold text-sm font-bold hover:gap-2.5 transition-all"
@@ -349,35 +378,6 @@ export default function AlturaV2Page() {
                             </a>
                         </div>
                     </motion.div>
-                </div>
-            </section>
-
-            {/* Portfólio */}
-            <section className="py-20 md:py-28 bg-white">
-                <div className="container mx-auto px-4">
-                    <motion.div {...fadeUp} className="text-center mb-14">
-                        <span className="text-jvs-gold font-bold tracking-wider uppercase text-sm mb-3 flex items-center justify-center gap-1.5">
-                            Portfólio
-                            <ArrowUpRight className="w-4 h-4" />
-                        </span>
-                        <h2 className="text-3xl md:text-4xl font-bold text-jvs-navy tracking-tight">
-                            Nossos Trabalhos
-                        </h2>
-                        <div className="w-16 h-1 bg-jvs-gold mx-auto mt-5 rounded-full" />
-                    </motion.div>
-
-                    <PortfolioCarousel
-                        images={[
-                            "/images/portfolio/trabalho-1.jpg",
-                            "/images/portfolio/trabalho-2.jpg",
-                            "/images/portfolio/trabalho-3.jpg",
-                            "/images/portfolio/trabalho-4.jpg",
-                            "/images/portfolio/trabalho-5.jpg",
-                            "/images/portfolio/trabalho-6.jpg",
-                            "/images/portfolio/trabalho-7.jpg",
-                            "/images/portfolio/trabalho-8.jpg",
-                        ]}
-                    />
                 </div>
             </section>
 

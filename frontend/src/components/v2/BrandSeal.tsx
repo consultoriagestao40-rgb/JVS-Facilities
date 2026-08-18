@@ -21,7 +21,7 @@ export default function BrandSeal({ variant = "white", className = "" }: BrandSe
         <img
             src={src}
             alt="JVS Facilities — 32 anos"
-            className={twMerge("h-16 sm:h-20 md:h-24 w-auto object-contain", className)}
+            className={twMerge("h-24 sm:h-32 md:h-40 lg:h-44 w-auto object-contain drop-shadow-[0_8px_24px_rgba(0,0,0,0.35)]", className)}
         />
     );
 }

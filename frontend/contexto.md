@@ -149,5 +149,8 @@ Registrar aqui cada tarefa concluída: data, tarefa, o que mudou e arquivos afet
   - **Home v2**: estrutura enxuta (“carteirada”) — Hero B2B → Clientes (vitrine) → Segmentos (indústria/hospital/varejo) → Stats → 4 pilares de serviço → Benefits → Comparativo → CTA. Removidos da primeira dobra: Playbook, TechFeature, Governance, RiskMitigation.
   - **Altura v2**: badge “Especialistas em acesso por corda” (no lugar de NR-35); clientes subidos; faixa de segmentos; diferenciais reforçando homologação/documentação; portfólio e CTA mantidos.
   - **Selo 32 anos**: arte correta (branco + cor) em `public/images/brand/selo-32-anos-*.png`. Fundo preto original removido (PNG transparente). `BrandSeal` ativo no hero de `/home-v2` e `/altura-v2`, e no **Footer global** (todas as páginas: `/`, `/altura`, `/simulador`, v2, etc.).
+  - **WhatsApp único**: todos os CTAs `wa.me` das LPs (incluindo `/altura` e `/altura-v2`) apontam para `(41) 99225-2968` (`5541992252968`). Removido o número antigo `99144-3657`.
+  - **Benefits v2**: copy de carteirada (32 anos, B2B, 4 pilares, resposta em campo) — sem “plataforma” / “proposta em 5 min”. Só em `/home-v2` (`BenefitsV2.tsx`); Home original intacta.
+  - **Feedback cliente (18/08)**: selo 32 anos maior no hero de `/home-v2` e `/altura-v2`; `/altura-v2` usa fotos reais do portfólio nos cards de soluções; portfólio subido para logo após clientes. Marca d’água do hero removida (não aprovada).
   - **Logos**: pastas `public/logos/home/` e `public/logos/altura/` + arrays em `src/data/clientLogosHome.ts` e `clientLogosAltura.ts` (vazios = placeholder na UI).
   - Componentes novos em `frontend/src/components/v2/`.

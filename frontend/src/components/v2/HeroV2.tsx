@@ -21,7 +21,7 @@ export default function HeroV2() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, ease: "easeOut" }}
                     >
-                        <div className="mb-6 flex justify-center md:justify-start">
+                        <div className="mb-8 flex justify-center md:justify-start">
                             <BrandSeal variant="white" />
                         </div>
 

@@ -57,7 +57,7 @@ export default function AlturaPage() {
                             Equipe certificada com mais de 20 anos de experiência em acesso por corda.
                         </p>
                         <a
-                            href="https://wa.me/5541991443657"
+                            href="https://wa.me/5541992252968"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 bg-gradient-gold text-jvs-navy px-9 py-4 rounded-full font-bold text-lg hover:scale-[1.03] transition-all shadow-xl shadow-jvs-navy/40"
@@ -213,7 +213,7 @@ export default function AlturaPage() {
                                         <div className="sm:w-2/3">
                                             <p className="text-slate-300 text-sm leading-relaxed mb-2">Cobertura completa contra acidentes e danos durante toda a operação.</p>
                                             <a
-                                                href="https://wa.me/5541991443657"
+                                                href="https://wa.me/5541992252968"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="inline-flex items-center gap-1.5 text-jvs-gold text-sm font-bold hover:gap-2.5 transition-all"
