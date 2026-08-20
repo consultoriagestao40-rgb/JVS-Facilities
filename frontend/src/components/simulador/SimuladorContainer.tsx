@@ -1,14 +1,23 @@
 "use client";
 
+import { useEffect, useRef } from 'react';
 import { useSimulador } from '@/context/SimuladorContext';
 import CadastroInicial from '@/components/forms/CadastroInicial';
 import SelecaoServicos from '@/components/forms/SelecaoServicos';
 import ConfiguracaoServicos from '@/components/forms/ConfiguracaoServicos';
 import ComposicaoCustos from '@/components/forms/ComposicaoCustos';
 import ResumoProposta from '@/components/simulador/ResumoProposta';
+import { trackSimuladorStep } from '@/lib/gtag';
 
 export default function SimuladorContainer() {
     const { state } = useSimulador();
+    const lastTrackedStep = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (lastTrackedStep.current === state.step) return;
+        lastTrackedStep.current = state.step;
+        trackSimuladorStep(state.step);
+    }, [state.step]);
 
     const renderStep = () => {
         switch (state.step) {

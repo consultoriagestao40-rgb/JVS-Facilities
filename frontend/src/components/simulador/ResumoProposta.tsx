@@ -9,6 +9,7 @@ import { generatePropostaPDF } from '@/utils/generatePropostaPDF';
 import PlanilhaCustos from '@/components/common/PlanilhaCustos';
 import { motion } from 'framer-motion';
 import { ItemResultado } from '@/types/simulador';
+import { trackSimuladorComplete, trackSimuladorAction } from '@/lib/gtag';
 
 export default function ResumoProposta() {
     const { state, novoCalculo, goToStep } = useSimulador();
@@ -28,6 +29,10 @@ export default function ResumoProposta() {
 
                 const data = await simuladorService.calcularProposta(state);
                 setResultado(data);
+                trackSimuladorComplete({
+                    id: data.id,
+                    value: data.resumo?.custoMensalTotal,
+                });
             } catch (err) {
                 console.error(err);
                 setError("Não foi possível calcular a proposta. Tente novamente.");
@@ -168,7 +173,10 @@ export default function ResumoProposta() {
                     Editar Simulação
                 </button>
                 <button
-                    onClick={() => resultado && generatePropostaPDF(resultado, state.userData)}
+                    onClick={() => {
+                        trackSimuladorAction('pdf', resultado.id);
+                        generatePropostaPDF(resultado, state.userData);
+                    }}
                     className="flex items-center justify-center gap-2 px-8 py-4 bg-jvs-navy text-white font-bold rounded-xl hover:bg-jvs-navy-light transition-colors"
                 >
                     <Download className="w-5 h-5" />
@@ -178,6 +186,7 @@ export default function ResumoProposta() {
                     href={`https://wa.me/5541992252968?text=${encodeURIComponent(`Olá, gostaria de avançar com a Proposta Comercial ID: ${resultado.id}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackSimuladorAction('whatsapp', resultado.id)}
                     className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-gold text-jvs-navy font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 hover:scale-[1.02] transition-all"
                 >
                     QUERO CONTRATAR
